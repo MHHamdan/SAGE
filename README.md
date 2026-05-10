@@ -27,7 +27,9 @@ A comprehensive Python toolkit for building production-ready agentic AI systems.
 - **Protocol Support**: MCP (Model Context Protocol) and A2A (Agent-to-Agent) interfaces
 - **Evaluation Framework**: CNSR, long-horizon evaluation, goal drift, incident tracking
 - **Stability Monitoring**: Oscillation detection, progress monotonicity, observation fidelity
-- **Research Experiments**: Full reproducible experiment suite (CNSR multi-task, Proposition 1 violations, LLM-as-Judge bias)
+- **Adaptive Stability Controller (ASC)**: Closed-loop controller with 4 policies (NoControl, FixedSchedule, Threshold, Predictive) and 5 bounded interventions; raises long-horizon completion from 2% to 83% (E4)
+- **Failure Predictor**: Calibrated logistic regression predicting task failure k turns ahead (AUC=0.752 combined model, E5)
+- **Research Experiments**: Full reproducible experiment suite (CNSR multi-task, Proposition 1 violations, LLM-as-Judge bias, E4 closed-loop ablation, E5 predictive validation)
 - **Observability**: Built-in tracing and monitoring with LangSmith support
 
 ---
@@ -200,6 +202,14 @@ python experiments/judge_bias.py
 # Task 4 — Generate all LaTeX table fragments
 python scripts/generate_latex.py
 # → results/table_fragments.tex  (+ 6 individual .tex files)
+
+# E4 — Closed-loop Adaptive Stability Controller ablation (50 tasks × 4 conditions × 3 seeds)
+python experiments/e4_closed_loop.py --seed 42
+# → results/e4_closed_loop/summary.csv  REPORT.md  figures/  MANIFEST.json
+
+# E5 — Predictive monitor validation (300 tasks, 5-fold CV, k ∈ {3,5,10})
+python experiments/e5_predictive_validation.py --seed 42
+# → results/e5_predictive/summary.csv  REPORT.md  predictors/  figures/  MANIFEST.json
 ```
 
 ### Experiment A1 — Observation Fidelity Injection
@@ -247,6 +257,30 @@ Kendall's τ between success-rate rank and CNSR rank: **−0.429** (code), **−
 | **Gemini-1.5-Flash** | **656.1 ± 56.4** | 57% | **1018.2 ± 168.9** | 54% | **546.4 ± 22.1** | 69% |
 | Mistral-7B | 173.7 ± 56.6 | 37% | 228.6 ± 36.5 | 31% | 163.5 ± 38.5 | 46% |
 | Ensemble (top-3) | 114.1 ± 21.6 | 56% | 151.1 ± 30.4 | 45% | 102.5 ± 11.6 | 69% |
+
+### Experiment E4 — Closed-Loop ASC Ablation (seed=42, 150 evals per condition)
+
+Headline: predictive closed-loop control raises 50-turn task completion from 2% to 83%.
+All comparisons significant (McNemar p < 0.0001, Holm-Bonferroni corrected).
+
+| Condition | Completion Rate | 95% CI | CNSR | Mean Cost |
+|---|---|---|---|---|
+| NoControl | 2.0% | [0.0%, 4.7%] | 0.020 | $1.000 |
+| FixedSchedule (k=10) | 36.7% | [29.3%, 44.7%] | 0.349 | $1.050 |
+| ThresholdController | **89.3%** | [84.0%, 94.0%] | 0.631 | $1.416 |
+| PredictiveController | 83.3% | [77.3%, 88.7%] | **0.640** | $1.302 |
+
+### Experiment E5 — Predictive Monitor Validation (seed=42, 300 tasks, k=5)
+
+Each monitor signal evaluated as a k=5-step-ahead failure predictor; combined model outperforms all single signals.
+
+| Predictor | AUC-ROC | 95% CI | Significant (H5.1) |
+|---|---|---|---|
+| drift_only | 0.609 | [0.594, 0.622] | ✓ p<0.0001 |
+| oscillation_only | 0.589 | [0.576, 0.602] | ✓ p<0.0001 |
+| fidelity_only | 0.495 | [0.479, 0.510] | ✗ p=0.760 |
+| **combined** | **0.752** | [0.741, 0.763] | — |
+| MLP (32 hidden) | 0.516 | [0.502, 0.529] | — |
 
 ### LLM-as-Judge Bias Mitigation
 
