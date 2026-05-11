@@ -1,0 +1,26 @@
+{
+  "git_sha": "27fb2c6",
+  "seed": 42,
+  "env_hash": "733c4515731a",
+  "config": {
+    "n_violation_tasks": 200,
+    "n_control_tasks": 100,
+    "total_turns": 50,
+    "embedding_dim": 64,
+    "drift_rate_base": 0.06,
+    "drift_rate_violation": 0.12,
+    "completion_drift_threshold": 0.35,
+    "lead_times": [
+      3,
+      5,
+      10
+    ],
+    "n_cv_folds": 5,
+    "n_bootstrap": 10000,
+    "alpha": 0.05
+  },
+  "output_files": {
+    "summary.csv": "202dcaa478bf2f974f471f0f695044d344c78a31ab72474de3039c7a136059ce",
+    "REPORT.md": "e8c5f8d5810c10f512c5bd94cb8579770ac26135c0cff10400660ecb531650ee"
+  }
+}

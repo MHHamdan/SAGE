@@ -1,0 +1,29 @@
+{
+  "git_sha": "27fb2c6",
+  "seed": 42,
+  "env_hash": "733c4515731a",
+  "config": {
+    "n_tasks": 50,
+    "n_seeds": 3,
+    "total_turns": 50,
+    "embedding_dim": 64,
+    "drift_rate_base": 0.06,
+    "completion_drift_threshold": 0.35,
+    "base_cost_per_turn": 0.02,
+    "max_interventions_per_task": 10,
+    "fixed_schedule_k": 10,
+    "drift_threshold": 0.3,
+    "oscillation_threshold": 0.6,
+    "fidelity_threshold": 0.7,
+    "cooldown_turns": 3,
+    "predictive_lead_time_k": 5,
+    "predictive_fire_at_p": 0.5,
+    "n_pretrain_tasks": 100,
+    "n_bootstrap": 10000,
+    "alpha": 0.05
+  },
+  "output_files": {
+    "summary.csv": "37172f89a5c5ab462733ff1c153208e8b2c65a4e1f9f36e01fc164e055b011d1",
+    "REPORT.md": "833d5fc1c10cd5618b128acfcebce06b4a3ddbf096ec9fdf79535d5e7ebb4c62"
+  }
+}
