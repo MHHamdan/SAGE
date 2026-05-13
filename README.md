@@ -14,7 +14,6 @@ A comprehensive Python toolkit for building production-ready agentic AI systems.
 
 =======
 <img width="2090" height="966" alt="System_archictecture (1)" src="https://github.com/user-attachments/assets/c6960d1d-d4ab-4954-8664-3b747187ea54" />
->>>>>>> 4aab772 (feat: add research experiments, eval shim, and README update (v1.1.0))
 
 ---
 
