@@ -1,5 +1,5 @@
 {
-  "git_sha": "27fb2c6",
+  "git_sha": "b668ea1",
   "seed": 42,
   "env_hash": "733c4515731a",
   "config": {
@@ -16,11 +16,11 @@
       10
     ],
     "n_cv_folds": 5,
-    "n_bootstrap": 10000,
+    "n_bootstrap": 1000,
     "alpha": 0.05
   },
   "output_files": {
-    "summary.csv": "202dcaa478bf2f974f471f0f695044d344c78a31ab72474de3039c7a136059ce",
-    "REPORT.md": "e8c5f8d5810c10f512c5bd94cb8579770ac26135c0cff10400660ecb531650ee"
+    "summary.csv": "c0e35bcc0c5f6bd9e51d38932a84eb85c2152e1627ce1bd3ac6245b9adfd80fa",
+    "REPORT.md": "0ee8bc1c06cd2241db3ca158661bb5478e2c8b397863bfe43fbe7cf2a3e10149"
   }
 }
