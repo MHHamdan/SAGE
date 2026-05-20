@@ -1,34 +1,48 @@
-# Agentic AI Toolkit
+# SAGE: A Stabilize–Assess–Govern–Enforce Framework for Deployment-Ready LLM-Based Autonomous Agents
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-32%20passing-brightgreen.svg)](#testing)
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-651%20passing-brightgreen.svg)](#testing)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](pyproject.toml)
 
-A comprehensive Python toolkit for building production-ready agentic AI systems. Features modular components for agent architectures, memory systems, tool integration, multi-agent coordination, evaluation, and a full suite of reproducible research experiments aligned with the paper *"Towards Autonomous Intelligence: A Survey of Agentic AI Systems"* (TAI-2025-Dec-R-02684).
+> Reference implementation for the IEEE Transactions on Artificial Intelligence submission of the same name (TAI-2025-Dec-R-02684).
 
-## HEAD
-A comprehensive Python toolkit for building production-ready agentic AI systems. Features modular components for agent architectures, memory systems, tool integration, multi-agent coordination, and evaluation.
+## What is SAGE?
+
+SAGE is a four-pillar framework for deployment-ready LLM-based autonomous agents. It treats agents as non-stationary closed-loop systems rather than static reasoners, and integrates four operational capacities: stability modelling (**Stabilize**), cost-aware autonomy assessment (**Assess**), failure and protocol governance (**Govern**), and adaptive corrective control (**Enforce**). Closed-loop adaptive control transforms long-horizon completion from 2.0% under open-loop execution to ≥ 83% under either of two adaptive policies (E4).
+
+## The four pillars
+
+| Pillar | What it does | Code | Paper |
+|---|---|---|---|
+| **S — Stabilize** | Closed-loop stability framing; monitorable conditions for observation fidelity, progress monotonicity, bounded context noise | [`sage/stability/`](src/sage/stability), [`sage/monitoring/stability_monitor.py`](src/sage/monitoring/stability_monitor.py) | §III, Supp. A.1–A.4 |
+| **A — Assess** | Cost-Normalized Success Rate (CNSR); behavioural autonomy taxonomy | [`sage/evaluation/`](src/sage/evaluation), [`eval/metrics.py`](eval/metrics.py) | §IV, §IX, Supp. B.3 |
+| **G — Govern** | Ten-class failure taxonomy; STRIDE threat models for MCP and A2A | [`sage/evaluation/failure_taxonomy.py`](src/sage/evaluation/failure_taxonomy.py), [`sage/evaluation/pathology_benchmarks.py`](src/sage/evaluation/pathology_benchmarks.py), [`sage/security/threat_validator.py`](src/sage/security/threat_validator.py) | §VIII, §XI, Supp. D |
+| **E — Enforce** | Adaptive Stability Controller (ASC); five bounded interventions; four control policies | [`sage/stability/controller.py`](src/sage/stability/controller.py), [`sage/stability/interventions.py`](src/sage/stability/interventions.py), [`sage/stability/predictor.py`](src/sage/stability/predictor.py) | §III.E, §IX.D, Supp. A.5.4–A.5.5 |
+
+*Govern is currently split across `evaluation/` (failure taxonomy + pathology benchmarks) and `security/` (STRIDE threat validator). See [TODO.md](TODO.md) for the planned consolidation under `sage/governance/`.*
+
+---
 
 <img width="760" height="1040" alt="stack_v2" src="https://github.com/user-attachments/assets/829695dd-5afd-4412-8d81-162c2c12812b" />
 
 ---
-<img width="2090" height="966" alt="System_archictecture (1)" src="https://github.com/user-attachments/assets/c6960d1d-d4ab-4954-8664-3b747187ea54" />
+<img width="2090" height="966" alt="System architecture" src="https://github.com/user-attachments/assets/c6960d1d-d4ab-4954-8664-3b747187ea54" />
 
 ---
 
 ## Features
 
-- **Agent Architectures**: ReAct, Chain-of-Thought, and custom agent patterns
-- **Memory Systems**: Buffer memory (working memory) and vector memory (semantic long-term)
-- **Tool Integration**: Flexible tool registry with schema validation and sandboxing
-- **Multi-Agent Systems**: Sequential pipelines, supervisor patterns, and hierarchical orchestration
-- **Protocol Support**: MCP (Model Context Protocol) and A2A (Agent-to-Agent) interfaces
-- **Evaluation Framework**: CNSR, long-horizon evaluation, goal drift, incident tracking
-- **Stability Monitoring**: Oscillation detection, progress monotonicity, observation fidelity
+- **Stability pillar**: Oscillation detection, progress monotonicity, observation fidelity, goal-drift score
 - **Adaptive Stability Controller (ASC)**: Closed-loop controller with 4 policies (NoControl, FixedSchedule, Threshold, Predictive) and 5 bounded interventions; raises long-horizon completion from 2% to 83% (E4)
-- **Failure Predictor**: Calibrated logistic regression predicting task failure k turns ahead (AUC=0.752 combined model, E5)
-- **Research Experiments**: Full reproducible experiment suite (CNSR multi-task, Proposition 1 violations, LLM-as-Judge bias, E4 closed-loop ablation, E5 predictive validation)
+- **Failure Predictor**: Calibrated logistic regression predicting task failure k turns ahead (AUC = 0.752 combined model, E5)
+- **Assess pillar**: CNSR metric, long-horizon evaluation, goal drift, incident tracking, autonomy taxonomy
+- **Govern pillar**: Ten-class failure taxonomy with detectors and mitigations; STRIDE threat validator for MCP and A2A
+- **Agent architectures**: ReAct, Chain-of-Thought, multi-agent supervisor and sequential pipelines
+- **Memory systems**: Buffer memory (working) and vector memory (semantic long-term)
+- **Tool integration**: Flexible tool registry with schema validation and sandboxing
+- **Protocol support**: MCP (Model Context Protocol) and A2A (Agent-to-Agent) interfaces
+- **Research experiments**: Full reproducible suite (CNSR multi-task, Proposition 1 violations A1/A2/A3, LLM-as-Judge bias, E4 closed-loop ablation, E5 predictive validation)
 - **Observability**: Built-in tracing and monitoring with LangSmith support
 
 ---
@@ -37,8 +51,8 @@ A comprehensive Python toolkit for building production-ready agentic AI systems.
 
 ```bash
 # Clone the repository
-git clone https://github.com/MHHamdan/agentic-ai-toolkit.git
-cd agentic-ai-toolkit
+git clone https://github.com/MHHamdan/SAGE.git
+cd SAGE
 
 # Basic installation
 pip install -e .
@@ -53,9 +67,9 @@ pip install -e ".[experiments]"
 pip install -e ".[dev]"
 ```
 
-### Experiment dependencies
+> **Backwards compatibility:** `pip install agentic-ai-toolkit` and `import agentic_toolkit` continue to work via a deprecation shim. The shim aliases every `agentic_toolkit.*` submodule to the same module object as `sage.*` (so class identity and `isinstance` checks are preserved) and emits a `DeprecationWarning` pointing you at the new imports. It will be removed in a future release.
 
-The experiments require:
+### Experiment dependencies
 
 ```bash
 pip install numpy scipy pandas litellm sentence-transformers
@@ -69,8 +83,8 @@ pip install numpy scipy pandas litellm sentence-transformers
 ### Basic ReAct Agent
 
 ```python
-from agentic_toolkit.core import LLMClient
-from agentic_toolkit.agents import ReActAgent
+from sage.core import LLMClient
+from sage.agents import ReActAgent
 from langchain_core.tools import tool
 
 llm = LLMClient(model="gpt-4o-mini", api_key="your-api-key")
@@ -95,10 +109,10 @@ result = agent.run("What is 25 * 4 and search for Python tutorials")
 print(result)
 ```
 
-### Evaluation — CNSR
+### Evaluation — CNSR (Assess pillar)
 
 ```python
-from agentic_toolkit.evaluation import calculate_cnsr, evaluate_agent
+from sage.evaluation import calculate_cnsr, evaluate_agent
 
 # Cost-Normalized Success Rate: Success Rate / Mean Cost per Task
 cnsr = calculate_cnsr(successes=80, total_tasks=100, total_cost=50.0)
@@ -110,11 +124,11 @@ print(f"Mean Cost: ${result.mean_cost:.2f}")
 print(f"CNSR: {result.cnsr:.2f}")
 ```
 
-### Stability Monitor
+### Stability Monitor (Stabilize pillar)
 
 ```python
 import numpy as np
-from agentic_toolkit.monitoring.stability_monitor import (
+from sage.monitoring.stability_monitor import (
     StabilityMonitor, create_stability_monitor
 )
 
@@ -142,10 +156,26 @@ print(f"Total steps: {report.total_steps}")
 print(f"Recommendations: {report.recommendations}")
 ```
 
+### Adaptive Stability Controller (Enforce pillar)
+
+```python
+from sage.stability.controller import AdaptiveStabilityController
+from sage.stability.interventions import (
+    GoalReanchor, ContextCompress, ForceReplan,
+    SchemaValidatedRetry, HumanEscalate,
+)
+
+controller = AdaptiveStabilityController(
+    policy="threshold",  # NoControl | FixedSchedule | Threshold | Predictive
+    interventions=[GoalReanchor(), ContextCompress(), ForceReplan(),
+                   SchemaValidatedRetry(), HumanEscalate()],
+)
+```
+
 ### Memory Systems
 
 ```python
-from agentic_toolkit.memory import BufferMemory, VectorMemory
+from sage.memory import BufferMemory, VectorMemory
 
 buffer = BufferMemory(max_items=10)
 buffer.add_user_message("Hello!")
@@ -162,7 +192,7 @@ results = vector_memory.get("What programming languages are popular?", k=2)
 ### Multi-Agent Pipeline
 
 ```python
-from agentic_toolkit.agents import SequentialPipeline, SupervisorAgent, ReActAgent
+from sage.agents import SequentialPipeline, SupervisorAgent, ReActAgent
 
 researcher = ReActAgent(name="researcher", llm=llm, tools=[search_tool])
 analyst    = ReActAgent(name="analyst",    llm=llm, tools=[analyze_tool])
@@ -179,7 +209,7 @@ result = pipeline.run("Create a report on renewable energy trends")
 
 ## Research Experiments
 
-This toolkit includes the full reproducible experiment suite from the TAI paper revision. All experiments use deterministic seeded pseudo-randomness and cache API responses under `results/cache/`.
+This implementation includes the full reproducible experiment suite from the TAI submission. All experiments use deterministic seeded pseudo-randomness and cache API responses under `results/cache/`.
 
 ### Running experiments
 
@@ -202,7 +232,7 @@ python experiments/judge_bias.py
 python scripts/generate_latex.py
 # → results/table_fragments.tex  (+ 6 individual .tex files)
 
-# E4 — Closed-loop Adaptive Stability Controller ablation (50 tasks × 4 conditions × 3 seeds)
+# E4 — Closed-loop ASC ablation (50 tasks × 4 conditions × 3 seeds)
 python experiments/e4_closed_loop.py --seed 42
 # → results/e4_closed_loop/summary.csv  REPORT.md  figures/  MANIFEST.json
 
@@ -259,8 +289,7 @@ Kendall's τ between success-rate rank and CNSR rank: **−0.429** (code), **−
 
 ### Experiment E4 — Closed-Loop ASC Ablation (seed=42, 150 evals per condition)
 
-Headline: predictive closed-loop control raises 50-turn task completion from 2% to 83%.
-All comparisons significant (McNemar p < 0.0001, Holm-Bonferroni corrected).
+Headline: predictive closed-loop control raises 50-turn task completion from 2% to 83%. All comparisons significant (McNemar *p* < 0.0001, Holm-Bonferroni corrected).
 
 | Condition | Completion Rate | 95% CI | CNSR | Mean Cost |
 |---|---|---|---|---|
@@ -294,68 +323,49 @@ Each monitor signal evaluated as a k=5-step-ahead failure predictor; combined mo
 ## Project Structure
 
 ```
-agentic_ai_toolkit/
-├── src/agentic_toolkit/         # Installable Python package
-│   ├── agents/                  # ReAct, multi-agent, supervisor
-│   ├── benchmarks/              # SWE-Bench, HotpotQA, AgentBench adapters
-│   ├── core/                    # Base agent, LLM client, config, cost tracking
-│   ├── evaluation/              # CNSR, goal drift, CNSR benchmark, harness
-│   │   ├── metrics.py           # compute_cnsr(), TaskCostBreakdown, MetricsCollector
-│   │   ├── goal_drift.py        # goal_drift_score()
-│   │   ├── long_horizon.py      # LongHorizonEvaluator
-│   │   ├── incident_tracker.py  # IncidentTracker
-│   │   └── cnsr_benchmark.py    # CNSRBenchmark, Pareto analysis
-│   ├── human_oversight/         # Approval flows, escalation, audit trails
-│   ├── learning/                # Deployment loop, feedback, experience replay
-│   ├── memory/                  # Buffer, vector, episodic memory
-│   ├── monitoring/              # StabilityMonitor, LimitCycleDetector
-│   ├── planning/                # Reactive, deliberative, hybrid, HTN planners
-│   ├── protocols/               # MCP client/server, A2A communication
-│   ├── security/                # Threat validator
-│   ├── skills/                  # Skill registry, versioning, selection
-│   ├── tools/                   # Tool registry, sandboxing, permissions
-│   ├── verification/            # Plan validator, policy engine, guarded executor
+SAGE/
+├── src/sage/                       # Installable Python package
+│   ├── agents/                     # ReAct, multi-agent, supervisor
+│   ├── benchmarks/                 # SWE-Bench, HotpotQA, AgentBench adapters
+│   ├── core/                       # Base agent, LLM client, config, cost tracking
+│   ├── evaluation/                 # Assess + Govern code
+│   │   ├── metrics.py              # compute_cnsr(), TaskCostBreakdown, MetricsCollector
+│   │   ├── goal_drift.py           # goal_drift_score()
+│   │   ├── long_horizon.py         # LongHorizonEvaluator
+│   │   ├── incident_tracker.py     # IncidentTracker
+│   │   ├── cnsr_benchmark.py       # CNSRBenchmark, Pareto analysis
+│   │   ├── autonomy_validator.py   # Autonomy taxonomy validator
+│   │   ├── failure_taxonomy.py     # G: 10-class failure taxonomy + detectors
+│   │   └── pathology_benchmarks.py # G: pathology benchmark runner
+│   ├── stability/                  # E (and S): closed-loop control
+│   │   ├── controller.py           # AdaptiveStabilityController
+│   │   ├── interventions.py        # 5 bounded interventions
+│   │   ├── predictor.py            # Calibrated failure predictor
+│   │   └── traces.py
+│   ├── monitoring/                 # S: StabilityMonitor (oscillation, drift, fidelity)
+│   ├── security/                   # G: STRIDE threat validator (MCP, A2A)
+│   ├── human_oversight/            # Approval flows, escalation, audit trails
+│   ├── learning/                   # Deployment loop, feedback, experience replay
+│   ├── memory/                     # Buffer, vector, episodic memory
+│   ├── planning/                   # Reactive, deliberative, hybrid, HTN planners
+│   ├── protocols/                  # MCP client/server, A2A communication
+│   ├── skills/                     # Skill registry, versioning, selection
+│   ├── tools/                      # Tool registry, sandboxing, permissions
+│   ├── verification/               # Plan validator, policy engine, guarded executor
 │   └── __init__.py
 │
-├── experiments/                 # TAI paper revision experiments
-│   ├── cnsr_multitask.py        # Task 1: CNSR across 7 models × 3 task types
-│   ├── exp_obs_fidelity.py      # Task 2A1: observation fidelity injection
-│   ├── exp_progress_mono.py     # Task 2A2: progress monotonicity stall
-│   ├── exp_context_noise.py     # Task 2A3: context noise / goal drift
-│   └── judge_bias.py            # Task 3: LLM-as-Judge bias measurement
+├── src/agentic_toolkit/            # Deprecation shim for the legacy name
 │
-├── eval/                        # Lightweight metrics shim (no heavy deps)
-│   └── metrics.py               # compute_cnsr() — works installed or uninstalled
-│
-├── scripts/
-│   └── generate_latex.py        # Task 4: CSV → LaTeX table fragments
-│
-├── tests/                       # Comprehensive test suite
-│   ├── core/                    # Control loop, cost, seeding tests
-│   ├── evaluation/              # CNSR benchmark, goal drift, incident tracker
-│   ├── monitoring/
-│   │   └── test_stability_monitor.py  # 32 tests — all passing
-│   ├── human_oversight/
-│   ├── integration/
-│   ├── learning/
-│   ├── protocols/
-│   ├── security/
-│   ├── skills/
-│   └── tools/
-│
-├── examples/                    # Quick-start examples
-│   ├── 01_simple_agent.py
-│   ├── 02_memory_systems.py
-│   ├── 03_multi_agent.py
-│   ├── 04_evaluation.py
-│   ├── 05_security_policy_demo.py
-│   ├── 06_protocols_demo.py
-│   └── use-cases/               # Enterprise, research, safety use-cases
-│
-├── configs/                     # YAML experiment configurations
-│   └── experiments/
-├── dashboard/                   # FastAPI + React monitoring dashboard
-├── pyproject.toml               # Package metadata (v1.1.0)
+├── experiments/                    # TAI paper experiments (A1–A3, CNSR, E4, E5)
+├── eval/                           # Lightweight metrics shim (no heavy deps)
+├── scripts/                        # generate_latex.py, env_report.py
+├── tests/                          # Test suite (sage.*)
+├── examples/                       # Quick-start examples + use-cases
+├── configs/                        # YAML experiment configurations
+├── dashboard/                      # FastAPI + React monitoring dashboard
+├── pyproject.toml                  # Package metadata (v1.2.0, sage-framework)
+├── CHANGELOG.md
+├── TODO.md
 └── requirements.txt
 ```
 
@@ -376,7 +386,7 @@ GEMINI_API_KEY=your-gemini-key
 
 # Optional: Observability
 LANGSMITH_API_KEY=your-langsmith-key
-LANGSMITH_PROJECT=my-project
+LANGSMITH_PROJECT=sage-framework
 
 # LiteLLM (used by experiments) picks up all of the above automatically
 ```
@@ -384,7 +394,7 @@ LANGSMITH_PROJECT=my-project
 ### Programmatic Configuration
 
 ```python
-from agentic_toolkit.core import Config, LLMConfig, MemoryConfig
+from sage.core import Config, LLMConfig, MemoryConfig
 
 config = Config(
     llm=LLMConfig(model="gpt-4o-mini", temperature=0.1, max_tokens=4096),
@@ -427,7 +437,7 @@ config = Config(
 pytest
 
 # Run with coverage
-pytest --cov=agentic_toolkit --cov-report=term-missing
+pytest --cov=sage --cov-report=term-missing
 
 # Run stability monitor tests only (32 tests, no API keys needed)
 pytest tests/monitoring/test_stability_monitor.py -v
@@ -476,7 +486,7 @@ API responses are cached under `results/cache/` (MD5-keyed JSON). On a cache mis
 ### Human Oversight
 
 ```python
-from agentic_toolkit.human_oversight import ApprovalHandler, RiskLevel
+from sage.human_oversight import ApprovalHandler, RiskLevel
 
 handler = ApprovalHandler(default_timeout=300, auto_reject_on_timeout=True)
 request = handler.create_request(
@@ -492,7 +502,7 @@ if result.approved:
 ### Deployment Loop
 
 ```python
-from agentic_toolkit.learning import DeploymentLoop, DeploymentConfig
+from sage.learning import DeploymentLoop, DeploymentConfig
 
 config = DeploymentConfig(
     evaluation_interval=100,
@@ -509,8 +519,8 @@ async for update in loop.run(tasks=task_stream):
 ### Protocol Integration
 
 ```python
-from agentic_toolkit.protocols.mcp import MCPClient
-from agentic_toolkit.protocols.a2a import A2AClient, AgentCard
+from sage.protocols.mcp import MCPClient
+from sage.protocols.a2a import A2AClient, AgentCard
 
 mcp_client = MCPClient(server_url="http://localhost:8080")
 tools = mcp_client.list_tools()
@@ -527,17 +537,27 @@ agent_card = AgentCard(
 
 ## Citation
 
-If you use this toolkit or the experimental results in your research, please cite:
+If you use SAGE or the experimental results in your research, please cite:
 
 ```bibtex
-@article{hamdan2025tai,
-  title   = {Towards Autonomous Intelligence: A Survey of Agentic AI Systems},
+@article{hamdan2025sage,
+  title   = {SAGE: A Stabilize--Assess--Govern--Enforce Framework for
+             Deployment-Ready LLM-Based Autonomous Agents},
   author  = {Hamdan, Mohammed H.},
   journal = {IEEE Transactions on Artificial Intelligence},
   year    = {2025},
   note    = {Manuscript TAI-2025-Dec-R-02684 (under revision)}
 }
 ```
+
+---
+
+## What changed in v1.2.0
+
+- **Rebrand to SAGE**: the framework is now named SAGE (Stabilize, Assess, Govern, Enforce). The Python import is `sage`; the PyPI distribution is `sage-framework`. The GitHub repo moved to [`MHHamdan/SAGE`](https://github.com/MHHamdan/SAGE).
+- **Backwards-compatible shim**: `import agentic_toolkit` and `pip install agentic-ai-toolkit` continue to work with a `DeprecationWarning`.
+- **No behavioural changes**: no algorithm, threshold, default argument, or numerical claim has changed. Empirical results (A1, A2, A3, CNSR, E4, E5) reproduce identically.
+- See [CHANGELOG.md](CHANGELOG.md) for the full history.
 
 ---
 
