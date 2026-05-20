@@ -28,9 +28,10 @@ from scipy.stats import kendalltau
 
 # ── project path setup ────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "src"))  # allow direct import of agentic_toolkit
+# NOTE: a previous version inserted "agentic_ai_toolkit/src" here, but no
+# such directory exists in this repo — the package lives at src/sage/.
+sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "agentic_ai_toolkit" / "src"))
 
 from eval.metrics import compute_cnsr  # noqa: E402
 

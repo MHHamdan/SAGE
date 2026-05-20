@@ -44,14 +44,14 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT))
 
-from agentic_toolkit.stability import (
+from sage.stability import (
     MonitorSignals, InterventionDecision,
     NoControl, FixedScheduleController, ThresholdController, PredictiveController,
     GoalReanchor, AgentState, EscalationRequest,
     FailurePredictor, TraceRecord,
     TraceEvent, TraceWriter,
 )
-from agentic_toolkit.stability.traces import (
+from sage.stability.traces import (
     MonitorSignalsModel, InterventionDecisionModel,
     now_iso, write_manifest, _get_git_sha, _get_env_hash,
 )
@@ -354,7 +354,7 @@ def pretrain_predictor(cfg: dict, base_seed: int) -> FailurePredictor:
                 turn=turn,
                 cost_so_far=float(turn) * cfg["base_cost_per_turn"],
             )
-            from agentic_toolkit.stability.predictor import extract_features
+            from sage.stability.predictor import extract_features
             feats = extract_features(sig, signal_history.copy())
             records.append(TraceRecord(
                 task_id=f"pretrain_{i:04d}",

@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from agentic_toolkit.memory import BufferMemory, VectorMemory
+from sage.memory import BufferMemory, VectorMemory
 
 
 def demo_buffer_memory():

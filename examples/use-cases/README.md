@@ -270,7 +270,7 @@ Error: Connection refused (http://localhost:11434)
 ### Python Import Errors
 ```bash
 # Ensure you're in the correct directory
-cd /path/to/agentic_ai_toolkit
+cd /path/to/SAGE
 
 # Install dependencies
 pip install requests

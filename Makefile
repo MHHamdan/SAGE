@@ -1,4 +1,4 @@
-# Makefile for Agentic AI Toolkit
+# Makefile for SAGE (Stabilize, Assess, Govern, Enforce)
 # Paper-grade reproducibility targets
 
 .PHONY: all install test lint format clean results paper-assets env-report \
@@ -12,7 +12,7 @@ all: help
 # =============================================================================
 
 install:
-	@echo "Installing agentic-ai-toolkit..."
+	@echo "Installing sage-framework..."
 	pip install -e ".[dev]"
 
 install-dev:
@@ -49,7 +49,7 @@ test-protocols:
 
 test-coverage:
 	@echo "Running tests with coverage..."
-	PYTHONPATH=src pytest tests/ --cov=src/agentic_toolkit --cov-report=html --cov-report=term
+	PYTHONPATH=src pytest tests/ --cov=src/sage --cov-report=html --cov-report=term
 
 # =============================================================================
 # Code Quality
@@ -58,7 +58,7 @@ test-coverage:
 lint:
 	@echo "Running linters..."
 	ruff check src/ tests/
-	mypy src/agentic_toolkit --ignore-missing-imports
+	mypy src/sage --ignore-missing-imports
 
 format:
 	@echo "Formatting code..."
@@ -104,8 +104,8 @@ validate:
 	@echo "Validating results reproducibility..."
 	@echo "Running determinism check..."
 	PYTHONPATH=src python -c "\
-from agentic_toolkit.evaluation import ReasoningBenchmark; \
-from agentic_toolkit.core.seeding import set_global_seed; \
+from sage.evaluation import ReasoningBenchmark; \
+from sage.core.seeding import set_global_seed; \
 set_global_seed(42); \
 b1 = ReasoningBenchmark(); \
 tasks1 = [t.task_id for t in b1.get_tasks()]; \
@@ -159,7 +159,7 @@ run-benchmarks:
 	@echo "Running full benchmark suite..."
 	@echo "This may take ~30 minutes..."
 	PYTHONPATH=src SEED=42 python -c "\
-from agentic_toolkit.evaluation import EvaluationHarness, EvaluationConfig, create_benchmark_suite; \
+from sage.evaluation import EvaluationHarness, EvaluationConfig, create_benchmark_suite; \
 config = EvaluationConfig(seed=42, save_results=True); \
 harness = EvaluationHarness(config); \
 for b in create_benchmark_suite(): harness.register_benchmark(b); \
@@ -195,11 +195,11 @@ clean-all: clean clean-results
 
 docker-build:
 	@echo "Building Docker image..."
-	docker build -t agentic-ai-toolkit .
+	docker build -t sage-framework .
 
 docker-run:
 	@echo "Running in Docker..."
-	docker run -it --rm agentic-ai-toolkit
+	docker run -it --rm sage-framework
 
 # =============================================================================
 # CI Targets
@@ -216,7 +216,7 @@ ci-fast: lint test-unit
 # =============================================================================
 
 help:
-	@echo "Agentic AI Toolkit - Makefile Targets"
+	@echo "SAGE Framework - Makefile Targets"
 	@echo ""
 	@echo "Setup:"
 	@echo "  make install          Install the package"

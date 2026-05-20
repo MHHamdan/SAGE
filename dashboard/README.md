@@ -28,7 +28,7 @@ A React dashboard for visualizing and managing the Agentic AI Toolkit.
 ### Using Docker (Recommended)
 
 ```bash
-cd agentic_ai_toolkit/dashboard
+cd SAGE/dashboard
 docker-compose up --build
 ```
 

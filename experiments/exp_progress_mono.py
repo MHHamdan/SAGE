@@ -23,7 +23,7 @@ from typing import Any
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "src"))  # allow direct import of agentic_toolkit
+sys.path.insert(0, str(ROOT / "src"))  # allow direct import of sage
 sys.path.insert(0, str(ROOT))
 
 RESULTS_DIR = ROOT / "results"

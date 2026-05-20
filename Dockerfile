@@ -1,4 +1,4 @@
-# Dockerfile for Agentic AI Toolkit
+# Dockerfile for SAGE (Stabilize, Assess, Govern, Enforce)
 # Reproducible environment for paper experiments
 
 FROM python:3.11-slim
@@ -42,5 +42,5 @@ ENV OLLAMA_HOST=http://host.docker.internal:11434 \
 CMD ["./run_all.sh"]
 
 # Alternative entry points:
-# docker run agentic-toolkit python -m agentic_toolkit.core.experiment
-# docker run agentic-toolkit pytest tests/
+# docker run sage-framework python -m sage.core.experiment
+# docker run sage-framework pytest tests/

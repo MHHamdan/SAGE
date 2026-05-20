@@ -14,8 +14,8 @@ from langchain_core.tools import tool
 load_dotenv()
 
 # Import toolkit components
-from agentic_toolkit.core.llm_client import LLMClient
-from agentic_toolkit.agents.react_agent import ReActAgent
+from sage.core.llm_client import LLMClient
+from sage.agents.react_agent import ReActAgent
 
 
 # Define custom tools

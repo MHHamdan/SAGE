@@ -13,8 +13,8 @@ from langchain_core.tools import tool
 
 load_dotenv()
 
-from agentic_toolkit.core.llm_client import LLMClient
-from agentic_toolkit.agents.react_agent import ReActAgent
+from sage.core.llm_client import LLMClient
+from sage.agents.react_agent import ReActAgent
 
 
 # Define specialized tools for different agents
@@ -224,7 +224,7 @@ def demo_agent_with_memory():
 
     llm = LLMClient(model="gpt-4o-mini", api_key=api_key, temperature=0.1)
 
-    from agentic_toolkit.memory import BufferMemory
+    from sage.memory import BufferMemory
 
     # Create agent with memory
     memory = BufferMemory(max_items=10)
