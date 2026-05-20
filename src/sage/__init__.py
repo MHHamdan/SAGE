@@ -18,7 +18,7 @@ from sage.core.config import Config
 from sage.core.base_agent import BaseAgent
 from sage.core.llm_client import LLMClient
 
-__version__ = "0.1.0"
+__version__ = "1.2.0"
 
 __all__ = [
     "Config",
