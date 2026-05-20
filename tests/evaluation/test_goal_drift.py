@@ -15,7 +15,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
-from agentic_toolkit.evaluation.goal_drift import (
+from sage.evaluation.goal_drift import (
     GoalDriftTracker,
     GoalSnapshot,
     DriftMeasurement,

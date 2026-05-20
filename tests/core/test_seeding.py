@@ -9,7 +9,7 @@ class TestSeeding:
 
     def test_set_global_seed(self, seed):
         """Test that global seed produces deterministic results."""
-        from agentic_toolkit.core.seeding import set_global_seed
+        from sage.core.seeding import set_global_seed
 
         set_global_seed(seed)
         values1 = [random.random() for _ in range(5)]
@@ -21,7 +21,7 @@ class TestSeeding:
 
     def test_deterministic_random(self, seed):
         """Test DeterministicRandom class."""
-        from agentic_toolkit.core.seeding import DeterministicRandom
+        from sage.core.seeding import DeterministicRandom
 
         rng = DeterministicRandom(seed)
         values1 = [rng.random() for _ in range(5)]
@@ -33,7 +33,7 @@ class TestSeeding:
 
     def test_derive_seed(self, seed):
         """Test seed derivation."""
-        from agentic_toolkit.core.seeding import derive_seed
+        from sage.core.seeding import derive_seed
 
         derived1 = derive_seed(seed, "component_a")
         derived2 = derive_seed(seed, "component_b")
@@ -43,7 +43,7 @@ class TestSeeding:
 
     def test_deterministic_choice(self, seed):
         """Test deterministic choice."""
-        from agentic_toolkit.core.seeding import DeterministicRandom
+        from sage.core.seeding import DeterministicRandom
 
         rng = DeterministicRandom(seed)
         items = ["a", "b", "c", "d", "e"]

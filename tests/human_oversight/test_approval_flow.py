@@ -9,7 +9,7 @@ import asyncio
 from datetime import datetime, timedelta
 from unittest.mock import Mock, AsyncMock
 
-from agentic_toolkit.human_oversight.approval_flow import (
+from sage.human_oversight.approval_flow import (
     ApprovalHandler,
     ApprovalRequest,
     ApprovalResult,

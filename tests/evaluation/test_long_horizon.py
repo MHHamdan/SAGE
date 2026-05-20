@@ -14,7 +14,7 @@ from typing import List, Any
 
 import numpy as np
 
-from agentic_toolkit.evaluation.long_horizon import (
+from sage.evaluation.long_horizon import (
     LongHorizonEvaluator,
     SimpleLongHorizonEvaluator,
     LongHorizonReport,
@@ -22,7 +22,7 @@ from agentic_toolkit.evaluation.long_horizon import (
     CheckpointData,
     EvaluationStatus,
 )
-from agentic_toolkit.evaluation.incident_tracker import (
+from sage.evaluation.incident_tracker import (
     IncidentType,
     IncidentSeverity,
 )

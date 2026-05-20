@@ -13,7 +13,7 @@ class TestCNSR:
 
     def test_cnsr_basic(self):
         """Eq. 1: CNSR = (S/N) / (sum(c_i)/N)"""
-        from agentic_toolkit.evaluation import calculate_cnsr
+        from sage.evaluation import calculate_cnsr
 
         # Example: 80 successes, 100 tasks, $50 total cost
         # Success rate = 80/100 = 0.8
@@ -24,14 +24,14 @@ class TestCNSR:
 
     def test_cnsr_zero_cost_infinite(self):
         """Eq. 1: CNSR = inf when cost = 0 and successes > 0 (Ollama case)"""
-        from agentic_toolkit.evaluation import calculate_cnsr
+        from sage.evaluation import calculate_cnsr
 
         cnsr = calculate_cnsr(successes=80, total_tasks=100, total_cost=0.0)
         assert cnsr == float("inf")
 
     def test_cnsr_zero_successes(self):
         """Eq. 1: CNSR = 0 when no successes"""
-        from agentic_toolkit.evaluation import calculate_cnsr
+        from sage.evaluation import calculate_cnsr
 
         cnsr = calculate_cnsr(successes=0, total_tasks=100, total_cost=10.0)
         assert cnsr == 0.0
@@ -42,7 +42,7 @@ class TestTaskCost:
 
     def test_task_cost_decomposition(self):
         """Eq. 2: c_task = c_tokens + c_tools + c_human"""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
 
@@ -66,7 +66,7 @@ class TestTaskCost:
 
     def test_ollama_zero_token_cost(self):
         """Eq. 2: Ollama models have $0 token cost"""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
         tracker.add_tokens("llama3.1:8b", input_tokens=10000, output_tokens=5000)
@@ -79,7 +79,7 @@ class TestRollingSuccess:
 
     def test_rolling_window_formula(self):
         """Eq. 3: RS_t(w) = (1/w) * sum(success_i) for i in [max(1,t-w+1), t]"""
-        from agentic_toolkit.evaluation import rolling_window_success
+        from sage.evaluation import rolling_window_success
 
         # Results: [T, T, F, T, F, T, T, F, T, T]
         results = [True, True, False, True, False, True, True, False, True, True]
@@ -99,7 +99,7 @@ class TestGoalDrift:
 
     def test_goal_drift_identical(self):
         """Eq. 15: Drift = 0 for identical embeddings"""
-        from agentic_toolkit.evaluation import goal_drift_score
+        from sage.evaluation import goal_drift_score
 
         e = [1.0, 0.5, 0.3, 0.2]
         drift = goal_drift_score(e, e)
@@ -107,7 +107,7 @@ class TestGoalDrift:
 
     def test_goal_drift_orthogonal(self):
         """Eq. 15: Drift = 1 for orthogonal embeddings (cosine = 0)"""
-        from agentic_toolkit.evaluation import goal_drift_score
+        from sage.evaluation import goal_drift_score
 
         e1 = [1.0, 0.0]
         e2 = [0.0, 1.0]
@@ -116,7 +116,7 @@ class TestGoalDrift:
 
     def test_goal_drift_formula(self):
         """Eq. 15: Drift = 1 - cosine_similarity"""
-        from agentic_toolkit.evaluation import goal_drift_score
+        from sage.evaluation import goal_drift_score
 
         e1 = [3.0, 4.0]  # magnitude = 5
         e2 = [4.0, 3.0]  # magnitude = 5
@@ -133,7 +133,7 @@ class TestIncidentRate:
 
     def test_incident_rate_formula(self):
         """Eq. 16: IR = (I_human + I_guardrail + I_violation + I_termination) / N"""
-        from agentic_toolkit.evaluation import IncidentTracker
+        from sage.evaluation import IncidentTracker
 
         tracker = IncidentTracker()
         tracker.record_incident("human_intervention")
@@ -153,7 +153,7 @@ class TestCostVariance:
 
     def test_cost_variance_formula(self):
         """Eq. 17: sigma^2 = (1/N) * sum((c_i - c_bar)^2)"""
-        from agentic_toolkit.evaluation import CostTrajectory
+        from sage.evaluation import CostTrajectory
 
         costs = [1.0, 2.0, 3.0, 4.0, 5.0]
         successes = [True] * 5
@@ -172,7 +172,7 @@ class TestEfficiencyScore:
 
     def test_efficiency_formula(self):
         """Eq. 18: Eff = SR * (1 - w_s + w_s * (s* / s_bar))"""
-        from agentic_toolkit.evaluation.metrics import compute_efficiency_score
+        from sage.evaluation.metrics import compute_efficiency_score
 
         success_rate = 0.8
         avg_steps = 10.0
@@ -197,7 +197,7 @@ class TestF1Score:
 
     def test_f1_formula(self):
         """Eq. 19: F1 = 2 * TP / (2*TP + FP + FN)"""
-        from agentic_toolkit.evaluation.metrics import compute_f1_score
+        from sage.evaluation.metrics import compute_f1_score
 
         # Predictions vs Ground Truth
         predictions = [True, True, False, True, False, True, False, True]
@@ -223,7 +223,7 @@ class TestMRR:
 
     def test_mrr_formula(self):
         """Eq. 20: MRR = (1/|Q|) * sum(1/rank_i)"""
-        from agentic_toolkit.evaluation.metrics import compute_mean_reciprocal_rank
+        from sage.evaluation.metrics import compute_mean_reciprocal_rank
 
         # Ranks for 5 queries: [1, 2, 3, 1, 5]
         rankings = [1, 2, 3, 1, 5]

@@ -8,7 +8,7 @@ Tests verify that CNSR computation properly integrates all cost components:
 import pytest
 import math
 
-from agentic_toolkit.evaluation.metrics import (
+from sage.evaluation.metrics import (
     TaskCostBreakdown,
     TaskResult,
     compute_cnsr_from_results,

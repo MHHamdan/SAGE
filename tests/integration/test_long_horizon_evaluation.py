@@ -22,51 +22,51 @@ from typing import Dict, Any, List
 import numpy as np
 
 # Evaluation components
-from agentic_toolkit.evaluation.goal_drift import (
+from sage.evaluation.goal_drift import (
     GoalDriftTracker,
     MultiGoalDriftTracker,
 )
-from agentic_toolkit.evaluation.incident_tracker import (
+from sage.evaluation.incident_tracker import (
     IncidentTracker,
     IncidentType,
     IncidentSeverity,
 )
-from agentic_toolkit.evaluation.rolling_metrics import (
+from sage.evaluation.rolling_metrics import (
     RollingWindowTracker,
     TaskResult,
 )
-from agentic_toolkit.evaluation.long_horizon import (
+from sage.evaluation.long_horizon import (
     LongHorizonEvaluator,
     SimpleLongHorizonEvaluator,
     EvaluationStatus,
 )
 
 # Human oversight components
-from agentic_toolkit.human_oversight.approval_flow import (
+from sage.human_oversight.approval_flow import (
     ApprovalHandler,
     ApprovalRequest,
     RiskLevel,
 )
-from agentic_toolkit.human_oversight.escalation import (
+from sage.human_oversight.escalation import (
     EscalationHandler,
     EscalationLevel,
 )
-from agentic_toolkit.human_oversight.audit import (
+from sage.human_oversight.audit import (
     AuditLogger,
     AuditEventType,
 )
 
 # Learning components
-from agentic_toolkit.learning.deployment_loop import (
+from sage.learning.deployment_loop import (
     DeploymentLoop,
     DeploymentConfig,
     ABTestDeployment,
 )
-from agentic_toolkit.learning.feedback import (
+from sage.learning.feedback import (
     FeedbackCollector,
     FeedbackType,
 )
-from agentic_toolkit.learning.experience import (
+from sage.learning.experience import (
     ExperienceBuffer,
     Experience,
 )

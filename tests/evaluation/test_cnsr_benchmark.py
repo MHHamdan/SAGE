@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 from unittest.mock import Mock
 
-from agentic_toolkit.evaluation.cnsr_benchmark import (
+from sage.evaluation.cnsr_benchmark import (
     CNSRBenchmark,
     BenchmarkConfig,
     AgentEvaluationResult,
@@ -17,7 +17,7 @@ from agentic_toolkit.evaluation.cnsr_benchmark import (
     create_cnsr_benchmark,
     quick_cnsr_comparison,
 )
-from agentic_toolkit.evaluation.metrics import TaskResult, TaskCostBreakdown
+from sage.evaluation.metrics import TaskResult, TaskCostBreakdown
 
 
 class TestCNSRBenchmark:

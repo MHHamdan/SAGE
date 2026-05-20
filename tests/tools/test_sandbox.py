@@ -9,7 +9,7 @@ class TestSandbox:
 
     def test_basic_execution(self):
         """Test basic sandboxed execution."""
-        from agentic_toolkit.tools.sandbox import Sandbox, SandboxMode
+        from sage.tools.sandbox import Sandbox, SandboxMode
 
         sandbox = Sandbox(mode=SandboxMode.BASIC)
 
@@ -23,7 +23,7 @@ class TestSandbox:
 
     def test_timeout(self):
         """Test timeout enforcement."""
-        from agentic_toolkit.tools.sandbox import Sandbox, ResourceLimits
+        from sage.tools.sandbox import Sandbox, ResourceLimits
 
         limits = ResourceLimits(timeout_seconds=0.1)
         sandbox = Sandbox(limits=limits)
@@ -40,7 +40,7 @@ class TestSandbox:
 
     def test_no_sandbox_mode(self):
         """Test execution without sandboxing."""
-        from agentic_toolkit.tools.sandbox import Sandbox, SandboxMode
+        from sage.tools.sandbox import Sandbox, SandboxMode
 
         sandbox = Sandbox(mode=SandboxMode.NONE)
 
@@ -54,7 +54,7 @@ class TestSandbox:
 
     def test_exception_handling(self):
         """Test exception handling in sandbox."""
-        from agentic_toolkit.tools.sandbox import Sandbox
+        from sage.tools.sandbox import Sandbox
 
         sandbox = Sandbox()
 
@@ -68,7 +68,7 @@ class TestSandbox:
 
     def test_path_validation(self):
         """Test path validation."""
-        from agentic_toolkit.tools.sandbox import Sandbox
+        from sage.tools.sandbox import Sandbox
 
         sandbox = Sandbox(blocked_paths=["/etc", "/root"])
 
@@ -78,7 +78,7 @@ class TestSandbox:
 
     def test_allowed_paths(self):
         """Test allowed paths."""
-        from agentic_toolkit.tools.sandbox import Sandbox
+        from sage.tools.sandbox import Sandbox
 
         sandbox = Sandbox(allowed_paths=["/app/data"])
 
@@ -91,7 +91,7 @@ class TestSandboxedTool:
 
     def test_sandboxed_tool_creation(self):
         """Test sandboxed tool creation."""
-        from agentic_toolkit.tools.sandbox import SandboxedTool
+        from sage.tools.sandbox import SandboxedTool
 
         def my_tool(x):
             return x + 1
@@ -103,7 +103,7 @@ class TestSandboxedTool:
 
     def test_sandboxed_tool_safe_execute(self):
         """Test safe execution method."""
-        from agentic_toolkit.tools.sandbox import SandboxedTool
+        from sage.tools.sandbox import SandboxedTool
 
         def risky_tool():
             raise RuntimeError("Oops")
@@ -120,7 +120,7 @@ class TestSandboxedDecorator:
 
     def test_decorator(self):
         """Test sandboxed decorator."""
-        from agentic_toolkit.tools.sandbox import sandboxed
+        from sage.tools.sandbox import sandboxed
 
         @sandboxed(timeout=5.0)
         def my_func(x):

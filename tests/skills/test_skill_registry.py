@@ -8,7 +8,7 @@ class TestSkillRegistry:
 
     def test_register_skill(self):
         """Test skill registration."""
-        from agentic_toolkit.skills import SkillRegistry, Skill
+        from sage.skills import SkillRegistry, Skill
 
         registry = SkillRegistry()
 
@@ -26,7 +26,7 @@ class TestSkillRegistry:
 
     def test_get_skill(self):
         """Test skill retrieval."""
-        from agentic_toolkit.skills import SkillRegistry, Skill
+        from sage.skills import SkillRegistry, Skill
 
         registry = SkillRegistry()
 
@@ -42,7 +42,7 @@ class TestSkillRegistry:
 
     def test_unregister_skill(self):
         """Test skill unregistration."""
-        from agentic_toolkit.skills import SkillRegistry, Skill
+        from sage.skills import SkillRegistry, Skill
 
         registry = SkillRegistry()
 
@@ -57,7 +57,7 @@ class TestSkillRegistry:
 
     def test_search_skills(self):
         """Test skill search by query."""
-        from agentic_toolkit.skills import SkillRegistry, Skill
+        from sage.skills import SkillRegistry, Skill
 
         registry = SkillRegistry()
 
@@ -80,7 +80,7 @@ class TestSkill:
 
     def test_skill_creation(self):
         """Test skill creation."""
-        from agentic_toolkit.skills import Skill
+        from sage.skills import Skill
 
         def my_func(x, y):
             return x + y
@@ -99,7 +99,7 @@ class TestSkill:
 
     def test_skill_execution(self):
         """Test skill execution."""
-        from agentic_toolkit.skills import Skill
+        from sage.skills import Skill
 
         def multiply(a, b):
             return a * b
@@ -111,7 +111,7 @@ class TestSkill:
 
     def test_skill_stats_update(self):
         """Test skill statistics update."""
-        from agentic_toolkit.skills import Skill
+        from sage.skills import Skill
 
         def test_func():
             return "done"

@@ -8,7 +8,7 @@ class TestPermissionEnforcement:
 
     def test_forbidden_permission_blocked(self):
         """Verify tools without required permissions are blocked."""
-        from agentic_toolkit.tools.permissions import (
+        from sage.tools.permissions import (
             PermissionManager,
             Permission,
         )
@@ -22,7 +22,7 @@ class TestPermissionEnforcement:
 
     def test_revoked_permission_blocked(self):
         """Verify revoked permissions are actually revoked."""
-        from agentic_toolkit.tools.permissions import (
+        from sage.tools.permissions import (
             PermissionManager,
             Permission,
         )
@@ -45,7 +45,7 @@ class TestSandboxEnforcement:
 
     def test_blocked_path_rejected(self):
         """Verify blocked paths are actually blocked."""
-        from agentic_toolkit.tools.sandbox import Sandbox
+        from sage.tools.sandbox import Sandbox
 
         sandbox = Sandbox(blocked_paths=["/etc", "/root", "/boot"])
 
@@ -56,7 +56,7 @@ class TestSandboxEnforcement:
 
     def test_allowed_path_only(self):
         """Verify allowlist is enforced."""
-        from agentic_toolkit.tools.sandbox import Sandbox
+        from sage.tools.sandbox import Sandbox
 
         sandbox = Sandbox(allowed_paths=["/app/data", "/tmp"])
 
@@ -68,7 +68,7 @@ class TestSandboxEnforcement:
     def test_timeout_enforced(self):
         """Verify timeout actually terminates execution."""
         import time
-        from agentic_toolkit.tools.sandbox import Sandbox, ResourceLimits
+        from sage.tools.sandbox import Sandbox, ResourceLimits
 
         limits = ResourceLimits(timeout_seconds=0.1)
         sandbox = Sandbox(limits=limits)
@@ -89,7 +89,7 @@ class TestPolicyEnforcement:
 
     def test_deny_policy_blocks_action(self):
         """Verify DENY policies block execution."""
-        from agentic_toolkit.verification.policies import (
+        from sage.verification.policies import (
             PolicyEngine,
             PolicyRule,
             PolicyDecision,
@@ -116,7 +116,7 @@ class TestPolicyEnforcement:
 
     def test_approval_required_policy(self):
         """Verify REQUIRE_APPROVAL policies trigger approval flow."""
-        from agentic_toolkit.verification.policies import (
+        from sage.verification.policies import (
             PolicyEngine,
             PolicyRule,
             PolicyDecision,
@@ -141,7 +141,7 @@ class TestAuditLogging:
 
     def test_sensitive_data_redacted(self):
         """Verify sensitive fields are redacted in audit logs."""
-        from agentic_toolkit.tools.audit import AuditEntry
+        from sage.tools.audit import AuditEntry
 
         entry = AuditEntry(
             timestamp="2024-01-01T00:00:00",
@@ -165,7 +165,7 @@ class TestAuditLogging:
 
     def test_long_values_truncated(self):
         """Verify long values are truncated."""
-        from agentic_toolkit.tools.audit import AuditEntry
+        from sage.tools.audit import AuditEntry
 
         long_value = "x" * 1000
 
@@ -181,7 +181,7 @@ class TestAuditLogging:
 
     def test_audit_logging_records_all(self):
         """Verify all invocations are logged."""
-        from agentic_toolkit.tools.audit import AuditLogger
+        from sage.tools.audit import AuditLogger
 
         logger = AuditLogger(enabled=True)
 
@@ -206,7 +206,7 @@ class TestApprovalCost:
 
     def test_approval_adds_human_cost(self):
         """Verify approval-gated actions add human intervention cost."""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
 

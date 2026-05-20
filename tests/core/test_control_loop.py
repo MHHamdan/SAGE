@@ -23,7 +23,7 @@ import numpy as np
 # Read and execute control_loop.py directly to avoid package __init__.py
 control_loop_path = os.path.join(
     os.path.dirname(__file__), '..', '..', 'src',
-    'agentic_toolkit', 'core', 'control_loop.py'
+    'sage', 'core', 'control_loop.py'
 )
 
 # Create a module namespace with required imports

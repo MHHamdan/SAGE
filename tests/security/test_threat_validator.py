@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import Mock
 
-from agentic_toolkit.security.threat_validator import (
+from sage.security.threat_validator import (
     ThreatValidator,
     ThreatDefinition,
     ThreatResult,
