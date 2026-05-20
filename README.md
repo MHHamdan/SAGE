@@ -397,78 +397,16 @@ config = Config(
 ## Architecture
 
 ### System Overview
-<<<<<<< HEAD
+
 <img width="1800" height="1300" alt="system_architecture_v2" src="https://github.com/user-attachments/assets/c12d9124-b914-40f8-81fd-481cdffde0b5" />
+
 ### Component Architecture
 
 <img width="1360" height="960" alt="class_diagram (1)" src="https://github.com/user-attachments/assets/c32f3dfe-f6a4-4426-bdc4-147f19eb9390" />
 
-
 ### Control Loop
 
 <img width="309" height="838" alt="agent_cycle" src="https://github.com/user-attachments/assets/378ee650-3b4b-457c-bc3b-9c2d734a54ed" />
-
-=======
-
-```mermaid
-graph TB
-    subgraph External["External Services"]
-        Ollama[(Ollama Local LLM)]
-        OpenAI[(OpenAI API)]
-        Together[(Together AI)]
-        ChromaDB[(ChromaDB Vector Store)]
-    end
-
-    subgraph Agents["Agent Layer"]
-        ReAct[ReActAgent]
-        CoT[CoTAgent]
-        Supervisor[SupervisorAgent]
-        Pipeline[SequentialPipeline]
-    end
-
-    subgraph Core["Core Layer"]
-        LLM[LLMClient]
-        Base[BaseAgent]
-        Cost[CostTracker]
-    end
-
-    subgraph Evaluation["Evaluation & Monitoring"]
-        CNSR[CNSR Metric]
-        Drift[GoalDriftScore]
-        Stability[StabilityMonitor]
-        Incidents[IncidentTracker]
-        LongH[LongHorizonEvaluator]
-    end
-
-    subgraph Experiments["Research Experiments"]
-        E1[cnsr_multitask.py]
-        E2[exp_obs_fidelity.py]
-        E3[exp_progress_mono.py]
-        E4[exp_context_noise.py]
-        E5[judge_bias.py]
-    end
-
-    ReAct --> Base --> LLM
-    LLM --> Ollama & OpenAI & Together
-    E1 & E2 & E3 & E4 & E5 --> CNSR & Drift & Stability
-```
-
-### Control Loop
-
-```mermaid
-stateDiagram-v2
-    [*] --> Perceive: User Query
-    Perceive --> Think: Environment State
-    Think --> Plan: Reasoning
-    Plan --> Verify: Proposed Actions
-    Verify --> Act: Validated Plan
-    Verify --> Think: Rejected (Replan)
-    Act --> Observe: Tool Execution
-    Observe --> Monitor: Stability Check
-    Monitor --> Think: Feedback Loop
-    Monitor --> [*]: Task Complete
-```
->>>>>>> 4aab772 (feat: add research experiments, eval shim, and README update (v1.1.0))
 
 ### Evaluation Metrics
 
