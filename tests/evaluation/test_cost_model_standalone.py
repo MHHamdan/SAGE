@@ -10,7 +10,7 @@ import importlib.util
 # Direct import from the metrics.py file without package init
 metrics_path = os.path.join(
     os.path.dirname(__file__), '..', '..', 'src',
-    'agentic_toolkit', 'evaluation', 'metrics.py'
+    'sage', 'evaluation', 'metrics.py'
 )
 spec = importlib.util.spec_from_file_location("metrics", metrics_path)
 metrics = importlib.util.module_from_spec(spec)

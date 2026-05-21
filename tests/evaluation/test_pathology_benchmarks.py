@@ -9,8 +9,8 @@ Verifies:
 
 import pytest
 
-from agentic_toolkit.evaluation.failure_taxonomy import FailurePathology
-from agentic_toolkit.evaluation.pathology_benchmarks import (
+from sage.evaluation.failure_taxonomy import FailurePathology
+from sage.evaluation.pathology_benchmarks import (
     ALL_PATHOLOGY_TASKS,
     TASKS_BY_PATHOLOGY,
     PathologyBenchmarkTask,

@@ -24,7 +24,7 @@ import numpy as np
 from scipy.stats import pearsonr
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "src"))  # allow direct import of agentic_toolkit
+sys.path.insert(0, str(ROOT / "src"))  # allow direct import of sage
 sys.path.insert(0, str(ROOT))
 
 RESULTS_DIR = ROOT / "results"

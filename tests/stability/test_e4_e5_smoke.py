@@ -107,7 +107,7 @@ class TestE4Smoke:
         jsonl_files = list(traces_dir.glob("*.jsonl"))
         assert jsonl_files, "No traces to validate"
         first_file = sorted(jsonl_files)[0]
-        from agentic_toolkit.stability.traces import TraceEvent
+        from sage.stability.traces import TraceEvent
         with first_file.open() as f:
             for i, line in enumerate(f):
                 if i >= 3:
@@ -177,7 +177,7 @@ class TestE5Smoke:
     def test_no_leakage_in_cv(self, e5_results):
         """Verify that no task_id appears in both train and test across folds."""
         import experiments.e5_predictive_validation as e5
-        from agentic_toolkit.stability.predictor import (
+        from sage.stability.predictor import (
             build_training_data, assert_no_leakage,
         )
         from sklearn.model_selection import StratifiedGroupKFold

@@ -9,7 +9,7 @@ class TestReplayProtection:
 
     def test_valid_message(self):
         """Test valid message passes validation."""
-        from agentic_toolkit.protocols.a2a import ReplayProtection, MessageMetadata
+        from sage.protocols.a2a import ReplayProtection, MessageMetadata
 
         protection = ReplayProtection()
         metadata = MessageMetadata.generate(sender_id="agent-1")
@@ -19,7 +19,7 @@ class TestReplayProtection:
 
     def test_replay_detection(self):
         """Test replay attack detection."""
-        from agentic_toolkit.protocols.a2a import (
+        from sage.protocols.a2a import (
             ReplayProtection,
             MessageMetadata,
             ReplayAttackDetected,
@@ -37,7 +37,7 @@ class TestReplayProtection:
 
     def test_old_message_rejected(self):
         """Test old messages are rejected."""
-        from agentic_toolkit.protocols.a2a import (
+        from sage.protocols.a2a import (
             ReplayProtection,
             MessageMetadata,
             ReplayAttackDetected,
@@ -52,7 +52,7 @@ class TestReplayProtection:
 
     def test_future_message_rejected(self):
         """Test messages with future timestamps are rejected."""
-        from agentic_toolkit.protocols.a2a import (
+        from sage.protocols.a2a import (
             ReplayProtection,
             MessageMetadata,
             ReplayAttackDetected,
@@ -67,7 +67,7 @@ class TestReplayProtection:
 
     def test_sequence_validation(self):
         """Test sequence number validation."""
-        from agentic_toolkit.protocols.a2a import (
+        from sage.protocols.a2a import (
             ReplayProtection,
             MessageMetadata,
             ReplayAttackDetected,
@@ -91,7 +91,7 @@ class TestNonceManager:
 
     def test_nonce_tracking(self):
         """Test nonce tracking."""
-        from agentic_toolkit.protocols.a2a import NonceManager
+        from sage.protocols.a2a import NonceManager
 
         manager = NonceManager()
 
@@ -99,13 +99,13 @@ class TestNonceManager:
         assert manager.check_and_add("nonce1", time.time())
 
         # Second use: replay
-        from agentic_toolkit.protocols.a2a import ReplayAttackDetected
+        from sage.protocols.a2a import ReplayAttackDetected
         with pytest.raises(ReplayAttackDetected):
             manager.check_and_add("nonce1", time.time())
 
     def test_nonce_cleanup(self):
         """Test old nonces are cleaned up."""
-        from agentic_toolkit.protocols.a2a import NonceManager
+        from sage.protocols.a2a import NonceManager
 
         manager = NonceManager(max_age_seconds=0.1, cleanup_interval=0.05)
 

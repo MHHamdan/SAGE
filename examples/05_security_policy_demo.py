@@ -21,15 +21,15 @@ def main():
     print()
 
     # Import security components
-    from agentic_toolkit.tools.permissions import (
+    from sage.tools.permissions import (
         PermissionManager,
         Permission,
         READONLY_PERMISSIONS,
         STANDARD_PERMISSIONS,
     )
-    from agentic_toolkit.tools.sandbox import Sandbox, SandboxMode, ResourceLimits
-    from agentic_toolkit.tools.audit import AuditLogger
-    from agentic_toolkit.verification.policies import (
+    from sage.tools.sandbox import Sandbox, SandboxMode, ResourceLimits
+    from sage.tools.audit import AuditLogger
+    from sage.verification.policies import (
         PolicyEngine,
         PolicyRule,
         PolicyDecision,

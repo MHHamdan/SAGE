@@ -15,7 +15,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
-from agentic_toolkit.evaluation.rolling_metrics import (
+from sage.evaluation.rolling_metrics import (
     RollingWindowTracker,
     TimeBasedRollingTracker,
     TaskResult,

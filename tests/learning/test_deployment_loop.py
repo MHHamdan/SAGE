@@ -9,7 +9,7 @@ import asyncio
 from datetime import datetime, timedelta
 from unittest.mock import Mock, AsyncMock
 
-from agentic_toolkit.learning.deployment_loop import (
+from sage.learning.deployment_loop import (
     DeploymentLoop,
     DeploymentConfig,
     DeploymentState,
@@ -18,14 +18,14 @@ from agentic_toolkit.learning.deployment_loop import (
     DeploymentUpdate,
     ABTestDeployment,
 )
-from agentic_toolkit.learning.feedback import (
+from sage.learning.feedback import (
     FeedbackCollector,
     Feedback,
     FeedbackType,
     FeedbackSource,
     AggregatedFeedback,
 )
-from agentic_toolkit.learning.experience import (
+from sage.learning.experience import (
     ExperienceBuffer,
     Experience,
     ExperienceBatch,

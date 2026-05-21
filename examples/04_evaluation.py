@@ -8,7 +8,7 @@ and long-horizon behavior.
 """
 
 import random
-from agentic_toolkit.evaluation import (
+from sage.evaluation import (
     calculate_cnsr,
     evaluate_agent,
     rolling_window_success,

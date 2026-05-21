@@ -1,1 +1,1 @@
-"""Integration tests for agentic_toolkit."""
+"""Integration tests for sage."""

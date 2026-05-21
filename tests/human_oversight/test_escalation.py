@@ -7,13 +7,13 @@ Tests for EscalationHandler, EscalationRequest, and related classes.
 import pytest
 from datetime import datetime
 
-from agentic_toolkit.human_oversight.escalation import (
+from sage.human_oversight.escalation import (
     EscalationHandler,
     EscalationRequest,
     EscalationLevel,
     EscalationPolicy,
 )
-from agentic_toolkit.human_oversight.approval_flow import RiskLevel
+from sage.human_oversight.approval_flow import RiskLevel
 
 
 # ============================================================================

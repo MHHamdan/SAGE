@@ -8,7 +8,7 @@ class TestCNSR:
 
     def test_cnsr_basic(self):
         """Test basic CNSR calculation."""
-        from agentic_toolkit.evaluation import calculate_cnsr
+        from sage.evaluation import calculate_cnsr
 
         # 80% success at $0.50/task = CNSR 1.6
         cnsr = calculate_cnsr(successes=80, total_tasks=100, total_cost=50.0)
@@ -16,21 +16,21 @@ class TestCNSR:
 
     def test_cnsr_zero_cost(self):
         """Test CNSR with zero cost (local models)."""
-        from agentic_toolkit.evaluation import calculate_cnsr
+        from sage.evaluation import calculate_cnsr
 
         cnsr = calculate_cnsr(successes=80, total_tasks=100, total_cost=0.0)
         assert cnsr == float("inf")
 
     def test_cnsr_no_successes(self):
         """Test CNSR with no successes."""
-        from agentic_toolkit.evaluation import calculate_cnsr
+        from sage.evaluation import calculate_cnsr
 
         cnsr = calculate_cnsr(successes=0, total_tasks=100, total_cost=10.0)
         assert cnsr == 0.0
 
     def test_cnsr_no_tasks(self):
         """Test CNSR with no tasks."""
-        from agentic_toolkit.evaluation import calculate_cnsr
+        from sage.evaluation import calculate_cnsr
 
         cnsr = calculate_cnsr(successes=0, total_tasks=0, total_cost=0.0)
         assert cnsr == 0.0
@@ -41,7 +41,7 @@ class TestRollingWindow:
 
     def test_rolling_window_basic(self):
         """Test basic rolling window calculation."""
-        from agentic_toolkit.evaluation import rolling_window_success
+        from sage.evaluation import rolling_window_success
 
         results = [True, True, False, True, False]
         rolling = rolling_window_success(results, window_size=3)
@@ -52,7 +52,7 @@ class TestRollingWindow:
 
     def test_rolling_window_all_success(self):
         """Test rolling window with all successes."""
-        from agentic_toolkit.evaluation import rolling_window_success
+        from sage.evaluation import rolling_window_success
 
         results = [True] * 10
         rolling = rolling_window_success(results, window_size=5)
@@ -61,7 +61,7 @@ class TestRollingWindow:
 
     def test_rolling_window_empty(self):
         """Test rolling window with empty results."""
-        from agentic_toolkit.evaluation import rolling_window_success
+        from sage.evaluation import rolling_window_success
 
         rolling = rolling_window_success([], window_size=5)
         assert rolling == []
@@ -72,7 +72,7 @@ class TestGoalDrift:
 
     def test_goal_drift_identical(self):
         """Test drift with identical embeddings."""
-        from agentic_toolkit.evaluation import goal_drift_score
+        from sage.evaluation import goal_drift_score
 
         embedding = [1.0, 0.5, 0.3]
         drift = goal_drift_score(embedding, embedding)
@@ -81,7 +81,7 @@ class TestGoalDrift:
 
     def test_goal_drift_orthogonal(self):
         """Test drift with orthogonal embeddings."""
-        from agentic_toolkit.evaluation import goal_drift_score
+        from sage.evaluation import goal_drift_score
 
         e1 = [1.0, 0.0]
         e2 = [0.0, 1.0]
@@ -95,7 +95,7 @@ class TestIncidentTracker:
 
     def test_incident_recording(self):
         """Test incident recording."""
-        from agentic_toolkit.evaluation import IncidentTracker
+        from sage.evaluation import IncidentTracker
 
         tracker = IncidentTracker()
         tracker.record_incident("human_intervention")
@@ -109,7 +109,7 @@ class TestIncidentTracker:
 
     def test_incident_rate(self):
         """Test incident rate calculation."""
-        from agentic_toolkit.evaluation import IncidentTracker
+        from sage.evaluation import IncidentTracker
 
         tracker = IncidentTracker()
         tracker.record_incident("human_intervention")
@@ -124,7 +124,7 @@ class TestEvaluateAgent:
 
     def test_evaluate_agent(self):
         """Test full agent evaluation."""
-        from agentic_toolkit.evaluation import evaluate_agent
+        from sage.evaluation import evaluate_agent
 
         result = evaluate_agent(
             successes=80,

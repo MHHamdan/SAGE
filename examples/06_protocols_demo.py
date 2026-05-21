@@ -28,7 +28,7 @@ def main():
     print("1. MCP Protocol - Client/Server Loopback")
     print("-" * 40)
 
-    from agentic_toolkit.protocols.mcp import (
+    from sage.protocols.mcp import (
         MCPServer,
         MCPClient,
         MCPTool,
@@ -92,7 +92,7 @@ def main():
     print("2. MCP Replay Protection")
     print("-" * 40)
 
-    from agentic_toolkit.protocols.mcp import ReplayProtector, ReplayError
+    from sage.protocols.mcp import ReplayProtector, ReplayError
 
     protector = ReplayProtector(window_seconds=60)
 
@@ -121,7 +121,7 @@ def main():
     print("3. A2A Agent Card Exchange")
     print("-" * 40)
 
-    from agentic_toolkit.protocols.a2a import (
+    from sage.protocols.a2a import (
         AgentCard,
         AgentCapability,
         AgentCardValidator,
@@ -199,7 +199,7 @@ def main():
     print("4. A2A Capability Token Flow")
     print("-" * 40)
 
-    from agentic_toolkit.protocols.a2a import (
+    from sage.protocols.a2a import (
         CapabilityAuth,
         CapabilityToken,
         TokenStatus,
@@ -256,7 +256,7 @@ def main():
         (coder_token, "search", False),
     ]
 
-    from agentic_toolkit.protocols.a2a import CapabilityAuthError
+    from sage.protocols.a2a import CapabilityAuthError
 
     for token, cap, expected in checks:
         try:
@@ -326,7 +326,7 @@ def main():
     print("6. Complete A2A Handshake Simulation")
     print("-" * 40)
 
-    from agentic_toolkit.protocols.a2a import A2AHandshake, HandshakeStatus
+    from sage.protocols.a2a import A2AHandshake, HandshakeStatus
 
     # Simulate handshake between two agents
     handshake = A2AHandshake(auth=auth, validator=validator)

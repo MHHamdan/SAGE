@@ -23,7 +23,7 @@ import types
 
 # Get the src directory path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SRC_DIR = os.path.join(SCRIPT_DIR, '..', 'src', 'agentic_toolkit', 'evaluation')
+SRC_DIR = os.path.join(SCRIPT_DIR, '..', 'src', 'sage', 'evaluation')
 
 
 def load_module_from_source(module_name: str, file_path: str, package_name: str = None):
@@ -51,13 +51,13 @@ def load_module_from_source(module_name: str, file_path: str, package_name: str 
 
 
 # Set up the package structure for relative imports
-pkg_name = 'agentic_toolkit.evaluation'
+pkg_name = 'sage.evaluation'
 
 # Create parent packages if needed
-if 'agentic_toolkit' not in sys.modules:
-    agentic_pkg = types.ModuleType('agentic_toolkit')
-    agentic_pkg.__path__ = [os.path.join(SCRIPT_DIR, '..', 'src', 'agentic_toolkit')]
-    sys.modules['agentic_toolkit'] = agentic_pkg
+if 'sage' not in sys.modules:
+    agentic_pkg = types.ModuleType('sage')
+    agentic_pkg.__path__ = [os.path.join(SCRIPT_DIR, '..', 'src', 'sage')]
+    sys.modules['sage'] = agentic_pkg
 
 if pkg_name not in sys.modules:
     eval_pkg = types.ModuleType(pkg_name)

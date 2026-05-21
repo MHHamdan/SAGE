@@ -15,7 +15,7 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from agentic_toolkit.stability.interventions import (
+from sage.stability.interventions import (
     AgentState,
     EscalationRequest,
     GoalReanchor,

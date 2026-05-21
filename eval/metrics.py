@@ -1,6 +1,6 @@
 """Evaluation metrics shim.
 
-Exports compute_cnsr and related helpers from agentic_toolkit.evaluation.metrics.
+Exports compute_cnsr and related helpers from sage.evaluation.metrics.
 Supports two modes:
   1. Package installed (pip install -e .): direct import works.
   2. Uninstalled (repo clone only): loads the source file directly via importlib.
@@ -17,12 +17,12 @@ from pathlib import Path
 
 
 def _load_direct() -> object:
-    """Load agentic_toolkit.evaluation.metrics directly from source file."""
+    """Load sage.evaluation.metrics directly from source file."""
     src = (
         Path(__file__).resolve().parent.parent
-        / "src" / "agentic_toolkit" / "evaluation" / "metrics.py"
+        / "src" / "sage" / "evaluation" / "metrics.py"
     )
-    mod_name = "agentic_toolkit.evaluation.metrics"
+    mod_name = "sage.evaluation.metrics"
     if mod_name in sys.modules:
         return sys.modules[mod_name]
     spec = importlib.util.spec_from_file_location(mod_name, src)
@@ -33,7 +33,7 @@ def _load_direct() -> object:
 
 
 try:
-    from agentic_toolkit.evaluation.metrics import (  # type: ignore[import]
+    from sage.evaluation.metrics import (  # type: ignore[import]
         compute_cnsr,
         compute_cnsr_from_results,
         compute_cost_from_usage,

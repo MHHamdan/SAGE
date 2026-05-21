@@ -9,7 +9,7 @@ class TestCapabilityToken:
 
     def test_token_creation(self):
         """Test token creation with capabilities."""
-        from agentic_toolkit.protocols.a2a import CapabilityAuth, CapabilityToken
+        from sage.protocols.a2a import CapabilityAuth, CapabilityToken
 
         auth = CapabilityAuth(secret_key="test-secret")
         auth.grant_capability("agent-1", "read")
@@ -28,7 +28,7 @@ class TestCapabilityToken:
 
     def test_token_validation(self):
         """Test token signature validation."""
-        from agentic_toolkit.protocols.a2a import CapabilityAuth, TokenStatus
+        from sage.protocols.a2a import CapabilityAuth, TokenStatus
 
         auth = CapabilityAuth(secret_key="test-secret")
 
@@ -42,7 +42,7 @@ class TestCapabilityToken:
 
     def test_invalid_signature_rejected(self):
         """Test that tampered tokens are rejected."""
-        from agentic_toolkit.protocols.a2a import CapabilityAuth, TokenStatus
+        from sage.protocols.a2a import CapabilityAuth, TokenStatus
 
         auth = CapabilityAuth(secret_key="test-secret")
 
@@ -59,7 +59,7 @@ class TestCapabilityToken:
 
     def test_expired_token_rejected(self):
         """Test that expired tokens are rejected."""
-        from agentic_toolkit.protocols.a2a import CapabilityAuth, TokenStatus
+        from sage.protocols.a2a import CapabilityAuth, TokenStatus
 
         auth = CapabilityAuth(secret_key="test-secret")
 
@@ -76,7 +76,7 @@ class TestCapabilityToken:
 
     def test_revoked_token_rejected(self):
         """Test that revoked tokens are rejected."""
-        from agentic_toolkit.protocols.a2a import CapabilityAuth, TokenStatus
+        from sage.protocols.a2a import CapabilityAuth, TokenStatus
 
         auth = CapabilityAuth(secret_key="test-secret")
 
@@ -92,7 +92,7 @@ class TestCapabilityToken:
 
     def test_capability_check(self):
         """Test capability checking."""
-        from agentic_toolkit.protocols.a2a import CapabilityAuth, CapabilityAuthError
+        from sage.protocols.a2a import CapabilityAuth, CapabilityAuthError
 
         auth = CapabilityAuth(secret_key="test-secret")
 
@@ -115,7 +115,7 @@ class TestAgentCardValidation:
 
     def test_valid_card(self):
         """Test valid agent card passes validation."""
-        from agentic_toolkit.protocols.a2a import AgentCard, AgentCardValidator
+        from sage.protocols.a2a import AgentCard, AgentCardValidator
 
         card = AgentCard(
             agent_id="agent-001",
@@ -128,7 +128,7 @@ class TestAgentCardValidation:
 
     def test_expired_card_rejected(self):
         """Test expired cards are rejected."""
-        from agentic_toolkit.protocols.a2a import (
+        from sage.protocols.a2a import (
             AgentCard,
             AgentCardValidator,
             AgentCardError,
@@ -148,7 +148,7 @@ class TestAgentCardValidation:
 
     def test_low_trust_rejected(self):
         """Test low trust cards are rejected when threshold set."""
-        from agentic_toolkit.protocols.a2a import (
+        from sage.protocols.a2a import (
             AgentCard,
             AgentCardValidator,
             AgentCardError,
@@ -166,7 +166,7 @@ class TestAgentCardValidation:
 
     def test_capability_validation(self):
         """Test capability request validation."""
-        from agentic_toolkit.protocols.a2a import (
+        from sage.protocols.a2a import (
             AgentCard,
             AgentCapability,
             AgentCardValidator,

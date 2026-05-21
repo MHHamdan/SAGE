@@ -55,11 +55,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT))
 
-from agentic_toolkit.stability import MonitorSignals, FailurePredictor, TraceRecord
-from agentic_toolkit.stability.predictor import (
+from sage.stability import MonitorSignals, FailurePredictor, TraceRecord
+from sage.stability.predictor import (
     extract_features, build_training_data, assert_no_leakage, FEATURE_NAMES,
 )
-from agentic_toolkit.stability.traces import write_manifest, _get_git_sha, _get_env_hash
+from sage.stability.traces import write_manifest, _get_git_sha, _get_env_hash
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)

@@ -11,7 +11,7 @@ Verifies:
 import pytest
 from typing import Dict, Any, List
 
-from agentic_toolkit.evaluation.autonomy_validator import (
+from sage.evaluation.autonomy_validator import (
     AutonomyValidator,
     AutonomyLevel,
     AutonomyCriterion,
@@ -28,7 +28,7 @@ from agentic_toolkit.evaluation.autonomy_validator import (
     FixedStepAgent
 )
 
-from agentic_toolkit.evaluation.autonomy_benchmarks import (
+from sage.evaluation.autonomy_benchmarks import (
     ALL_AUTONOMY_TASKS,
     TASKS_BY_CRITERION,
     get_autonomy_benchmark_statistics

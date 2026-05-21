@@ -21,10 +21,10 @@ import pytest
 
 import importlib.util
 
-# ROOT = agentic_ai_toolkit/ (two levels up from tests/monitoring/)
+# ROOT = SAGE/ (two levels up from tests/monitoring/)
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "src"))  # allow direct import of agentic_toolkit
+sys.path.insert(0, str(ROOT / "src"))  # allow direct import of sage
 
 # ── local experiment imports ──────────────────────────────────────────────────
 from experiments.exp_obs_fidelity import run_experiment as run_a1
@@ -36,11 +36,11 @@ from eval.metrics import compute_cnsr
 def _load_stability_monitor():
     """Load stability_monitor directly to avoid heavy package __init__."""
     path = (
-        ROOT / "src" / "agentic_toolkit"
+        ROOT / "src" / "sage"
         / "monitoring" / "stability_monitor.py"
     )
     # Use a fully-qualified name so dataclass __module__ resolution works
-    mod_name = "agentic_toolkit.monitoring.stability_monitor"
+    mod_name = "sage.monitoring.stability_monitor"
     if mod_name in sys.modules:
         return sys.modules[mod_name]
     spec = importlib.util.spec_from_file_location(mod_name, path)

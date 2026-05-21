@@ -8,7 +8,7 @@ class TestCostTracker:
 
     def test_token_cost_calculation(self):
         """Test token cost calculation."""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
         tracker.add_tokens("gpt-4o", input_tokens=1000, output_tokens=500)
@@ -19,7 +19,7 @@ class TestCostTracker:
 
     def test_ollama_zero_cost(self):
         """Test Ollama models have zero cost."""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
         tracker.add_tokens("llama3.1:8b", input_tokens=10000, output_tokens=5000)
@@ -28,7 +28,7 @@ class TestCostTracker:
 
     def test_tool_cost(self):
         """Test tool cost tracking."""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
         tracker.add_tool_call("search", cost=0.01)
@@ -40,7 +40,7 @@ class TestCostTracker:
 
     def test_total_cost(self):
         """Test total cost calculation."""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
         tracker.add_tokens("gpt-4o-mini", input_tokens=1000, output_tokens=500)
@@ -52,7 +52,7 @@ class TestCostTracker:
 
     def test_cost_summary(self):
         """Test cost summary generation."""
-        from agentic_toolkit.core.cost import CostTracker
+        from sage.core.cost import CostTracker
 
         tracker = CostTracker()
         tracker.add_tokens("llama3.1:8b", input_tokens=500, output_tokens=200)

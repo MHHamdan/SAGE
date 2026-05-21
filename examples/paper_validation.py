@@ -153,7 +153,7 @@ def run_cnsr_validation(seed: int = 42) -> Dict[str, Any]:
     logger.info("EXPERIMENT 1: CNSR METRIC VALIDATION")
     logger.info("=" * 60)
 
-    from agentic_toolkit.evaluation.cnsr_benchmark import (
+    from sage.evaluation.cnsr_benchmark import (
         CNSRBenchmark,
         BenchmarkConfig,
         MODEL_COST_RATES
@@ -279,7 +279,7 @@ def run_autonomy_validation(seed: int = 42) -> Dict[str, Any]:
     logger.info("EXPERIMENT 2: AUTONOMY CLASSIFICATION VALIDATION")
     logger.info("=" * 60)
 
-    from agentic_toolkit.evaluation.autonomy_validator import (
+    from sage.evaluation.autonomy_validator import (
         AutonomyValidator,
         AutonomyLevel,
         GenuineAgent,
@@ -417,7 +417,7 @@ def run_stability_validation(seed: int = 42) -> Dict[str, Any]:
     logger.info("EXPERIMENT 3: STABILITY MONITORING VALIDATION")
     logger.info("=" * 60)
 
-    from agentic_toolkit.monitoring.stability_monitor import (
+    from sage.monitoring.stability_monitor import (
         StabilityMonitor,
         LimitCycleDetector
     )
@@ -614,7 +614,7 @@ def run_security_validation(seed: int = 42) -> Dict[str, Any]:
     logger.info("EXPERIMENT 4: STRIDE SECURITY ANALYSIS")
     logger.info("=" * 60)
 
-    from agentic_toolkit.security.threat_validator import (
+    from sage.security.threat_validator import (
         ThreatValidator,
         STRIDECategory,
         get_stride_mcp_table

@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agentic-ai-toolkit"
-version = "1.1.0"
-description = "A comprehensive toolkit for building production-ready agentic AI systems with evaluation, stability monitoring, and multi-task benchmarking"
+name = "sage-framework"
+version = "1.2.0"
+description = "SAGE — a Stabilize–Assess–Govern–Enforce framework for deployment-ready LLM-based autonomous agents (reference implementation for IEEE TAI submission)"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -20,7 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-keywords = ["ai", "agents", "llm", "langchain", "langgraph", "agentic"]
+keywords = ["ai", "agents", "llm", "sage", "stability", "cnsr", "langchain", "langgraph", "agentic"]
 
 dependencies = [
     "langchain>=0.2.0",
@@ -74,14 +74,14 @@ experiments = [
     "sentence-transformers>=2.2.0",
 ]
 all = [
-    "agentic-ai-toolkit[dev,google,observability,a2a,paper,experiments]",
+    "sage-framework[dev,google,observability,a2a,paper,experiments]",
 ]
 
 [project.urls]
-Homepage = "https://github.com/MHHamdan/agentic-ai-toolkit"
-Documentation = "https://github.com/MHHamdan/agentic-ai-toolkit#readme"
-Repository = "https://github.com/MHHamdan/agentic-ai-toolkit"
-"Bug Tracker" = "https://github.com/MHHamdan/agentic-ai-toolkit/issues"
+Homepage = "https://github.com/MHHamdan/SAGE"
+Documentation = "https://github.com/MHHamdan/SAGE#readme"
+Repository = "https://github.com/MHHamdan/SAGE"
+"Bug Tracker" = "https://github.com/MHHamdan/SAGE/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
