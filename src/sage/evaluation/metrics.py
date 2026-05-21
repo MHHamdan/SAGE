@@ -9,9 +9,9 @@ And the CNSR metric from Equation 6:
 
 import logging
 import math
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass, field
 from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

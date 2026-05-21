@@ -5,12 +5,12 @@ to validate plans before execution.
 """
 
 import logging
-from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from ..planning.schemas import Plan, PlanStep
-from .constraint_checker import ConstraintChecker, CheckResult
+from .constraint_checker import CheckResult, ConstraintChecker
 from .simulator import PlanSimulator, SimulationResult
 
 logger = logging.getLogger(__name__)

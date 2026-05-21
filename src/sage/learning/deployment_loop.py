@@ -26,23 +26,23 @@ Example:
     ...     print(f"Success rate: {update.success_rate:.2%}")
 """
 
+import asyncio
+import json
+import logging
+import uuid
 from dataclasses import dataclass, field
-from typing import (
-    Optional,
-    Callable,
-    Awaitable,
-    Dict,
-    Any,
-    List,
-    AsyncIterator,
-    Union,
-)
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
-import asyncio
-import uuid
-import json
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Union,
+)
 
 logger = logging.getLogger(__name__)
 

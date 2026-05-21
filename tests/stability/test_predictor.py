@@ -20,12 +20,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from sage.stability.controller import MonitorSignals
 from sage.stability.predictor import (
+    FEATURE_NAMES,
     FailurePredictor,
     TraceRecord,
-    extract_features,
-    build_training_data,
     assert_no_leakage,
-    FEATURE_NAMES,
+    build_training_data,
+    extract_features,
 )
 
 

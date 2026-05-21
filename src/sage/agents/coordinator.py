@@ -1,9 +1,9 @@
 """Multi-agent coordinator with arbitration modes."""
 
 import logging
-from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from ..core.base_agent import BaseAgent
 

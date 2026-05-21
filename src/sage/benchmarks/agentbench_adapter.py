@@ -25,17 +25,17 @@ Example:
 
 from __future__ import annotations
 
-import logging
-import json
 import hashlib
-from enum import Enum
+import json
+import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from enum import Enum
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
-from .base_adapter import BenchmarkAdapter, BenchmarkTask, BenchmarkResult
+from .base_adapter import BenchmarkAdapter, BenchmarkResult, BenchmarkTask
 
 logger = logging.getLogger(__name__)
 

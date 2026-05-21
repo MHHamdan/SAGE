@@ -10,8 +10,8 @@ Security features:
 - Capability authentication
 """
 
+from .a2a import AgentCard, AgentCardValidator, CapabilityAuth, ReplayProtection
 from .mcp import MCPClient, MCPServer, MCPValidationError
-from .a2a import AgentCard, AgentCardValidator, ReplayProtection, CapabilityAuth
 
 __all__ = [
     "MCPClient",

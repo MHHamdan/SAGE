@@ -7,14 +7,14 @@ deliberative, reactive, hybrid, and HTN planners.
 import logging
 import time
 from abc import ABC, abstractmethod
-from typing import Optional, List, Dict, Any, Callable
+from typing import Any, Callable, Dict, List, Optional
 
 from .schemas import (
     Plan,
-    PlanStep,
     PlanningContext,
     PlanningResult,
     PlanStatus,
+    PlanStep,
     StepStatus,
     create_plan,
     create_step,

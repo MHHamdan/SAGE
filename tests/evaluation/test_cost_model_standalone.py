@@ -3,9 +3,9 @@
 This test can run without full package dependencies.
 """
 
-import sys
-import os
 import importlib.util
+import os
+import sys
 
 # Direct import from the metrics.py file without package init
 metrics_path = os.path.join(

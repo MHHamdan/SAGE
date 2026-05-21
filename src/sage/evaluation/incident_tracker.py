@@ -34,13 +34,13 @@ Example:
     >>> print(f"Incident rate: {stats.incident_rate_per_hour:.2f}/hour")
 """
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Callable, Any, Union
-from enum import Enum
-from datetime import datetime, timedelta
+import json
 import logging
 import uuid
-import json
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 

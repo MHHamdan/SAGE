@@ -5,7 +5,7 @@ Provides secure tool and resource sharing between agents and models.
 
 from .client import MCPClient
 from .server import MCPServer
-from .validation import MCPValidationError, validate_tool_call, validate_resource
+from .validation import MCPValidationError, validate_resource, validate_tool_call
 
 __all__ = [
     "MCPClient",

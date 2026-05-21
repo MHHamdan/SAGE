@@ -20,15 +20,15 @@ Example:
     >>> report = logger.export(format="json")
 """
 
+import csv
+import io
+import json
+import logging
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Callable, Union
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-import logging
-import json
-import csv
-import io
+from typing import Any, Callable, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 

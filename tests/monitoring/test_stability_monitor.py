@@ -11,6 +11,7 @@ Verifies:
 from __future__ import annotations
 
 import csv
+import importlib.util
 import os
 import random
 import sys
@@ -19,18 +20,18 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import importlib.util
-
 # ROOT = SAGE/ (two levels up from tests/monitoring/)
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))  # allow direct import of sage
 
+from eval.metrics import compute_cnsr
+from experiments.exp_context_noise import goal_drift_score
+from experiments.exp_context_noise import run_experiment as run_a3
+
 # ── local experiment imports ──────────────────────────────────────────────────
 from experiments.exp_obs_fidelity import run_experiment as run_a1
 from experiments.exp_progress_mono import run_experiment as run_a2
-from experiments.exp_context_noise import run_experiment as run_a3, goal_drift_score
-from eval.metrics import compute_cnsr
 
 
 def _load_stability_monitor():

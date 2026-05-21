@@ -10,8 +10,8 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Generic, TypeVar
 from enum import Enum
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 logger = logging.getLogger(__name__)
 

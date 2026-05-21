@@ -4,13 +4,14 @@ Provides a lightweight Python DSL for defining security and
 execution policies. Optionally supports OPA/Rego integration.
 """
 
-import re
-import yaml
 import logging
-from typing import Optional, List, Dict, Any, Callable, Union
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Union
+
+import yaml
 
 logger = logging.getLogger(__name__)
 

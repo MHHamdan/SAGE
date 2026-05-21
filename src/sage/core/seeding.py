@@ -4,13 +4,13 @@ This module provides utilities to ensure reproducible results across
 all random number generators used in the toolkit.
 """
 
-import random
-import os
 import hashlib
 import logging
-from typing import Optional, Dict, Any
+import os
+import random
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -244,8 +244,8 @@ def get_reproducibility_info() -> Dict[str, Any]:
     Returns:
         Dictionary with version and seed information
     """
-    import sys
     import platform
+    import sys
 
     info = {
         "python_version": sys.version,

@@ -1,12 +1,12 @@
 """Standard benchmarks for agent evaluation."""
 
+import json
 import logging
 import time
-import json
-from typing import Optional, List, Dict, Any, Callable
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

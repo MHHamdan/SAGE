@@ -17,12 +17,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from sage.stability.interventions import (
     AgentState,
-    EscalationRequest,
-    GoalReanchor,
     ContextCompress,
+    EscalationRequest,
     ForceReplan,
-    SchemaValidatedRetry,
+    GoalReanchor,
     HumanEscalate,
+    SchemaValidatedRetry,
 )
 
 

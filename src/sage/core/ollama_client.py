@@ -7,9 +7,10 @@ support for API-based models (optional). Ollama is the default backend.
 import json
 import logging
 import time
-from typing import Optional, List, Dict, Any, Union, Iterator, Callable
-from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, Iterator, List, Optional, Union
+
 import httpx
 
 logger = logging.getLogger(__name__)
@@ -502,7 +503,7 @@ class UnifiedLLMClient:
             GenerationResult with content and metadata
         """
         if self._is_langchain:
-            from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+            from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
             lc_messages = []
             for m in messages:

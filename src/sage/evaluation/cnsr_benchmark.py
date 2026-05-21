@@ -34,21 +34,21 @@ Example:
 from __future__ import annotations
 
 import logging
-import time
 import statistics
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Callable, Tuple, Protocol
+import time
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Protocol, Tuple
 
 import numpy as np
 
 from .metrics import (
+    DEFAULT_COST_RATES,
     TaskCostBreakdown,
     TaskResult,
     compute_cnsr_from_results,
     compute_cost_from_usage,
-    DEFAULT_COST_RATES,
 )
 
 logger = logging.getLogger(__name__)

@@ -1,20 +1,20 @@
 """Evaluation harness for reproducible agent benchmarking."""
 
+import json
 import logging
 import time
-import json
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 from .benchmarks import (
     Benchmark,
-    BenchmarkTask,
     BenchmarkResult,
+    BenchmarkTask,
     TaskDifficulty,
 )
-from .metrics import MetricsCollector, AggregatedMetrics
+from .metrics import AggregatedMetrics, MetricsCollector
 
 logger = logging.getLogger(__name__)
 

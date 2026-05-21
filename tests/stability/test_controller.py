@@ -16,12 +16,12 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from sage.stability.controller import (
-    MonitorSignals,
-    InterventionDecision,
-    NoControl,
     FixedScheduleController,
-    ThresholdController,
+    InterventionDecision,
+    MonitorSignals,
+    NoControl,
     PredictiveController,
+    ThresholdController,
 )
 
 

@@ -4,8 +4,9 @@ Each test corresponds to an equation in paper_assets/equations.tex.
 Tests use toy inputs with manually computed expected outputs.
 """
 
-import pytest
 import math
+
+import pytest
 
 
 class TestCNSR:

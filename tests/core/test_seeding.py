@@ -1,7 +1,8 @@
 """Tests for deterministic seeding module."""
 
-import pytest
 import random
+
+import pytest
 
 
 class TestSeeding:

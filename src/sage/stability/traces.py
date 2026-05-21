@@ -136,8 +136,8 @@ def _get_git_sha() -> str:
 
 def _get_env_hash() -> str:
     import numpy as np
-    import sklearn
     import scipy
+    import sklearn
 
     s = f"numpy={np.__version__},sklearn={sklearn.__version__},scipy={scipy.__version__}"
     return hashlib.sha256(s.encode()).hexdigest()[:12]

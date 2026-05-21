@@ -20,10 +20,10 @@ from dataclasses import dataclass, field
 from typing import Optional, Protocol, runtime_checkable
 
 from .interventions import (
-    Intervention,
-    GoalReanchor,
     ContextCompress,
     ForceReplan,
+    GoalReanchor,
+    Intervention,
     SchemaValidatedRetry,
 )
 

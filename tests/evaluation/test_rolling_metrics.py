@@ -10,17 +10,18 @@ Tests cover:
 - Edge cases
 """
 
-import pytest
-import numpy as np
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
+import numpy as np
+import pytest
+
 from sage.evaluation.rolling_metrics import (
-    RollingWindowTracker,
-    TimeBasedRollingTracker,
-    TaskResult,
-    WindowMetrics,
     PerformanceTrend,
+    RollingWindowTracker,
+    TaskResult,
+    TimeBasedRollingTracker,
+    WindowMetrics,
 )
 
 # Test fixtures

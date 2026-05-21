@@ -204,12 +204,13 @@ class TestE5Smoke:
 
     def test_no_leakage_in_cv(self, e5_results):
         """Verify that no task_id appears in both train and test across folds."""
+        from sklearn.model_selection import StratifiedGroupKFold
+
         import experiments.e5_predictive_validation as e5
         from sage.stability.predictor import (
-            build_training_data,
             assert_no_leakage,
+            build_training_data,
         )
-        from sklearn.model_selection import StratifiedGroupKFold
 
         cfg = dict(e5.E5_CONFIG)
         cfg["n_violation_tasks"] = 15

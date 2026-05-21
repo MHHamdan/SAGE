@@ -1,23 +1,24 @@
 """Tests for CNSR Benchmark module."""
 
-import pytest
-import numpy as np
 from unittest.mock import Mock
 
+import numpy as np
+import pytest
+
 from sage.evaluation.cnsr_benchmark import (
-    CNSRBenchmark,
-    BenchmarkConfig,
-    AgentEvaluationResult,
-    CNSRResults,
-    ParetoAnalysis,
-    DivergenceReport,
-    SensitivityReport,
-    RankingMethod,
     MODEL_COST_RATES,
+    AgentEvaluationResult,
+    BenchmarkConfig,
+    CNSRBenchmark,
+    CNSRResults,
+    DivergenceReport,
+    ParetoAnalysis,
+    RankingMethod,
+    SensitivityReport,
     create_cnsr_benchmark,
     quick_cnsr_comparison,
 )
-from sage.evaluation.metrics import TaskResult, TaskCostBreakdown
+from sage.evaluation.metrics import TaskCostBreakdown, TaskResult
 
 
 class TestCNSRBenchmark:

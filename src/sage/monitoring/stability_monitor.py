@@ -39,14 +39,14 @@ Example:
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import time
-import hashlib
-from enum import Enum, auto
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Callable, Tuple, Set
 from collections import deque
+from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 

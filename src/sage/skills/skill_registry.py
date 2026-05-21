@@ -1,8 +1,8 @@
 """Skill registry for managing agent skills."""
 
 import logging
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
 
 from .skill_base import Skill, SkillPermission
 

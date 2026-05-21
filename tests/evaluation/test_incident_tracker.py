@@ -11,18 +11,19 @@ Tests cover:
 - Edge cases
 """
 
-import pytest
 import json
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
+import pytest
+
 from sage.evaluation.incident_tracker import (
-    IncidentTracker,
     AggregatedIncidentTracker,
     Incident,
-    IncidentType,
     IncidentSeverity,
     IncidentStatistics,
+    IncidentTracker,
+    IncidentType,
 )
 
 # Test fixtures

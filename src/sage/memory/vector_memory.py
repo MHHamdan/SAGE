@@ -1,11 +1,11 @@
 """Vector memory for semantic search and retrieval."""
 
-from typing import List, Dict, Any, Optional
 import logging
+from typing import Any, Dict, List, Optional
 
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
+from langchain_openai import OpenAIEmbeddings
 
 from sage.memory.base_memory import BaseMemory
 

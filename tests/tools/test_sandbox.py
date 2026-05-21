@@ -1,7 +1,8 @@
 """Tests for tool sandboxing."""
 
-import pytest
 import time
+
+import pytest
 
 
 class TestSandbox:
@@ -23,7 +24,7 @@ class TestSandbox:
 
     def test_timeout(self):
         """Test timeout enforcement."""
-        from sage.tools.sandbox import Sandbox, ResourceLimits
+        from sage.tools.sandbox import ResourceLimits, Sandbox
 
         limits = ResourceLimits(timeout_seconds=0.1)
         sandbox = Sandbox(limits=limits)

@@ -4,19 +4,20 @@ Tests for Human Approval Flow.
 Comprehensive tests for ApprovalHandler, ApprovalRequest, and related classes.
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock
+from unittest.mock import AsyncMock, Mock
+
+import pytest
 
 from sage.human_oversight.approval_flow import (
     ApprovalHandler,
     ApprovalRequest,
     ApprovalResult,
     ApprovalStatus,
-    RiskLevel,
     ApprovalTimeoutError,
     BatchApprovalHandler,
+    RiskLevel,
 )
 
 # ============================================================================

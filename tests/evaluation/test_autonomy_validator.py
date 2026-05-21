@@ -8,30 +8,30 @@ Verifies:
 4. Test scenarios properly differentiate genuine vs pseudo-agents
 """
 
-import pytest
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-from sage.evaluation.autonomy_validator import (
-    AutonomyValidator,
-    AutonomyLevel,
-    AutonomyCriterion,
-    AutonomyCriteria,
-    TestResult,
-    AutonomyValidationResult,
-    TestScenario,
-    TestScenarioGenerator,
-    ObstacleInjector,
-    FailureInjector,
-    GenuineAgent,
-    ScriptedAgent,
-    FragileAgent,
-    FixedStepAgent,
-)
+import pytest
 
 from sage.evaluation.autonomy_benchmarks import (
     ALL_AUTONOMY_TASKS,
     TASKS_BY_CRITERION,
     get_autonomy_benchmark_statistics,
+)
+from sage.evaluation.autonomy_validator import (
+    AutonomyCriteria,
+    AutonomyCriterion,
+    AutonomyLevel,
+    AutonomyValidationResult,
+    AutonomyValidator,
+    FailureInjector,
+    FixedStepAgent,
+    FragileAgent,
+    GenuineAgent,
+    ObstacleInjector,
+    ScriptedAgent,
+    TestResult,
+    TestScenario,
+    TestScenarioGenerator,
 )
 
 # ============================================================

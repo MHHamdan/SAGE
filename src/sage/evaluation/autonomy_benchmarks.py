@@ -16,8 +16,8 @@ All tasks are deterministic with fixed seeds for reproducibility.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from .autonomy_validator import AutonomyCriterion
 

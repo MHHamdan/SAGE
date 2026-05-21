@@ -7,17 +7,19 @@ Tests for:
 4. Reactivity assessment - Over/under-reactive behavior
 """
 
-import sys
-import os
-from dataclasses import dataclass
-from typing import Any, List, Optional, Dict, Callable
-import types
-import time
 import hashlib
 import logging
-from dataclasses import dataclass as dc_dataclass, field
-from enum import Enum
+import os
+import sys
+import time
+import types
 from collections import deque
+from dataclasses import dataclass
+from dataclasses import dataclass as dc_dataclass
+from dataclasses import field
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
+
 import numpy as np
 
 # Read and execute control_loop.py directly to avoid package __init__.py

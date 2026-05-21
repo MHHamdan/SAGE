@@ -5,16 +5,17 @@ Tests verify that CNSR computation properly integrates all cost components:
     CNSR = Success_Rate / Mean_Cost (Equation 6)
 """
 
-import pytest
 import math
 
+import pytest
+
 from sage.evaluation.metrics import (
+    DEFAULT_COST_RATES,
     TaskCostBreakdown,
     TaskResult,
+    compute_cnsr,
     compute_cnsr_from_results,
     compute_cost_from_usage,
-    DEFAULT_COST_RATES,
-    compute_cnsr,
 )
 
 

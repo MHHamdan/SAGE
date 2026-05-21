@@ -1,9 +1,9 @@
 """Conflict resolution for multi-agent systems."""
 
 import logging
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

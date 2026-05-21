@@ -26,12 +26,12 @@ Example:
     >>> print(f"Average rating: {aggregated.average_rating:.2f}")
 """
 
+import json
+import logging
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Callable
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
-import json
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

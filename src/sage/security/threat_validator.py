@@ -26,15 +26,15 @@ Example:
 
 from __future__ import annotations
 
-import logging
-import time
 import hashlib
 import json
+import logging
 import re
-from enum import Enum, auto
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Callable, Tuple, Set
+import time
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 

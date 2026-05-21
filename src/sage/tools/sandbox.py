@@ -4,12 +4,12 @@ Provides isolation and resource limits for tool execution.
 """
 
 import logging
-import time
 import subprocess
-from typing import Optional, List, Dict, Any, Callable
+import threading
+import time
 from dataclasses import dataclass, field
 from enum import Enum
-import threading
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

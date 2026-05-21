@@ -4,32 +4,33 @@ Tests for Deployment Loop and Learning Components.
 Comprehensive tests for DeploymentLoop, FeedbackCollector, and ExperienceBuffer.
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock
+from unittest.mock import AsyncMock, Mock
+
+import pytest
 
 from sage.learning.deployment_loop import (
-    DeploymentLoop,
+    ABTestDeployment,
     DeploymentConfig,
+    DeploymentLoop,
+    DeploymentMetrics,
     DeploymentState,
     DeploymentStatus,
-    DeploymentMetrics,
     DeploymentUpdate,
-    ABTestDeployment,
-)
-from sage.learning.feedback import (
-    FeedbackCollector,
-    Feedback,
-    FeedbackType,
-    FeedbackSource,
-    AggregatedFeedback,
 )
 from sage.learning.experience import (
-    ExperienceBuffer,
     Experience,
     ExperienceBatch,
+    ExperienceBuffer,
     PrioritizedExperienceBuffer,
+)
+from sage.learning.feedback import (
+    AggregatedFeedback,
+    Feedback,
+    FeedbackCollector,
+    FeedbackSource,
+    FeedbackType,
 )
 
 # ============================================================================

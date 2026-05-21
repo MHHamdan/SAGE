@@ -14,8 +14,8 @@ Pillars:
              (sage.stability.controller, .interventions, .predictor)
 """
 
-from sage.core.config import Config
 from sage.core.base_agent import BaseAgent
+from sage.core.config import Config
 from sage.core.llm_client import LLMClient
 
 __version__ = "1.2.0"

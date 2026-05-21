@@ -12,14 +12,14 @@ Reference: Table IX maps pathologies to evaluation methods.
 
 from __future__ import annotations
 
-import random
 import hashlib
+import random
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Callable, Tuple
-from abc import ABC, abstractmethod
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from .failure_taxonomy import FailurePathology, FailureDetector, PathologyIncident
+from .failure_taxonomy import FailureDetector, FailurePathology, PathologyIncident
 
 
 @dataclass

@@ -1,9 +1,9 @@
 """Skill selector for intelligent skill ranking and selection."""
 
 import logging
-from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 from .skill_base import Skill
 from .skill_registry import SkillRegistry

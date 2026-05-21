@@ -27,14 +27,14 @@ Example:
     ... )
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Callable
-from datetime import datetime, timedelta
-from enum import Enum
 import logging
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
-from .approval_flow import RiskLevel, ApprovalRequest
+from .approval_flow import ApprovalRequest, RiskLevel
 
 logger = logging.getLogger(__name__)
 

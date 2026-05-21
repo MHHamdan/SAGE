@@ -24,19 +24,19 @@ Example:
 
 from __future__ import annotations
 
-import logging
 import json
+import logging
 import re
 import string
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Set
-from pathlib import Path
 from collections import Counter
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
-from .base_adapter import BenchmarkAdapter, BenchmarkTask, BenchmarkResult
+from .base_adapter import BenchmarkAdapter, BenchmarkResult, BenchmarkTask
 
 logger = logging.getLogger(__name__)
 

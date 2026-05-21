@@ -4,9 +4,9 @@ Implements least-privilege access control for tool execution.
 """
 
 import logging
-from typing import Optional, List, Dict, Any, Set
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,8 @@
 """Tests for capability authentication."""
 
-import pytest
 import time
+
+import pytest
 
 
 class TestCapabilityToken:
@@ -128,12 +129,13 @@ class TestAgentCardValidation:
 
     def test_expired_card_rejected(self):
         """Test expired cards are rejected."""
+        from datetime import datetime, timedelta
+
         from sage.protocols.a2a import (
             AgentCard,
-            AgentCardValidator,
             AgentCardError,
+            AgentCardValidator,
         )
-        from datetime import datetime, timedelta
 
         expired = (datetime.utcnow() - timedelta(days=1)).isoformat()
         card = AgentCard(
@@ -150,8 +152,8 @@ class TestAgentCardValidation:
         """Test low trust cards are rejected when threshold set."""
         from sage.protocols.a2a import (
             AgentCard,
-            AgentCardValidator,
             AgentCardError,
+            AgentCardValidator,
         )
 
         card = AgentCard(
@@ -167,10 +169,10 @@ class TestAgentCardValidation:
     def test_capability_validation(self):
         """Test capability request validation."""
         from sage.protocols.a2a import (
-            AgentCard,
             AgentCapability,
-            AgentCardValidator,
+            AgentCard,
             AgentCardError,
+            AgentCardValidator,
         )
 
         card = AgentCard(

@@ -4,11 +4,11 @@ Defines the core data structures for plans, steps, conditions,
 and plan validation.
 """
 
-from typing import Optional, List, Dict, Any, Union
-from dataclasses import dataclass, field
-from enum import Enum
-from datetime import datetime
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
 
 class StepStatus(Enum):

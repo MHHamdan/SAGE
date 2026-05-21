@@ -22,13 +22,13 @@ Example:
     ...     train_on_experience(exp)
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Union
-from datetime import datetime
-from collections import deque
-import random
-import logging
 import json
+import logging
+import random
+from collections import deque
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 

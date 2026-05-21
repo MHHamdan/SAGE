@@ -10,20 +10,21 @@ Tests cover:
 - Edge cases and error handling
 """
 
-import pytest
-import numpy as np
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
+import numpy as np
+import pytest
+
 from sage.evaluation.goal_drift import (
-    GoalDriftTracker,
-    GoalSnapshot,
     DriftMeasurement,
     DriftStatistics,
+    GoalDriftTracker,
+    GoalSnapshot,
     GoalSource,
     MultiGoalDriftTracker,
-    compute_goal_similarity,
     compute_drift_score,
+    compute_goal_similarity,
 )
 
 # Test fixtures

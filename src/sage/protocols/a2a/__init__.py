@@ -6,9 +6,9 @@ Provides secure inter-agent communication with:
 - Capability authentication
 """
 
-from .agent_card import AgentCard, AgentCardValidator, AgentCardError
-from .replay_protection import ReplayProtection, NonceManager, ReplayAttackDetected
-from .capability_auth import CapabilityAuth, CapabilityToken, CapabilityAuthError
+from .agent_card import AgentCard, AgentCardError, AgentCardValidator
+from .capability_auth import CapabilityAuth, CapabilityAuthError, CapabilityToken
+from .replay_protection import NonceManager, ReplayAttackDetected, ReplayProtection
 
 __all__ = [
     "AgentCard",

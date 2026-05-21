@@ -10,13 +10,13 @@ For Ollama (local models), token costs are $0, but usage is still tracked
 for comparison with API models.
 """
 
-import time
 import logging
-from typing import Optional, Dict, Any, List
-from dataclasses import dataclass, field
-from enum import Enum
-from datetime import datetime
 import threading
+import time
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

@@ -13,13 +13,13 @@ These tests verify that all components work together correctly
 in realistic scenarios.
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+from unittest.mock import AsyncMock, Mock
 
 import numpy as np
+import pytest
 
 # Evaluation components
 from sage.evaluation.goal_drift import (
@@ -27,18 +27,18 @@ from sage.evaluation.goal_drift import (
     MultiGoalDriftTracker,
 )
 from sage.evaluation.incident_tracker import (
+    IncidentSeverity,
     IncidentTracker,
     IncidentType,
-    IncidentSeverity,
+)
+from sage.evaluation.long_horizon import (
+    EvaluationStatus,
+    LongHorizonEvaluator,
+    SimpleLongHorizonEvaluator,
 )
 from sage.evaluation.rolling_metrics import (
     RollingWindowTracker,
     TaskResult,
-)
-from sage.evaluation.long_horizon import (
-    LongHorizonEvaluator,
-    SimpleLongHorizonEvaluator,
-    EvaluationStatus,
 )
 
 # Human oversight components
@@ -47,28 +47,28 @@ from sage.human_oversight.approval_flow import (
     ApprovalRequest,
     RiskLevel,
 )
+from sage.human_oversight.audit import (
+    AuditEventType,
+    AuditLogger,
+)
 from sage.human_oversight.escalation import (
     EscalationHandler,
     EscalationLevel,
 )
-from sage.human_oversight.audit import (
-    AuditLogger,
-    AuditEventType,
-)
 
 # Learning components
 from sage.learning.deployment_loop import (
-    DeploymentLoop,
-    DeploymentConfig,
     ABTestDeployment,
+    DeploymentConfig,
+    DeploymentLoop,
+)
+from sage.learning.experience import (
+    Experience,
+    ExperienceBuffer,
 )
 from sage.learning.feedback import (
     FeedbackCollector,
     FeedbackType,
-)
-from sage.learning.experience import (
-    ExperienceBuffer,
-    Experience,
 )
 
 # ============================================================================

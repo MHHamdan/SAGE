@@ -30,13 +30,13 @@ Example:
     >>> print(f"Rolling success rate: {metrics.success_rate:.2%}")
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional, Deque, Tuple, Dict, Any
-from collections import deque
-from datetime import datetime, timedelta
 import logging
-import uuid
 import math
+import uuid
+from collections import deque
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import numpy as np
 

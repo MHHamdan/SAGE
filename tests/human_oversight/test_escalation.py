@@ -4,16 +4,17 @@ Tests for Escalation Handling.
 Tests for EscalationHandler, EscalationRequest, and related classes.
 """
 
-import pytest
 from datetime import datetime
 
+import pytest
+
+from sage.human_oversight.approval_flow import RiskLevel
 from sage.human_oversight.escalation import (
     EscalationHandler,
-    EscalationRequest,
     EscalationLevel,
     EscalationPolicy,
+    EscalationRequest,
 )
-from sage.human_oversight.approval_flow import RiskLevel
 
 # ============================================================================
 # EscalationPolicy Tests

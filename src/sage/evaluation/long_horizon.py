@@ -33,30 +33,30 @@ Example:
     >>> print(f"Incident Rate: {report.incident_rate_per_hour:.2f}/hour")
 """
 
+import asyncio
+import json
+import logging
+import uuid
 from dataclasses import dataclass, field
-from typing import List, Optional, Callable, Any, Dict, Union
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
-import json
-import uuid
-import asyncio
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 
-from .goal_drift import GoalDriftTracker, DriftMeasurement
+from .goal_drift import DriftMeasurement, GoalDriftTracker
 from .incident_tracker import (
+    Incident,
+    IncidentSeverity,
     IncidentTracker,
     IncidentType,
-    IncidentSeverity,
-    Incident,
 )
+from .metrics import compute_cnsr
 from .rolling_metrics import (
     RollingWindowTracker,
     TaskResult,
     WindowMetrics,
 )
-from .metrics import compute_cnsr
 
 logger = logging.getLogger(__name__)
 

@@ -24,15 +24,15 @@ This module distinguishes genuine agents from pseudo-agentic systems like:
 
 from __future__ import annotations
 
-import random
 import hashlib
 import logging
+import random
 import time
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import Any, Dict, List, Optional, Callable, Tuple, Set
-from collections import defaultdict
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 

@@ -13,13 +13,13 @@ This module provides:
 
 from __future__ import annotations
 
-import time
 import hashlib
 import logging
+import time
+from collections import deque
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Callable
-from collections import deque
+from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 

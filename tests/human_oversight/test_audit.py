@@ -4,16 +4,17 @@ Tests for Audit Logging.
 Tests for AuditLogger, AuditEntry, and related classes.
 """
 
-import pytest
 import json
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-import tempfile
+
+import pytest
 
 from sage.human_oversight.audit import (
-    AuditLogger,
     AuditEntry,
     AuditEventType,
+    AuditLogger,
 )
 
 # ============================================================================

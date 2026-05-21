@@ -33,12 +33,12 @@ Example:
     ...     print("Warning: Consider re-anchoring goal")
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional, Callable, Union, Any
-from datetime import datetime
-from enum import Enum
 import logging
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, List, Optional, Union
 
 import numpy as np
 

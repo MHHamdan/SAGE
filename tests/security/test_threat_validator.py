@@ -1,23 +1,24 @@
 """Tests for Security/Threat Validator module."""
 
-import pytest
 from unittest.mock import Mock
 
+import pytest
+
 from sage.security.threat_validator import (
-    ThreatValidator,
-    ThreatDefinition,
-    ThreatResult,
-    AttackTreeNode,
-    STRIDEReport,
-    STRIDECategory,
-    ThreatSeverity,
-    MitigationStatus,
-    MCP_THREATS,
     A2A_THREATS,
     ALL_THREATS,
-    quick_security_assessment,
-    get_threat_by_id,
+    MCP_THREATS,
+    AttackTreeNode,
+    MitigationStatus,
+    STRIDECategory,
+    STRIDEReport,
+    ThreatDefinition,
+    ThreatResult,
+    ThreatSeverity,
+    ThreatValidator,
     get_stride_mcp_table,
+    get_threat_by_id,
+    quick_security_assessment,
 )
 
 

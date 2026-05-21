@@ -10,24 +10,20 @@ Provides real-time monitoring capabilities for agent execution, including:
 This module implements the control-theoretic framework described in the paper.
 """
 
-from .stability_monitor import (
-    # Core classes
-    StabilityMonitor,
-    LimitCycleDetector,
-    # Status types
-    StabilityStatus,
+from .stability_monitor import (  # Core classes; Status types; Enums; Convenience functions
     ConvergenceStatus,
-    OscillationStatus,
-    MonotonicityStatus,
     FidelityStatus,
+    LimitCycleDetector,
+    MonotonicityStatus,
+    OscillationStatus,
+    StabilityMonitor,
     StabilityReport,
-    StabilityViolation,
-    # Enums
-    ViolationType,
     StabilitySeverity,
-    # Convenience functions
-    create_stability_monitor,
+    StabilityStatus,
+    StabilityViolation,
+    ViolationType,
     check_stability_conditions,
+    create_stability_monitor,
 )
 
 __all__ = [

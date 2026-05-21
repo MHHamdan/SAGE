@@ -21,7 +21,7 @@ Usage:
 
 from .skill_base import Skill, SkillMetadata, SkillPermission
 from .skill_registry import SkillRegistry
-from .skill_selector import SkillSelector, SelectionStrategy
+from .skill_selector import SelectionStrategy, SkillSelector
 from .versioning import SkillVersion, VersionedSkill
 
 __all__ = [
