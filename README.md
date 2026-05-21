@@ -11,7 +11,7 @@
 
 SAGE is a four-pillar framework for deployment-ready LLM-based autonomous agents. It treats agents as non-stationary closed-loop systems rather than static reasoners, and integrates four operational capacities: stability modelling (**Stabilize**), cost-aware autonomy assessment (**Assess**), failure and protocol governance (**Govern**), and adaptive corrective control (**Enforce**). Closed-loop adaptive control transforms long-horizon completion from 2.0% under open-loop execution to ≥ 83% under either of two adaptive policies (E4).
 
-
+https://github.com/MHHamdan/SAGE/blob/ci-cleanup/framework/sage_framework_figure.pdf 
 
 ## The four pillars
 
