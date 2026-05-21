@@ -5,7 +5,6 @@
 [![Tests](https://img.shields.io/badge/tests-651%20passing-brightgreen.svg)](#testing)
 [![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](pyproject.toml)
 
-> Reference implementation for the IEEE Transactions on Artificial Intelligence submission of the same name (TAI-2025-Dec-R-02684).
 
 ## What is SAGE?
 
