@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 class ExecutionStatus(Enum):
     """Status of guarded execution."""
+
     SUCCESS = "success"
     BLOCKED = "blocked"
     FAILED = "failed"
@@ -31,6 +32,7 @@ class ExecutionStatus(Enum):
 @dataclass
 class StepExecutionResult:
     """Result of executing a single step."""
+
     step_id: str
     step_name: str
     status: ExecutionStatus
@@ -55,6 +57,7 @@ class StepExecutionResult:
 @dataclass
 class ExecutionResult:
     """Result of executing an entire plan."""
+
     plan_id: str
     status: ExecutionStatus
     step_results: List[StepExecutionResult] = field(default_factory=list)
@@ -133,7 +136,9 @@ class GuardedExecutor:
 
         In production, this should prompt for human approval.
         """
-        logger.warning(f"Approval required for step '{step.name}' but no callback configured")
+        logger.warning(
+            f"Approval required for step '{step.name}' but no callback configured"
+        )
         return False
 
     def execute(
@@ -168,7 +173,9 @@ class GuardedExecutor:
 
             if not validation.is_valid:
                 result.status = ExecutionStatus.BLOCKED
-                result.blocked_reason = f"Validation failed: {len(validation.errors)} errors"
+                result.blocked_reason = (
+                    f"Validation failed: {len(validation.errors)} errors"
+                )
                 logger.warning(f"Plan {plan.plan_id} failed validation")
                 return result
 
@@ -254,7 +261,9 @@ class GuardedExecutor:
         if policy_result.denied:
             result.status = ExecutionStatus.BLOCKED
             result.error = f"Blocked by policy: {policy_result.reason}"
-            logger.warning(f"Step '{step.name}' blocked by policy: {policy_result.rule_name}")
+            logger.warning(
+                f"Step '{step.name}' blocked by policy: {policy_result.rule_name}"
+            )
             return result
 
         # Check approval requirement
@@ -281,7 +290,10 @@ class GuardedExecutor:
         if not tool:
             # Try to find partial match
             for tool_name, tool_fn in tools.items():
-                if tool_name.lower() in step.action.lower() or step.action.lower() in tool_name.lower():
+                if (
+                    tool_name.lower() in step.action.lower()
+                    or step.action.lower() in tool_name.lower()
+                ):
                     tool = tool_fn
                     break
 

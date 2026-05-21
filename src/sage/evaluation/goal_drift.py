@@ -47,6 +47,7 @@ logger = logging.getLogger(__name__)
 
 class GoalSource(Enum):
     """Source of goal inference."""
+
     ORIGINAL = "original"
     ACTION_TRACE = "action_trace"
     EXPLICIT_STATEMENT = "explicit_statement"
@@ -67,6 +68,7 @@ class GoalSnapshot:
         confidence: Confidence in the goal inference (0.0 to 1.0)
         metadata: Additional context about the snapshot
     """
+
     snapshot_id: str
     timestamp: datetime
     goal_text: str
@@ -78,7 +80,9 @@ class GoalSnapshot:
     def __post_init__(self):
         """Validate snapshot data."""
         if not 0.0 <= self.confidence <= 1.0:
-            raise ValueError(f"Confidence must be between 0 and 1, got {self.confidence}")
+            raise ValueError(
+                f"Confidence must be between 0 and 1, got {self.confidence}"
+            )
         if self.goal_embedding is not None:
             self.goal_embedding = np.asarray(self.goal_embedding)
 
@@ -97,6 +101,7 @@ class DriftMeasurement:
         confidence: Confidence in the current goal inference
         source: How the current goal was inferred
     """
+
     measurement_id: str
     timestamp: datetime
     drift_score: float
@@ -109,7 +114,9 @@ class DriftMeasurement:
     def __post_init__(self):
         """Validate measurement data."""
         if not 0.0 <= self.drift_score <= 1.0:
-            raise ValueError(f"Drift score must be between 0 and 1, got {self.drift_score}")
+            raise ValueError(
+                f"Drift score must be between 0 and 1, got {self.drift_score}"
+            )
 
 
 @dataclass
@@ -125,6 +132,7 @@ class DriftStatistics:
         num_measurements: Number of measurements
         time_span_seconds: Time span covered by measurements
     """
+
     mean_drift: float
     max_drift: float
     min_drift: float
@@ -135,9 +143,7 @@ class DriftStatistics:
 
 
 def compute_goal_similarity(
-    embedding1: np.ndarray,
-    embedding2: np.ndarray,
-    epsilon: float = 1e-8
+    embedding1: np.ndarray, embedding2: np.ndarray, epsilon: float = 1e-8
 ) -> float:
     """Compute cosine similarity between goal embeddings.
 
@@ -156,9 +162,7 @@ def compute_goal_similarity(
     e2 = np.asarray(embedding2).flatten()
 
     if e1.shape != e2.shape:
-        raise ValueError(
-            f"Embedding dimensions must match: {e1.shape} vs {e2.shape}"
-        )
+        raise ValueError(f"Embedding dimensions must match: {e1.shape} vs {e2.shape}")
 
     norm1 = np.linalg.norm(e1)
     norm2 = np.linalg.norm(e2)
@@ -173,8 +177,7 @@ def compute_goal_similarity(
 
 
 def compute_drift_score(
-    original_embedding: np.ndarray,
-    current_embedding: np.ndarray
+    original_embedding: np.ndarray, current_embedding: np.ndarray
 ) -> float:
     """Compute goal drift score from embeddings.
 
@@ -235,7 +238,7 @@ class GoalDriftTracker:
         drift_threshold: float = 0.3,
         window_size: int = 10,
         reanchor_threshold: float = 0.5,
-        trend_sensitivity: float = 0.05
+        trend_sensitivity: float = 0.05,
     ):
         """Initialize the goal drift tracker.
 
@@ -263,7 +266,9 @@ class GoalDriftTracker:
         self._goal_history: List[GoalSnapshot] = []
         self._reanchor_count: int = 0
 
-    def set_original_goal(self, goal: str, metadata: Optional[dict] = None) -> GoalSnapshot:
+    def set_original_goal(
+        self, goal: str, metadata: Optional[dict] = None
+    ) -> GoalSnapshot:
         """Set the original goal at start of operation.
 
         This establishes the baseline against which all drift is measured.
@@ -291,7 +296,7 @@ class GoalDriftTracker:
             goal_embedding=embedding,
             source=GoalSource.ORIGINAL,
             confidence=1.0,
-            metadata=metadata or {}
+            metadata=metadata or {},
         )
 
         self._original_goal = snapshot
@@ -306,7 +311,7 @@ class GoalDriftTracker:
         goal: str,
         source: str = "action_trace",
         confidence: float = 1.0,
-        metadata: Optional[dict] = None
+        metadata: Optional[dict] = None,
     ) -> DriftMeasurement:
         """Record an inferred current goal and compute drift.
 
@@ -331,7 +336,9 @@ class GoalDriftTracker:
             ValueError: If goal is empty or confidence invalid
         """
         if self._original_goal is None:
-            raise RuntimeError("Original goal must be set before recording inferred goals")
+            raise RuntimeError(
+                "Original goal must be set before recording inferred goals"
+            )
 
         if not goal or not goal.strip():
             raise ValueError("Goal text cannot be empty")
@@ -345,20 +352,16 @@ class GoalDriftTracker:
             "action_trace": GoalSource.ACTION_TRACE,
             "explicit_statement": GoalSource.EXPLICIT_STATEMENT,
             "user_feedback": GoalSource.USER_FEEDBACK,
-            "summary": GoalSource.SUMMARY
+            "summary": GoalSource.SUMMARY,
         }
         goal_source = source_map.get(source.lower(), GoalSource.ACTION_TRACE)
 
         # Compute embedding and drift
         embedding = self._get_embedding(goal)
         similarity = compute_goal_similarity(
-            self._original_goal.goal_embedding,
-            embedding
+            self._original_goal.goal_embedding, embedding
         )
-        drift_score = compute_drift_score(
-            self._original_goal.goal_embedding,
-            embedding
-        )
+        drift_score = compute_drift_score(self._original_goal.goal_embedding, embedding)
 
         # Create snapshot
         snapshot = GoalSnapshot(
@@ -368,7 +371,7 @@ class GoalDriftTracker:
             goal_embedding=embedding,
             source=goal_source,
             confidence=confidence,
-            metadata=metadata or {}
+            metadata=metadata or {},
         )
         self._current_goal = snapshot
         self._goal_history.append(snapshot)
@@ -382,7 +385,7 @@ class GoalDriftTracker:
             current_goal=goal,
             similarity=similarity,
             confidence=confidence,
-            source=goal_source
+            source=goal_source,
         )
         self._measurements.append(measurement)
 
@@ -428,7 +431,7 @@ class GoalDriftTracker:
             return "stable"
 
         # Get recent measurements
-        recent = self._measurements[-self.window_size:]
+        recent = self._measurements[-self.window_size :]
         if len(recent) < 2:
             return "stable"
 
@@ -438,8 +441,9 @@ class GoalDriftTracker:
         y = np.array([m.drift_score for m in recent])
 
         # Slope of least squares fit
-        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / \
-                (n * np.sum(x ** 2) - np.sum(x) ** 2)
+        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / (
+            n * np.sum(x**2) - np.sum(x) ** 2
+        )
 
         if slope > self.trend_sensitivity:
             return "increasing"
@@ -470,7 +474,7 @@ class GoalDriftTracker:
                 std_drift=0.0,
                 trend="stable",
                 num_measurements=0,
-                time_span_seconds=0.0
+                time_span_seconds=0.0,
             )
 
         scores = [m.drift_score for m in self._measurements]
@@ -487,7 +491,7 @@ class GoalDriftTracker:
             std_drift=float(np.std(scores)) if len(scores) > 1 else 0.0,
             trend=self.get_drift_trend(),
             num_measurements=len(scores),
-            time_span_seconds=time_span
+            time_span_seconds=time_span,
         )
 
     def should_reanchor(self) -> bool:
@@ -516,7 +520,9 @@ class GoalDriftTracker:
 
         return False
 
-    def reanchor_goal(self, new_goal: str, metadata: Optional[dict] = None) -> GoalSnapshot:
+    def reanchor_goal(
+        self, new_goal: str, metadata: Optional[dict] = None
+    ) -> GoalSnapshot:
         """Re-anchor to a new goal, resetting drift tracking.
 
         Use this when the agent's objective has legitimately changed
@@ -596,15 +602,23 @@ class GoalDriftTracker:
             "reanchor_threshold": self.reanchor_threshold,
             "window_size": self.window_size,
             "reanchor_count": self._reanchor_count,
-            "original_goal": self._original_goal.goal_text if self._original_goal else None,
-            "current_goal": self._current_goal.goal_text if self._current_goal else None,
+            "original_goal": (
+                self._original_goal.goal_text if self._original_goal else None
+            ),
+            "current_goal": (
+                self._current_goal.goal_text if self._current_goal else None
+            ),
             "current_drift": self.get_current_drift(),
             "drift_trend": self.get_drift_trend(),
             "num_measurements": len(self._measurements),
-            "statistics": {
-                "mean_drift": self.get_drift_statistics().mean_drift,
-                "max_drift": self.get_drift_statistics().max_drift,
-            } if self._measurements else None
+            "statistics": (
+                {
+                    "mean_drift": self.get_drift_statistics().mean_drift,
+                    "max_drift": self.get_drift_statistics().max_drift,
+                }
+                if self._measurements
+                else None
+            ),
         }
 
     def reset(self) -> None:
@@ -640,7 +654,7 @@ class MultiGoalDriftTracker:
     def __init__(
         self,
         embed_fn: Callable[[str], Union[np.ndarray, List[float]]],
-        drift_threshold: float = 0.3
+        drift_threshold: float = 0.3,
     ):
         """Initialize multi-goal drift tracker.
 
@@ -653,10 +667,7 @@ class MultiGoalDriftTracker:
         self._trackers: dict[str, GoalDriftTracker] = {}
 
     def add_goal(
-        self,
-        goal_id: str,
-        goal_text: str,
-        weight: float = 1.0
+        self, goal_id: str, goal_text: str, weight: float = 1.0
     ) -> GoalDriftTracker:
         """Add a goal to track.
 
@@ -669,8 +680,7 @@ class MultiGoalDriftTracker:
             GoalDriftTracker for this goal
         """
         tracker = GoalDriftTracker(
-            embed_fn=self.embed_fn,
-            drift_threshold=self.drift_threshold
+            embed_fn=self.embed_fn, drift_threshold=self.drift_threshold
         )
         tracker.set_original_goal(goal_text)
         self._trackers[goal_id] = tracker
@@ -681,7 +691,7 @@ class MultiGoalDriftTracker:
         goal_id: str,
         goal_text: str,
         source: str = "action_trace",
-        confidence: float = 1.0
+        confidence: float = 1.0,
     ) -> DriftMeasurement:
         """Record inferred goal for a specific goal ID.
 
@@ -710,8 +720,7 @@ class MultiGoalDriftTracker:
             Dictionary with drift info for each goal
         """
         return {
-            goal_id: tracker.to_dict()
-            for goal_id, tracker in self._trackers.items()
+            goal_id: tracker.to_dict() for goal_id, tracker in self._trackers.items()
         }
 
     def get_aggregate_drift(self, weights: Optional[dict] = None) -> float:

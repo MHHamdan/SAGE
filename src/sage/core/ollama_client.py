@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class GenerationConfig:
     """Configuration for text generation."""
+
     temperature: float = 0.1
     top_p: float = 0.9
     max_tokens: int = 4096
@@ -41,6 +42,7 @@ class GenerationConfig:
 @dataclass
 class GenerationResult:
     """Result from text generation."""
+
     content: str
     model: str
     prompt_tokens: int = 0
@@ -58,6 +60,7 @@ class GenerationResult:
 @dataclass
 class Message:
     """Chat message."""
+
     role: str  # system, user, assistant
     content: str
     tool_calls: Optional[List[Dict]] = None
@@ -168,7 +171,9 @@ class OllamaClient(BaseLLMProvider):
                 if attempt < self.max_retries - 1:
                     time.sleep(self.retry_delay * (attempt + 1))
                 else:
-                    raise RuntimeError(f"Ollama request failed after {self.max_retries} attempts: {e}")
+                    raise RuntimeError(
+                        f"Ollama request failed after {self.max_retries} attempts: {e}"
+                    )
 
     def _stream_request(
         self,
@@ -273,7 +278,9 @@ class OllamaClient(BaseLLMProvider):
 
         # Estimate tokens
         prompt_text = " ".join(m.content for m in messages)
-        prompt_tokens = response.get("prompt_eval_count", self._estimate_tokens(prompt_text))
+        prompt_tokens = response.get(
+            "prompt_eval_count", self._estimate_tokens(prompt_text)
+        )
         completion_tokens = response.get("eval_count", self._estimate_tokens(content))
 
         result = GenerationResult(
@@ -416,6 +423,7 @@ class UnifiedLLMClient:
             # Optional OpenAI support - requires langchain-openai
             try:
                 from .llm_client import LLMClient as OpenAILLMClient
+
                 self._provider = OpenAILLMClient(
                     model=model or "gpt-4o-mini",
                     api_key=api_key,
@@ -454,6 +462,7 @@ class UnifiedLLMClient:
         if self._is_langchain:
             # Wrap LangChain response
             from langchain_core.messages import HumanMessage, SystemMessage
+
             messages = []
             if system:
                 messages.append(SystemMessage(content=system))

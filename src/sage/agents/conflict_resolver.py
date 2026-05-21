@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class ConflictType(Enum):
     """Types of conflicts between agents."""
+
     RESOURCE = "resource"  # Same resource access
     ACTION = "action"  # Conflicting actions
     GOAL = "goal"  # Conflicting goals
@@ -19,6 +20,7 @@ class ConflictType(Enum):
 
 class ResolutionStrategy(Enum):
     """Strategies for resolving conflicts."""
+
     PRIORITY = "priority"  # Higher priority wins
     UTILITY = "utility"  # Maximize utility
     CONSTRAINT = "constraint"  # Apply constraints
@@ -29,6 +31,7 @@ class ResolutionStrategy(Enum):
 @dataclass
 class ConflictAction:
     """An action involved in a conflict."""
+
     agent_name: str
     action: str
     resource: Optional[str] = None
@@ -40,6 +43,7 @@ class ConflictAction:
 @dataclass
 class Conflict:
     """Represents a conflict between actions."""
+
     conflict_id: str
     conflict_type: ConflictType
     actions: List[ConflictAction] = field(default_factory=list)
@@ -52,6 +56,7 @@ class Conflict:
 @dataclass
 class ResolutionResult:
     """Result of conflict resolution."""
+
     success: bool
     winning_action: Optional[ConflictAction] = None
     blocked_actions: List[ConflictAction] = field(default_factory=list)
@@ -92,23 +97,27 @@ class ConflictDetector:
         for resource, res_actions in resource_actions.items():
             if len(res_actions) > 1:
                 self._conflict_count += 1
-                conflicts.append(Conflict(
-                    conflict_id=f"conflict_{self._conflict_count}",
-                    conflict_type=ConflictType.RESOURCE,
-                    actions=res_actions,
-                    description=f"Multiple agents accessing resource: {resource}",
-                ))
+                conflicts.append(
+                    Conflict(
+                        conflict_id=f"conflict_{self._conflict_count}",
+                        conflict_type=ConflictType.RESOURCE,
+                        actions=res_actions,
+                        description=f"Multiple agents accessing resource: {resource}",
+                    )
+                )
 
         # Check for action conflicts (e.g., write vs delete)
         conflicting_pairs = self._find_conflicting_actions(actions)
         for action1, action2 in conflicting_pairs:
             self._conflict_count += 1
-            conflicts.append(Conflict(
-                conflict_id=f"conflict_{self._conflict_count}",
-                conflict_type=ConflictType.ACTION,
-                actions=[action1, action2],
-                description=f"Conflicting actions: {action1.action} vs {action2.action}",
-            ))
+            conflicts.append(
+                Conflict(
+                    conflict_id=f"conflict_{self._conflict_count}",
+                    conflict_type=ConflictType.ACTION,
+                    actions=[action1, action2],
+                    description=f"Conflicting actions: {action1.action} vs {action2.action}",
+                )
+            )
 
         return conflicts
 
@@ -128,10 +137,15 @@ class ConflictDetector:
         ]
 
         for i, action1 in enumerate(actions):
-            for action2 in actions[i + 1:]:
+            for action2 in actions[i + 1 :]:
                 for pattern in conflict_patterns:
-                    if ((pattern[0] in action1.action.lower() and pattern[1] in action2.action.lower()) or
-                        (pattern[1] in action1.action.lower() and pattern[0] in action2.action.lower())):
+                    if (
+                        pattern[0] in action1.action.lower()
+                        and pattern[1] in action2.action.lower()
+                    ) or (
+                        pattern[1] in action1.action.lower()
+                        and pattern[0] in action2.action.lower()
+                    ):
                         conflicts.append((action1, action2))
 
         return conflicts
@@ -216,8 +230,7 @@ class ConflictResolver:
     def _resolve_by_utility(self, conflict: Conflict) -> ResolutionResult:
         """Resolve by maximizing utility."""
         utilities = [
-            (action, self.utility_function(action))
-            for action in conflict.actions
+            (action, self.utility_function(action)) for action in conflict.actions
         ]
         utilities.sort(key=lambda x: x[1], reverse=True)
 
@@ -264,6 +277,7 @@ class ConflictResolver:
     def _resolve_random(self, conflict: Conflict) -> ResolutionResult:
         """Resolve randomly."""
         import random
+
         winner = random.choice(conflict.actions)
         blocked = [a for a in conflict.actions if a != winner]
 

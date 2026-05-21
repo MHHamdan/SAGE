@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class MCPConnectionState(Enum):
     """MCP connection states."""
+
     DISCONNECTED = "disconnected"
     CONNECTING = "connecting"
     CONNECTED = "connected"
@@ -23,6 +24,7 @@ class MCPConnectionState(Enum):
 @dataclass
 class MCPToolDefinition:
     """Definition of an MCP tool."""
+
     name: str
     description: str
     parameters: Dict[str, Any] = field(default_factory=dict)
@@ -33,6 +35,7 @@ class MCPToolDefinition:
 @dataclass
 class MCPResource:
     """An MCP resource."""
+
     uri: str
     name: str
     mime_type: str = "application/octet-stream"
@@ -43,6 +46,7 @@ class MCPResource:
 @dataclass
 class MCPRequest:
     """MCP request with security metadata."""
+
     request_id: str
     method: str
     params: Dict[str, Any] = field(default_factory=dict)
@@ -59,6 +63,7 @@ class MCPRequest:
 @dataclass
 class MCPResponse:
     """MCP response."""
+
     request_id: str
     success: bool
     result: Any = None
@@ -119,7 +124,10 @@ class MCPClient:
     @property
     def is_connected(self) -> bool:
         """Check if connected."""
-        return self._state in (MCPConnectionState.CONNECTED, MCPConnectionState.AUTHENTICATED)
+        return self._state in (
+            MCPConnectionState.CONNECTED,
+            MCPConnectionState.AUTHENTICATED,
+        )
 
     async def connect(self) -> bool:
         """Connect to the MCP server.

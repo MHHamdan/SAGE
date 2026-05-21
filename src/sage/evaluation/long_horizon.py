@@ -63,6 +63,7 @@ logger = logging.getLogger(__name__)
 
 class EvaluationStatus(Enum):
     """Status of evaluation run."""
+
     NOT_STARTED = "not_started"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -83,6 +84,7 @@ class TaskExecutionResult:
         error: Error message (if failed)
         inferred_goal: Inferred goal from task execution (for drift tracking)
     """
+
     task_id: str
     success: bool
     cost: float
@@ -105,6 +107,7 @@ class CheckpointData:
         incident_count: Total incidents so far
         cnsr: Current CNSR value
     """
+
     checkpoint_num: int
     timestamp: datetime
     tasks_completed: int
@@ -156,6 +159,7 @@ class LongHorizonReport:
         recommendations: Generated recommendations
         checkpoints: Checkpoint data captured during evaluation
     """
+
     evaluation_id: str
     start_time: datetime
     end_time: datetime
@@ -198,35 +202,30 @@ class LongHorizonReport:
             "end_time": self.end_time.isoformat(),
             "total_tasks": self.total_tasks,
             "status": self.status.value,
-
             "success_metrics": {
                 "overall_success_rate": self.overall_success_rate,
                 "rolling_success_history": self.rolling_success_history,
                 "success_trend": self.success_trend,
-                "final_window_success_rate": self.final_window_success_rate
+                "final_window_success_rate": self.final_window_success_rate,
             },
-
             "cost_metrics": {
                 "total_cost": self.total_cost,
                 "cnsr": self.cnsr,
                 "cost_per_success": self.cost_per_success,
-                "cost_trend": self.cost_trend
+                "cost_trend": self.cost_trend,
             },
-
             "goal_metrics": {
                 "final_goal_drift": self.final_goal_drift,
                 "max_goal_drift": self.max_goal_drift,
                 "drift_trend": self.drift_trend,
-                "reanchor_count": self.reanchor_count
+                "reanchor_count": self.reanchor_count,
             },
-
             "safety_metrics": {
                 "total_incidents": self.total_incidents,
                 "incident_rate_per_hour": self.incident_rate_per_hour,
                 "incidents_by_severity": self.incidents_by_severity,
-                "critical_incident_count": len(self.critical_incidents)
+                "critical_incident_count": len(self.critical_incidents),
             },
-
             "recommendations": self.recommendations,
             "checkpoints": [
                 {
@@ -236,10 +235,10 @@ class LongHorizonReport:
                     "rolling_success_rate": c.rolling_success_rate,
                     "current_drift": c.current_drift,
                     "incident_count": c.incident_count,
-                    "cnsr": c.cnsr
+                    "cnsr": c.cnsr,
                 }
                 for c in self.checkpoints
-            ]
+            ],
         }
 
     def to_json(self, indent: int = 2) -> str:
@@ -292,7 +291,7 @@ class LongHorizonEvaluator:
         window_size: int = 50,
         drift_threshold: float = 0.3,
         incident_threshold_per_hour: float = 5.0,
-        success_degradation_threshold: float = 0.1
+        success_degradation_threshold: float = 0.1,
     ):
         """Initialize the long-horizon evaluator.
 
@@ -314,12 +313,10 @@ class LongHorizonEvaluator:
 
         # Initialize tracking components
         self.rolling_tracker = RollingWindowTracker(
-            window_size=window_size,
-            overlap=window_size // 2
+            window_size=window_size, overlap=window_size // 2
         )
         self.goal_tracker = GoalDriftTracker(
-            embed_fn=embed_fn,
-            drift_threshold=drift_threshold
+            embed_fn=embed_fn, drift_threshold=drift_threshold
         )
         self.incident_tracker = IncidentTracker()
 
@@ -340,7 +337,7 @@ class LongHorizonEvaluator:
         on_checkpoint: Optional[Callable[[CheckpointData], None]] = None,
         on_task_complete: Optional[Callable[[TaskExecutionResult], None]] = None,
         goal_inference_fn: Optional[Callable[[Any, Any], str]] = None,
-        max_concurrent: int = 1
+        max_concurrent: int = 1,
     ) -> LongHorizonReport:
         """Run complete long-horizon evaluation.
 
@@ -394,8 +391,7 @@ class LongHorizonEvaluator:
                     try:
                         inferred_goal = goal_inference_fn(task, result)
                         self.goal_tracker.record_inferred_goal(
-                            inferred_goal,
-                            source="action_trace"
+                            inferred_goal, source="action_trace"
                         )
                     except Exception as e:
                         logger.warning(f"Goal inference failed: {e}")
@@ -420,7 +416,7 @@ class LongHorizonEvaluator:
             self.incident_tracker.record_incident(
                 incident_type=IncidentType.UNEXPECTED_TERMINATION,
                 severity=IncidentSeverity.CRITICAL,
-                description=f"Evaluation failed: {str(e)}"
+                description=f"Evaluation failed: {str(e)}",
             )
 
         # Generate report
@@ -442,7 +438,7 @@ class LongHorizonEvaluator:
         try:
             # Execute task
             # Handle both sync and async run methods
-            if asyncio.iscoroutinefunction(getattr(self.agent, 'run', None)):
+            if asyncio.iscoroutinefunction(getattr(self.agent, "run", None)):
                 output = await self.agent.run(task)
             else:
                 output = self.agent.run(task)
@@ -460,7 +456,7 @@ class LongHorizonEvaluator:
                 success=success,
                 cost=cost,
                 latency_ms=latency_ms,
-                output=output
+                output=output,
             )
 
         except Exception as e:
@@ -471,7 +467,7 @@ class LongHorizonEvaluator:
                 incident_type=IncidentType.TOOL_FAILURE,
                 severity=IncidentSeverity.MEDIUM,
                 description=f"Task {task_id} failed: {str(e)}",
-                context={"task_index": task_index}
+                context={"task_index": task_index},
             )
 
             return TaskExecutionResult(
@@ -479,19 +475,21 @@ class LongHorizonEvaluator:
                 success=False,
                 cost=0.01,  # Minimal cost for failed tasks
                 latency_ms=latency_ms,
-                error=str(e)
+                error=str(e),
             )
 
     def _record_task_result(self, result: TaskExecutionResult) -> None:
         """Record task result in all trackers."""
         # Update rolling tracker
-        self.rolling_tracker.record(TaskResult(
-            task_id=result.task_id,
-            timestamp=datetime.now(),
-            success=result.success,
-            cost=result.cost,
-            latency_ms=result.latency_ms
-        ))
+        self.rolling_tracker.record(
+            TaskResult(
+                task_id=result.task_id,
+                timestamp=datetime.now(),
+                success=result.success,
+                cost=result.cost,
+                latency_ms=result.latency_ms,
+            )
+        )
 
         # Update totals
         self._total_cost += result.cost
@@ -504,11 +502,7 @@ class LongHorizonEvaluator:
         current_window = self.rolling_tracker.get_current_window()
         rolling_success = current_window.success_rate if current_window else 0.0
 
-        cnsr = compute_cnsr(
-            self._total_successes,
-            tasks_completed,
-            self._total_cost
-        )
+        cnsr = compute_cnsr(self._total_successes, tasks_completed, self._total_cost)
 
         checkpoint = CheckpointData(
             checkpoint_num=len(self._checkpoints) + 1,
@@ -517,7 +511,7 @@ class LongHorizonEvaluator:
             rolling_success_rate=rolling_success,
             current_drift=self.goal_tracker.get_current_drift(),
             incident_count=self.incident_tracker.get_statistics().total_incidents,
-            cnsr=cnsr
+            cnsr=cnsr,
         )
 
         logger.info(
@@ -578,20 +572,20 @@ class LongHorizonEvaluator:
         # Success metrics
         overall_success_rate = (
             self._total_successes / self._tasks_completed
-            if self._tasks_completed > 0 else 0.0
+            if self._tasks_completed > 0
+            else 0.0
         )
 
         # CNSR
         cnsr = compute_cnsr(
-            self._total_successes,
-            self._tasks_completed,
-            self._total_cost
+            self._total_successes, self._tasks_completed, self._total_cost
         )
 
         # Cost per success
         cost_per_success = (
             self._total_cost / self._total_successes
-            if self._total_successes > 0 else float('inf')
+            if self._total_successes > 0
+            else float("inf")
         )
 
         # Goal metrics
@@ -607,7 +601,7 @@ class LongHorizonEvaluator:
             overall_success_rate,
             cnsr,
             drift_stats.mean_drift,
-            incident_stats.incident_rate_per_hour
+            incident_stats.incident_rate_per_hour,
         )
 
         return LongHorizonReport(
@@ -616,25 +610,21 @@ class LongHorizonEvaluator:
             end_time=end_time,
             total_tasks=self._tasks_completed,
             status=self._status,
-
             # Success metrics
             overall_success_rate=overall_success_rate,
             rolling_success_history=rolling_values,
             success_trend=self.rolling_tracker.get_success_trend(),
             final_window_success_rate=final_window_success,
-
             # Cost metrics
             total_cost=self._total_cost,
             cnsr=cnsr,
             cost_per_success=cost_per_success,
             cost_trend=self._determine_cost_trend(cost_values),
-
             # Goal metrics
             final_goal_drift=self.goal_tracker.get_current_drift(),
             max_goal_drift=drift_stats.max_drift,
             drift_trend=drift_stats.trend,
             reanchor_count=self.goal_tracker.get_reanchor_count(),
-
             # Safety metrics
             total_incidents=incident_stats.total_incidents,
             incident_rate_per_hour=incident_stats.incident_rate_per_hour,
@@ -642,10 +632,9 @@ class LongHorizonEvaluator:
                 s.name: c for s, c in incident_stats.incidents_by_severity.items()
             },
             critical_incidents=critical_incidents,
-
             # Analysis
             recommendations=recommendations,
-            checkpoints=self._checkpoints
+            checkpoints=self._checkpoints,
         )
 
     def _determine_cost_trend(self, cost_values: List[float]) -> str:
@@ -654,8 +643,8 @@ class LongHorizonEvaluator:
             return "stable"
 
         # Simple linear trend
-        first_half = np.mean(cost_values[:len(cost_values)//2])
-        second_half = np.mean(cost_values[len(cost_values)//2:])
+        first_half = np.mean(cost_values[: len(cost_values) // 2])
+        second_half = np.mean(cost_values[len(cost_values) // 2 :])
 
         if second_half > first_half * 1.1:
             return "increasing"
@@ -664,11 +653,7 @@ class LongHorizonEvaluator:
         return "stable"
 
     def _generate_recommendations(
-        self,
-        success_rate: float,
-        cnsr: float,
-        mean_drift: float,
-        incident_rate: float
+        self, success_rate: float, cnsr: float, mean_drift: float, incident_rate: float
     ) -> List[str]:
         """Generate recommendations based on evaluation results.
 
@@ -740,11 +725,7 @@ class LongHorizonEvaluator:
 
         return recommendations
 
-    def export_report(
-        self,
-        report: LongHorizonReport,
-        format: str = "json"
-    ) -> str:
+    def export_report(self, report: LongHorizonReport, format: str = "json") -> str:
         """Export evaluation report to string.
 
         Args:
@@ -771,49 +752,43 @@ class LongHorizonEvaluator:
             f"**Period**: {report.start_time.isoformat()} to {report.end_time.isoformat()}",
             f"**Tasks**: {report.total_tasks}",
             f"**Status**: {report.status.value}",
-
             f"\n## Success Metrics",
             f"\n- **Overall Success Rate**: {report.overall_success_rate:.2%}",
             f"- **Final Window Success**: {report.final_window_success_rate:.2%}",
             f"- **Success Trend**: {report.success_trend}",
-
             f"\n## Cost Metrics",
             f"\n- **Total Cost**: ${report.total_cost:.2f}",
             f"- **CNSR**: {report.cnsr:.3f}",
             f"- **Cost per Success**: ${report.cost_per_success:.3f}",
             f"- **Cost Trend**: {report.cost_trend}",
-
             f"\n## Goal Metrics",
             f"\n- **Final Goal Drift**: {report.final_goal_drift:.3f}",
             f"- **Max Goal Drift**: {report.max_goal_drift:.3f}",
             f"- **Drift Trend**: {report.drift_trend}",
             f"- **Re-anchor Count**: {report.reanchor_count}",
-
             f"\n## Safety Metrics",
             f"\n- **Total Incidents**: {report.total_incidents}",
             f"- **Incident Rate**: {report.incident_rate_per_hour:.2f}/hour",
             f"- **Critical Incidents**: {len(report.critical_incidents)}",
-
             f"\n### Incidents by Severity",
         ]
 
         for severity, count in report.incidents_by_severity.items():
             lines.append(f"- {severity}: {count}")
 
-        lines.extend([
-            f"\n## Recommendations",
-            ""
-        ])
+        lines.extend([f"\n## Recommendations", ""])
 
         for i, rec in enumerate(report.recommendations, 1):
             lines.append(f"{i}. {rec}")
 
         if report.checkpoints:
-            lines.extend([
-                f"\n## Checkpoints",
-                "\n| Checkpoint | Tasks | Success Rate | Drift | Incidents | CNSR |",
-                "|------------|-------|--------------|-------|-----------|------|"
-            ])
+            lines.extend(
+                [
+                    f"\n## Checkpoints",
+                    "\n| Checkpoint | Tasks | Success Rate | Drift | Incidents | CNSR |",
+                    "|------------|-------|--------------|-------|-----------|------|",
+                ]
+            )
             for cp in report.checkpoints:
                 lines.append(
                     f"| {cp.checkpoint_num} | {cp.tasks_completed} | "
@@ -836,10 +811,11 @@ class LongHorizonEvaluator:
             "total_cost": self._total_cost,
             "current_success_rate": (
                 self._total_successes / self._tasks_completed
-                if self._tasks_completed > 0 else 0.0
+                if self._tasks_completed > 0
+                else 0.0
             ),
             "current_drift": self.goal_tracker.get_current_drift(),
-            "incident_count": self.incident_tracker.get_statistics().total_incidents
+            "incident_count": self.incident_tracker.get_statistics().total_incidents,
         }
 
 
@@ -875,7 +851,7 @@ class SimpleLongHorizonEvaluator:
         latency_ms: float = 0.0,
         incident_type: Optional[IncidentType] = None,
         incident_severity: Optional[IncidentSeverity] = None,
-        incident_description: Optional[str] = None
+        incident_description: Optional[str] = None,
     ) -> None:
         """Record a task result.
 
@@ -889,19 +865,21 @@ class SimpleLongHorizonEvaluator:
         """
         self._task_count += 1
 
-        self.rolling_tracker.record(TaskResult(
-            task_id=f"task_{self._task_count}",
-            timestamp=datetime.now(),
-            success=success,
-            cost=cost,
-            latency_ms=latency_ms
-        ))
+        self.rolling_tracker.record(
+            TaskResult(
+                task_id=f"task_{self._task_count}",
+                timestamp=datetime.now(),
+                success=success,
+                cost=cost,
+                latency_ms=latency_ms,
+            )
+        )
 
         if incident_type and incident_severity:
             self.incident_tracker.record_incident(
                 incident_type=incident_type,
                 severity=incident_severity,
-                description=incident_description or "Incident recorded"
+                description=incident_description or "Incident recorded",
             )
 
     def get_summary(self) -> Dict[str, Any]:
@@ -921,11 +899,11 @@ class SimpleLongHorizonEvaluator:
             "cnsr": compute_cnsr(
                 summary.get("total_successes", 0),
                 summary["total_tasks"],
-                summary["total_cost"]
+                summary["total_cost"],
             ),
             "rolling_success_rate": self.rolling_tracker.get_rolling_success_rate(),
             "success_trend": self.rolling_tracker.get_success_trend(),
             "total_incidents": incidents.total_incidents,
             "incident_rate_per_hour": incidents.incident_rate_per_hour,
-            "is_degrading": self.rolling_tracker.detect_performance_degradation()
+            "is_degrading": self.rolling_tracker.detect_performance_degradation(),
         }

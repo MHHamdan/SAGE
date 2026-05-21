@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ExperimentConfig:
     """Configuration for an experiment."""
+
     name: str = "experiment"
     seed: int = 42
     num_runs: int = 5
@@ -158,6 +159,7 @@ class ExperimentConfig:
 @dataclass
 class RunResult:
     """Result from a single experiment run."""
+
     run_id: str
     seed: int
     success: bool
@@ -184,6 +186,7 @@ class RunResult:
 @dataclass
 class ExperimentResult:
     """Result from a complete experiment."""
+
     experiment_id: str
     config: ExperimentConfig
     runs: List[RunResult] = field(default_factory=list)
@@ -226,7 +229,7 @@ class ExperimentResult:
             n = len(values)
             mean = sum(values) / n
             variance = sum((v - mean) ** 2 for v in values) / n if n > 1 else 0
-            std = variance ** 0.5
+            std = variance**0.5
 
             aggregated[key] = {
                 "mean": mean,
@@ -350,6 +353,7 @@ class ExperimentRunner:
 
                 # Run task
                 import time
+
                 start_time = time.time()
                 run_result = RunResult(run_id=run_id, seed=run_seed, success=False)
 
@@ -358,11 +362,13 @@ class ExperimentRunner:
 
                     run_result.success = task_result.get("success", True)
                     run_result.metrics = {
-                        k: v for k, v in task_result.items()
+                        k: v
+                        for k, v in task_result.items()
                         if k != "success" and isinstance(v, (int, float))
                     }
                     run_result.metadata = {
-                        k: v for k, v in task_result.items()
+                        k: v
+                        for k, v in task_result.items()
                         if k != "success" and not isinstance(v, (int, float))
                     }
 

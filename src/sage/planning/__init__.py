@@ -93,6 +93,8 @@ def create_planner(
 
     planner_class = planners.get(planner_type.lower())
     if not planner_class:
-        raise ValueError(f"Unknown planner type: {planner_type}. Available: {list(planners.keys())}")
+        raise ValueError(
+            f"Unknown planner type: {planner_type}. Available: {list(planners.keys())}"
+        )
 
     return planner_class(llm_client, **kwargs)

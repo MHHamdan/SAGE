@@ -41,10 +41,7 @@ class TestThreatValidator:
         mock_mcp = Mock()
         mock_a2a = Mock()
 
-        validator = ThreatValidator(
-            mcp_client=mock_mcp,
-            a2a_client=mock_a2a
-        )
+        validator = ThreatValidator(mcp_client=mock_mcp, a2a_client=mock_a2a)
 
         assert validator.mcp_client == mock_mcp
         assert validator.a2a_client == mock_a2a
@@ -74,14 +71,9 @@ class TestThreatValidator:
 
     def test_test_prompt_injection_custom_payloads(self, validator):
         """Test with custom injection payloads."""
-        payloads = [
-            "Custom payload 1",
-            "Custom payload 2"
-        ]
+        payloads = ["Custom payload 1", "Custom payload 2"]
 
-        result = validator.test_prompt_injection_via_tool(
-            injection_payloads=payloads
-        )
+        result = validator.test_prompt_injection_via_tool(injection_payloads=payloads)
 
         assert result.details["payloads_tested"] == 2
 
@@ -101,10 +93,7 @@ class TestThreatValidator:
 
     def test_test_context_leakage_with_data(self, validator):
         """Test with sample sensitive data."""
-        sample_data = {
-            "email": "test@example.com",
-            "ssn": "123-45-6789"
-        }
+        sample_data = {"email": "test@example.com", "ssn": "123-45-6789"}
 
         result = validator.test_context_leakage(sample_context=sample_data)
         assert len(result.evidence) > 0
@@ -118,15 +107,9 @@ class TestThreatValidator:
 
     def test_test_cross_agent_escalation_custom_caps(self, validator):
         """Test with custom capabilities."""
-        capabilities = {
-            "agent_1": ["read"],
-            "agent_2": ["write"],
-            "agent_3": ["admin"]
-        }
+        capabilities = {"agent_1": ["read"], "agent_2": ["write"], "agent_3": ["admin"]}
 
-        result = validator.test_cross_agent_escalation(
-            agent_capabilities=capabilities
-        )
+        result = validator.test_cross_agent_escalation(agent_capabilities=capabilities)
 
         assert "agent_1" in str(result.details)
 
@@ -281,7 +264,7 @@ class TestThreatResult:
             mitigation_status=MitigationStatus.NONE,
             evidence=["Test evidence"],
             test_method="unit_test",
-            recommendations=["Fix it"]
+            recommendations=["Fix it"],
         )
 
         assert result.vulnerable
@@ -296,7 +279,7 @@ class TestThreatResult:
             mitigation_status=MitigationStatus.FULL,
             evidence=[],
             test_method="test",
-            recommendations=[]
+            recommendations=[],
         )
 
         d = result.to_dict()
@@ -313,7 +296,7 @@ class TestAttackTreeNode:
             node_id="root",
             description="Test attack",
             node_type="OR",
-            difficulty="medium"
+            difficulty="medium",
         )
 
         assert node.node_id == "root"
@@ -322,16 +305,10 @@ class TestAttackTreeNode:
     def test_attack_tree_with_children(self):
         """Test AttackTreeNode with children."""
         child1 = AttackTreeNode(
-            node_id="c1",
-            description="Child 1",
-            node_type="LEAF",
-            difficulty="easy"
+            node_id="c1", description="Child 1", node_type="LEAF", difficulty="easy"
         )
         child2 = AttackTreeNode(
-            node_id="c2",
-            description="Child 2",
-            node_type="LEAF",
-            difficulty="hard"
+            node_id="c2", description="Child 2", node_type="LEAF", difficulty="hard"
         )
 
         root = AttackTreeNode(
@@ -339,7 +316,7 @@ class TestAttackTreeNode:
             description="Root",
             node_type="AND",
             difficulty="medium",
-            children=[child1, child2]
+            children=[child1, child2],
         )
 
         assert len(root.children) == 2
@@ -351,7 +328,7 @@ class TestAttackTreeNode:
             description="Test",
             node_type="LEAF",
             difficulty="easy",
-            mitigations=["Mitigation 1"]
+            mitigations=["Mitigation 1"],
         )
 
         d = node.to_dict()

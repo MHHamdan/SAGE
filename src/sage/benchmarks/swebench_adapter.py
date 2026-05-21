@@ -41,6 +41,7 @@ logger = logging.getLogger(__name__)
 
 class SWEBenchDifficulty(Enum):
     """SWE-Bench difficulty levels."""
+
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
@@ -48,6 +49,7 @@ class SWEBenchDifficulty(Enum):
 
 class SWEBenchVariant(Enum):
     """SWE-Bench variants."""
+
     LITE = "lite"
     FULL = "full"
     VERIFIED = "verified"
@@ -67,6 +69,7 @@ class SWEBenchTask(BenchmarkTask):
         difficulty: Estimated difficulty
         created_at: Issue creation date
     """
+
     repo: str = ""
     base_commit: str = ""
     issue_description: str = ""
@@ -78,14 +81,16 @@ class SWEBenchTask(BenchmarkTask):
 
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
-        base.update({
-            "repo": self.repo,
-            "base_commit": self.base_commit,
-            "issue_description": self.issue_description,
-            "hints": self.hints,
-            "difficulty": self.difficulty.value,
-            "created_at": self.created_at
-        })
+        base.update(
+            {
+                "repo": self.repo,
+                "base_commit": self.base_commit,
+                "issue_description": self.issue_description,
+                "hints": self.hints,
+                "difficulty": self.difficulty.value,
+                "created_at": self.created_at,
+            }
+        )
         return base
 
 
@@ -101,6 +106,7 @@ class SWEBenchResult(BenchmarkResult):
         patch_applies: Whether patch applies cleanly
         execution_time: Time taken to run tests
     """
+
     tests_passed: int = 0
     tests_total: int = 0
     tests_failed: List[str] = field(default_factory=list)
@@ -110,14 +116,16 @@ class SWEBenchResult(BenchmarkResult):
 
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
-        base.update({
-            "tests_passed": self.tests_passed,
-            "tests_total": self.tests_total,
-            "tests_failed": self.tests_failed,
-            "patch_valid": self.patch_valid,
-            "patch_applies": self.patch_applies,
-            "execution_time": self.execution_time
-        })
+        base.update(
+            {
+                "tests_passed": self.tests_passed,
+                "tests_total": self.tests_total,
+                "tests_failed": self.tests_failed,
+                "patch_valid": self.patch_valid,
+                "patch_applies": self.patch_applies,
+                "execution_time": self.execution_time,
+            }
+        )
         return base
 
 
@@ -128,8 +136,11 @@ SAMPLE_SWEBENCH_TASKS = [
         "repo": "django/django",
         "issue": "UsernameValidator allows trailing newline in usernames",
         "description": "The username validator in Django allows usernames with trailing newlines. This is a security concern as it could lead to confusion or bypass of username-based access controls.",
-        "hints": ["Look at django/contrib/auth/validators.py", "The regex pattern needs to be anchored"],
-        "difficulty": "easy"
+        "hints": [
+            "Look at django/contrib/auth/validators.py",
+            "The regex pattern needs to be anchored",
+        ],
+        "difficulty": "easy",
     },
     {
         "id": "scikit-learn__scikit-learn-13779",
@@ -137,23 +148,29 @@ SAMPLE_SWEBENCH_TASKS = [
         "issue": "VotingClassifier fails with string labels",
         "description": "When using VotingClassifier with estimators that have string labels, the ensemble fails to properly combine predictions due to label encoding issues.",
         "hints": ["Check the _predict_proba method", "Labels need consistent encoding"],
-        "difficulty": "medium"
+        "difficulty": "medium",
     },
     {
         "id": "matplotlib__matplotlib-22711",
         "repo": "matplotlib/matplotlib",
         "issue": "Legend title fontsize not respected",
         "description": "Setting fontsize for legend title through legend() or set_title() is not working properly. The title uses a different fontsize than specified.",
-        "hints": ["Look at lib/matplotlib/legend.py", "The title properties need to be propagated"],
-        "difficulty": "medium"
+        "hints": [
+            "Look at lib/matplotlib/legend.py",
+            "The title properties need to be propagated",
+        ],
+        "difficulty": "medium",
     },
     {
         "id": "sympy__sympy-18532",
         "repo": "sympy/sympy",
         "issue": "expr.atoms() returns wrong set for MutableMatrix",
         "description": "When calling atoms() on expressions containing MutableMatrix objects, the returned set of atoms is incorrect or incomplete.",
-        "hints": ["Check the atoms() method in core/basic.py", "MutableMatrix may need special handling"],
-        "difficulty": "hard"
+        "hints": [
+            "Check the atoms() method in core/basic.py",
+            "MutableMatrix may need special handling",
+        ],
+        "difficulty": "hard",
     },
     {
         "id": "requests__requests-5087",
@@ -161,7 +178,7 @@ SAMPLE_SWEBENCH_TASKS = [
         "issue": "Session does not properly handle retries",
         "description": "The Session class does not properly handle retry configurations when adapters are mounted, leading to inconsistent retry behavior.",
         "hints": ["Look at sessions.py", "Check how adapters are merged"],
-        "difficulty": "medium"
+        "difficulty": "medium",
     },
 ]
 
@@ -191,7 +208,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
         data_path: Optional[str] = None,
         variant: str = "lite",
         seed: int = 42,
-        use_sample_data: bool = True
+        use_sample_data: bool = True,
     ):
         """Initialize SWE-Bench adapter.
 
@@ -219,7 +236,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
         n: Optional[int] = None,
         difficulty: Optional[str] = None,
         repo: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> List[SWEBenchTask]:
         """Load SWE-Bench tasks.
 
@@ -259,7 +276,9 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
         self._tasks = tasks
         self._loaded = True
 
-        logger.info(f"Loaded {len(tasks)} SWE-Bench tasks (variant={self.variant.value})")
+        logger.info(
+            f"Loaded {len(tasks)} SWE-Bench tasks (variant={self.variant.value})"
+        )
         return tasks
 
     def _load_from_file(self) -> List[SWEBenchTask]:
@@ -284,7 +303,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
                 test_patch=item.get("test_patch", ""),
                 golden_patch=item.get("patch", ""),
                 difficulty=SWEBenchDifficulty(item.get("difficulty", "medium")),
-                created_at=item.get("created_at", "")
+                created_at=item.get("created_at", ""),
             )
             tasks.append(task)
 
@@ -302,7 +321,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
                 issue_description=item["description"],
                 hints=item.get("hints", []),
                 difficulty=SWEBenchDifficulty(item["difficulty"]),
-                metadata={"source": "sample"}
+                metadata={"source": "sample"},
             )
             tasks.append(task)
 
@@ -317,17 +336,14 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
                 repo=repo,
                 issue_description=f"Sample issue {idx} for {repo}",
                 difficulty=SWEBenchDifficulty(["easy", "medium", "hard"][idx % 3]),
-                metadata={"source": "generated"}
+                metadata={"source": "generated"},
             )
             tasks.append(task)
 
         return tasks[:n]
 
     def evaluate(
-        self,
-        task: SWEBenchTask,
-        patch: str,
-        run_tests: bool = True
+        self, task: SWEBenchTask, patch: str, run_tests: bool = True
     ) -> SWEBenchResult:
         """Evaluate agent-generated patch.
 
@@ -350,7 +366,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
                 score=0.0,
                 patch_valid=False,
                 patch_applies=False,
-                error="Invalid patch format"
+                error="Invalid patch format",
             )
 
         # Check if patch applies (simulated)
@@ -364,7 +380,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
                 score=0.1,  # Small credit for valid format
                 patch_valid=True,
                 patch_applies=False,
-                error="Patch does not apply cleanly"
+                error="Patch does not apply cleanly",
             )
 
         # Evaluate tests (simulated)
@@ -392,7 +408,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
             tests_total=tests_total,
             tests_failed=tests_failed,
             patch_valid=True,
-            patch_applies=True
+            patch_applies=True,
         )
 
     def _validate_patch_format(self, patch: str) -> bool:
@@ -401,13 +417,10 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
             return False
 
         # Check for diff headers
-        has_diff_header = (
-            "diff --git" in patch or
-            "---" in patch and "+++" in patch
-        )
+        has_diff_header = "diff --git" in patch or "---" in patch and "+++" in patch
 
         # Check for hunk headers
-        has_hunks = bool(re.search(r'@@\s*-\d+', patch))
+        has_hunks = bool(re.search(r"@@\s*-\d+", patch))
 
         return has_diff_header or has_hunks
 
@@ -421,17 +434,19 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
             return False  # Merge conflict markers
 
         # Check for reasonable diff structure
-        lines = patch.split('\n')
-        add_count = sum(1 for l in lines if l.startswith('+') and not l.startswith('+++'))
-        del_count = sum(1 for l in lines if l.startswith('-') and not l.startswith('---'))
+        lines = patch.split("\n")
+        add_count = sum(
+            1 for l in lines if l.startswith("+") and not l.startswith("+++")
+        )
+        del_count = sum(
+            1 for l in lines if l.startswith("-") and not l.startswith("---")
+        )
 
         # At least some changes
         return add_count > 0 or del_count > 0
 
     def _run_tests_simulated(
-        self,
-        task: SWEBenchTask,
-        patch: str
+        self, task: SWEBenchTask, patch: str
     ) -> Tuple[int, int, List[str]]:
         """Run tests in simulated mode.
 
@@ -439,7 +454,7 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
             Tuple of (passed, total, failed_names)
         """
         # Simulate test results based on patch quality heuristics
-        patch_lines = len(patch.split('\n'))
+        patch_lines = len(patch.split("\n"))
 
         # Base number of tests
         total = self._rng.integers(5, 20)
@@ -450,7 +465,9 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
             passed = total
         else:
             # Heuristic based on patch size and structure
-            quality_score = min(1.0, patch_lines / 50)  # Larger patches may be more complete
+            quality_score = min(
+                1.0, patch_lines / 50
+            )  # Larger patches may be more complete
             base_pass_rate = 0.3 + quality_score * 0.4
             passed = int(total * base_pass_rate)
 
@@ -484,20 +501,22 @@ class SWEBenchAdapter(BenchmarkAdapter[SWEBenchTask, SWEBenchResult]):
         valid_patches = sum(1 for r in results if r.patch_valid)
         applying_patches = sum(1 for r in results if r.patch_applies)
 
-        base_stats.update({
-            "pass_at_1": self.get_pass_at_1(results),
-            "valid_patch_rate": valid_patches / len(results),
-            "applying_patch_rate": applying_patches / len(results),
-            "mean_tests_passed": sum(r.tests_passed for r in results) / len(results),
-            "mean_tests_total": sum(r.tests_total for r in results) / len(results)
-        })
+        base_stats.update(
+            {
+                "pass_at_1": self.get_pass_at_1(results),
+                "valid_patch_rate": valid_patches / len(results),
+                "applying_patch_rate": applying_patches / len(results),
+                "mean_tests_passed": sum(r.tests_passed for r in results)
+                / len(results),
+                "mean_tests_total": sum(r.tests_total for r in results) / len(results),
+            }
+        )
 
         return base_stats
 
 
 def download_swebench_data(
-    output_dir: str = "data/swebench",
-    variant: str = "lite"
+    output_dir: str = "data/swebench", variant: str = "lite"
 ) -> str:
     """Download SWE-Bench data.
 

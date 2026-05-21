@@ -11,9 +11,16 @@ from typing import Optional, List, Dict, Any
 
 from .planner_base import BasePlanner
 from .schemas import (
-    Plan, PlanStep, PlanningContext, PlanningResult,
-    PlanStatus, StepStatus, Condition, ConditionType,
-    create_plan, create_step,
+    Plan,
+    PlanStep,
+    PlanningContext,
+    PlanningResult,
+    PlanStatus,
+    StepStatus,
+    Condition,
+    ConditionType,
+    create_plan,
+    create_step,
 )
 
 logger = logging.getLogger(__name__)
@@ -163,13 +170,15 @@ class DeliberativePlanner(BasePlanner):
         analysis = self._analyze_failure(current_plan, failure_reason)
 
         # Update context with failure information
-        context.history.append({
-            "action": "plan_failure",
-            "plan_id": current_plan.plan_id,
-            "failure_reason": failure_reason,
-            "completed_steps": current_plan.completed_steps,
-            "analysis": analysis,
-        })
+        context.history.append(
+            {
+                "action": "plan_failure",
+                "plan_id": current_plan.plan_id,
+                "failure_reason": failure_reason,
+                "completed_steps": current_plan.completed_steps,
+                "analysis": analysis,
+            }
+        )
 
         # Add constraint to avoid the same failure
         if analysis.get("avoid_action"):
@@ -315,19 +324,23 @@ List 1-3 of each type."""
             if line.upper().startswith("PRECONDITION:"):
                 desc = line.split(":", 1)[1].strip()
                 if desc:
-                    preconditions.append(Condition(
-                        name=f"pre_{len(preconditions)}",
-                        description=desc,
-                        condition_type=ConditionType.PRECONDITION,
-                    ))
+                    preconditions.append(
+                        Condition(
+                            name=f"pre_{len(preconditions)}",
+                            description=desc,
+                            condition_type=ConditionType.PRECONDITION,
+                        )
+                    )
             elif line.upper().startswith("POSTCONDITION:"):
                 desc = line.split(":", 1)[1].strip()
                 if desc:
-                    postconditions.append(Condition(
-                        name=f"post_{len(postconditions)}",
-                        description=desc,
-                        condition_type=ConditionType.POSTCONDITION,
-                    ))
+                    postconditions.append(
+                        Condition(
+                            name=f"post_{len(postconditions)}",
+                            description=desc,
+                            condition_type=ConditionType.POSTCONDITION,
+                        )
+                    )
 
         return {
             "preconditions": preconditions,
@@ -382,7 +395,14 @@ List 1-3 of each type."""
         risk = 0.1  # Base risk
 
         # Increase risk for certain actions
-        high_risk_keywords = ["delete", "remove", "modify", "execute", "write", "update"]
+        high_risk_keywords = [
+            "delete",
+            "remove",
+            "modify",
+            "execute",
+            "write",
+            "update",
+        ]
         action_lower = step.action.lower()
         desc_lower = step.description.lower()
 
@@ -418,7 +438,9 @@ List 1-3 of each type."""
         if current:
             analysis["failed_step"] = current.name
             analysis["failed_action"] = current.action
-            analysis["avoid_action"] = current.action if "error" in failure_reason.lower() else None
+            analysis["avoid_action"] = (
+                current.action if "error" in failure_reason.lower() else None
+            )
 
         return analysis
 
@@ -435,14 +457,16 @@ List 1-3 of each type."""
         for error in errors:
             if "no steps" in error.lower():
                 # Add a default step
-                plan.add_step(create_step(
-                    name="Execute task",
-                    action="execute",
-                    description=plan.goal,
-                ))
+                plan.add_step(
+                    create_step(
+                        name="Execute task",
+                        action="execute",
+                        description=plan.goal,
+                    )
+                )
 
             if "exceeds max steps" in error.lower():
                 # Truncate to max steps
-                plan.steps = plan.steps[:plan.max_steps_allowed]
+                plan.steps = plan.steps[: plan.max_steps_allowed]
 
         return plan

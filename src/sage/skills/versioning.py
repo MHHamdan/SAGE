@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SkillVersion:
     """Semantic version for a skill."""
+
     major: int = 1
     minor: int = 0
     patch: int = 0
@@ -22,12 +23,20 @@ class SkillVersion:
         return f"{self.major}.{self.minor}.{self.patch}"
 
     def __lt__(self, other: "SkillVersion") -> bool:
-        return (self.major, self.minor, self.patch) < (other.major, other.minor, other.patch)
+        return (self.major, self.minor, self.patch) < (
+            other.major,
+            other.minor,
+            other.patch,
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, SkillVersion):
             return False
-        return (self.major, self.minor, self.patch) == (other.major, other.minor, other.patch)
+        return (self.major, self.minor, self.patch) == (
+            other.major,
+            other.minor,
+            other.patch,
+        )
 
     @classmethod
     def from_string(cls, version_str: str) -> "SkillVersion":
@@ -54,6 +63,7 @@ class SkillVersion:
 @dataclass
 class VersionedSkill:
     """A skill with version history management."""
+
     name: str
     current_version: Skill
     version_history: Dict[str, Skill] = field(default_factory=dict)
@@ -82,7 +92,9 @@ class VersionedSkill:
         cur_ver = SkillVersion.from_string(self.current_version.version)
 
         if new_ver <= cur_ver:
-            raise ValueError(f"New version {skill.version} must be newer than {self.current_version.version}")
+            raise ValueError(
+                f"New version {skill.version} must be newer than {self.current_version.version}"
+            )
 
         # Deprecate previous if requested
         if deprecate_previous:

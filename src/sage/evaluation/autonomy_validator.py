@@ -48,6 +48,7 @@ class AutonomyLevel(IntEnum):
     - BOUNDED_AGENT: Domain-limited autonomy
     - FULL_AGENT: Unrestricted within tool constraints
     """
+
     STATIC_WORKFLOW = 0
     CONDITIONAL = 1
     GUIDED_AGENT = 2
@@ -62,13 +63,14 @@ class AutonomyLevel(IntEnum):
             1: cls.CONDITIONAL,
             2: cls.GUIDED_AGENT,
             3: cls.BOUNDED_AGENT,
-            4: cls.FULL_AGENT
+            4: cls.FULL_AGENT,
         }
         return mapping.get(min(count, 4), cls.STATIC_WORKFLOW)
 
 
 class AutonomyCriterion(Enum):
     """The four minimum autonomy criteria from Section IV-A."""
+
     ACTION_SELECTION_FREEDOM = "action_selection_freedom"
     GOAL_DIRECTED_PERSISTENCE = "goal_directed_persistence"
     DYNAMIC_TERMINATION = "dynamic_termination"
@@ -91,29 +93,32 @@ class AutonomyThresholds:
         recovery_attempt_ratio: Minimum fraction of failures with recovery attempted
         recovery_strategy_diversity: Minimum unique strategies as fraction of failures
     """
+
     # Action Selection Freedom thresholds
     action_variation_ratio: float = 0.5  # 50% of goals must show variation
 
     # Goal-Directed Persistence thresholds
     persistence_obstacle_ratio: float = 0.5  # 50% of obstacles handled
-    persistence_strategy_changes: int = 1     # At least 1 strategy change
-    persistence_progress: float = 0.3         # 30% progress toward goal
+    persistence_strategy_changes: int = 1  # At least 1 strategy change
+    persistence_progress: float = 0.3  # 30% progress toward goal
 
     # Dynamic Termination thresholds
-    termination_variance: int = 2             # At least 2 steps variance
-    termination_unique_counts: int = 2        # At least 2 unique step counts
+    termination_variance: int = 2  # At least 2 steps variance
+    termination_unique_counts: int = 2  # At least 2 unique step counts
 
     # Error Recovery thresholds
-    recovery_attempt_ratio: float = 0.5       # 50% recovery attempts
-    recovery_strategy_diversity: int = 2      # At least 2 unique strategies
+    recovery_attempt_ratio: float = 0.5  # 50% recovery attempts
+    recovery_strategy_diversity: int = 2  # At least 2 unique strategies
 
     # Autonomy level weights (for weighted classification)
-    criterion_weights: Dict[str, float] = field(default_factory=lambda: {
-        "action_selection_freedom": 1.0,
-        "goal_directed_persistence": 1.0,
-        "dynamic_termination": 1.0,
-        "error_recovery": 1.0
-    })
+    criterion_weights: Dict[str, float] = field(
+        default_factory=lambda: {
+            "action_selection_freedom": 1.0,
+            "goal_directed_persistence": 1.0,
+            "dynamic_termination": 1.0,
+            "error_recovery": 1.0,
+        }
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize to dictionary."""
@@ -126,7 +131,7 @@ class AutonomyThresholds:
             "termination_unique_counts": self.termination_unique_counts,
             "recovery_attempt_ratio": self.recovery_attempt_ratio,
             "recovery_strategy_diversity": self.recovery_strategy_diversity,
-            "criterion_weights": self.criterion_weights
+            "criterion_weights": self.criterion_weights,
         }
 
     @classmethod
@@ -140,7 +145,7 @@ class AutonomyThresholds:
             termination_variance=5,
             termination_unique_counts=3,
             recovery_attempt_ratio=0.8,
-            recovery_strategy_diversity=3
+            recovery_strategy_diversity=3,
         )
 
     @classmethod
@@ -154,13 +159,14 @@ class AutonomyThresholds:
             termination_variance=1,
             termination_unique_counts=2,
             recovery_attempt_ratio=0.3,
-            recovery_strategy_diversity=1
+            recovery_strategy_diversity=1,
         )
 
 
 @dataclass
 class TestResult:
     """Result of a single criterion validation test."""
+
     criterion: AutonomyCriterion
     passed: bool
     confidence: float = 1.0
@@ -175,7 +181,7 @@ class TestResult:
             "passed": self.passed,
             "confidence": self.confidence,
             "failure_reason": self.failure_reason,
-            "evidence": self.evidence
+            "evidence": self.evidence,
         }
 
 
@@ -186,6 +192,7 @@ class AutonomyCriteria:
 
     Per Section IV-A, all four must be met for "genuine agentic behavior."
     """
+
     action_selection_freedom: bool = False
     goal_directed_persistence: bool = False
     dynamic_termination: bool = False
@@ -200,12 +207,14 @@ class AutonomyCriteria:
     @property
     def criteria_met(self) -> int:
         """Count of criteria that are met."""
-        return sum([
-            self.action_selection_freedom,
-            self.goal_directed_persistence,
-            self.dynamic_termination,
-            self.error_recovery
-        ])
+        return sum(
+            [
+                self.action_selection_freedom,
+                self.goal_directed_persistence,
+                self.dynamic_termination,
+                self.error_recovery,
+            ]
+        )
 
     @property
     def is_genuine_agent(self) -> bool:
@@ -222,7 +231,7 @@ class AutonomyCriteria:
             "dynamic_termination": self.dynamic_termination,
             "error_recovery": self.error_recovery,
             "criteria_met": self.criteria_met,
-            "is_genuine_agent": self.is_genuine_agent
+            "is_genuine_agent": self.is_genuine_agent,
         }
 
 
@@ -236,6 +245,7 @@ class AutonomyValidationResult:
     - Criteria met breakdown
     - Detailed test results for each criterion
     """
+
     level: AutonomyLevel
     criteria: AutonomyCriteria
     test_results: Dict[AutonomyCriterion, TestResult] = field(default_factory=dict)
@@ -264,7 +274,7 @@ class AutonomyValidationResult:
                 k.value: v.to_dict() for k, v in self.test_results.items()
             },
             "validation_time_seconds": self.validation_time_seconds,
-            "agent_info": self.agent_info
+            "agent_info": self.agent_info,
         }
 
     def summary(self) -> str:
@@ -274,7 +284,7 @@ class AutonomyValidationResult:
             f"Criteria Met: {self.criteria_met}/4",
             f"Is Genuine Agent: {self.is_genuine_agent}",
             "",
-            "Criterion Results:"
+            "Criterion Results:",
         ]
 
         for criterion, result in self.test_results.items():
@@ -290,14 +300,18 @@ class AutonomyValidationResult:
 # Test Scenario Generators
 # ============================================================
 
+
 @dataclass
 class TestScenario:
     """A test scenario for action selection freedom tests."""
+
     scenario_id: str
     goal: str
     state: Dict[str, Any]
     available_actions: List[str]
-    expected_varied: bool = True  # Whether we expect different actions for different states
+    expected_varied: bool = (
+        True  # Whether we expect different actions for different states
+    )
 
 
 class TestScenarioGenerator:
@@ -325,29 +339,37 @@ class TestScenarioGenerator:
                 scenario_id="resource_full",
                 goal=goal,
                 state={
-                    "resources": {"api_quota": 100, "memory_mb": 1024, "tools": ["search", "calculator", "file_read"]},
-                    "context": "All resources available"
+                    "resources": {
+                        "api_quota": 100,
+                        "memory_mb": 1024,
+                        "tools": ["search", "calculator", "file_read"],
+                    },
+                    "context": "All resources available",
                 },
-                available_actions=["search", "calculate", "read_file", "ask_user"]
+                available_actions=["search", "calculate", "read_file", "ask_user"],
             ),
             TestScenario(
                 scenario_id="resource_limited",
                 goal=goal,
                 state={
-                    "resources": {"api_quota": 0, "memory_mb": 1024, "tools": ["calculator"]},
-                    "context": "API quota exhausted, only local tools available"
+                    "resources": {
+                        "api_quota": 0,
+                        "memory_mb": 1024,
+                        "tools": ["calculator"],
+                    },
+                    "context": "API quota exhausted, only local tools available",
                 },
-                available_actions=["calculate", "use_cache", "ask_user"]
+                available_actions=["calculate", "use_cache", "ask_user"],
             ),
             TestScenario(
                 scenario_id="resource_minimal",
                 goal=goal,
                 state={
                     "resources": {"api_quota": 0, "memory_mb": 128, "tools": []},
-                    "context": "Minimal resources, must ask for help"
+                    "context": "Minimal resources, must ask for help",
                 },
-                available_actions=["ask_user", "report_limitation"]
-            )
+                available_actions=["ask_user", "report_limitation"],
+            ),
         ]
 
     def generate_context_scenarios(self, goal: str) -> List[TestScenario]:
@@ -363,9 +385,9 @@ class TestScenarioGenerator:
                 state={
                     "prior_knowledge": {},
                     "conversation_history": [],
-                    "context": "Fresh start, no prior information"
+                    "context": "Fresh start, no prior information",
                 },
-                available_actions=["search", "ask_clarification", "make_assumption"]
+                available_actions=["search", "ask_clarification", "make_assumption"],
             ),
             TestScenario(
                 scenario_id="context_partial",
@@ -373,20 +395,32 @@ class TestScenarioGenerator:
                 state={
                     "prior_knowledge": {"topic": "known", "details": "partial"},
                     "conversation_history": ["Previous discussion about topic"],
-                    "context": "Some prior knowledge available"
+                    "context": "Some prior knowledge available",
                 },
-                available_actions=["refine_search", "ask_specific", "proceed_with_known"]
+                available_actions=[
+                    "refine_search",
+                    "ask_specific",
+                    "proceed_with_known",
+                ],
             ),
             TestScenario(
                 scenario_id="context_complete",
                 goal=goal,
                 state={
-                    "prior_knowledge": {"topic": "known", "details": "complete", "answer": "cached"},
+                    "prior_knowledge": {
+                        "topic": "known",
+                        "details": "complete",
+                        "answer": "cached",
+                    },
                     "conversation_history": ["Full discussion", "Answer provided"],
-                    "context": "Complete information already available"
+                    "context": "Complete information already available",
                 },
-                available_actions=["retrieve_cached", "verify_freshness", "present_known"]
-            )
+                available_actions=[
+                    "retrieve_cached",
+                    "verify_freshness",
+                    "present_known",
+                ],
+            ),
         ]
 
     def generate_constraint_scenarios(self, goal: str) -> List[TestScenario]:
@@ -402,9 +436,9 @@ class TestScenarioGenerator:
                 state={
                     "constraints": {},
                     "permissions": ["read", "write", "execute", "network"],
-                    "context": "No restrictions"
+                    "context": "No restrictions",
                 },
-                available_actions=["full_solution", "comprehensive_approach"]
+                available_actions=["full_solution", "comprehensive_approach"],
             ),
             TestScenario(
                 scenario_id="time_constrained",
@@ -412,9 +446,13 @@ class TestScenarioGenerator:
                 state={
                     "constraints": {"time_limit_seconds": 5},
                     "permissions": ["read", "write", "execute", "network"],
-                    "context": "Tight time constraint"
+                    "context": "Tight time constraint",
                 },
-                available_actions=["quick_solution", "approximate_answer", "request_extension"]
+                available_actions=[
+                    "quick_solution",
+                    "approximate_answer",
+                    "request_extension",
+                ],
             ),
             TestScenario(
                 scenario_id="permission_constrained",
@@ -422,10 +460,14 @@ class TestScenarioGenerator:
                 state={
                     "constraints": {"no_network": True, "read_only": True},
                     "permissions": ["read"],
-                    "context": "Read-only, offline mode"
+                    "context": "Read-only, offline mode",
                 },
-                available_actions=["local_solution", "cached_answer", "explain_limitation"]
-            )
+                available_actions=[
+                    "local_solution",
+                    "cached_answer",
+                    "explain_limitation",
+                ],
+            ),
         ]
 
 
@@ -455,24 +497,58 @@ class ObstacleInjector:
         """
         if difficulty == "easy":
             return [
-                {"step": 2, "type": "temporary_failure", "description": "Tool returns error once"},
+                {
+                    "step": 2,
+                    "type": "temporary_failure",
+                    "description": "Tool returns error once",
+                },
             ]
         elif difficulty == "medium":
             return [
-                {"step": 2, "type": "temporary_failure", "description": "Tool returns error once"},
-                {"step": 4, "type": "resource_unavailable", "description": "Resource temporarily unavailable"},
-                {"step": 6, "type": "unexpected_state", "description": "State differs from expectation"},
+                {
+                    "step": 2,
+                    "type": "temporary_failure",
+                    "description": "Tool returns error once",
+                },
+                {
+                    "step": 4,
+                    "type": "resource_unavailable",
+                    "description": "Resource temporarily unavailable",
+                },
+                {
+                    "step": 6,
+                    "type": "unexpected_state",
+                    "description": "State differs from expectation",
+                },
             ]
         else:  # hard
             return [
-                {"step": 1, "type": "early_failure", "description": "First action fails"},
-                {"step": 3, "type": "cascading_failure", "description": "Multiple tools fail"},
-                {"step": 5, "type": "state_corruption", "description": "Partial state corruption"},
+                {
+                    "step": 1,
+                    "type": "early_failure",
+                    "description": "First action fails",
+                },
+                {
+                    "step": 3,
+                    "type": "cascading_failure",
+                    "description": "Multiple tools fail",
+                },
+                {
+                    "step": 5,
+                    "type": "state_corruption",
+                    "description": "Partial state corruption",
+                },
                 {"step": 7, "type": "timeout", "description": "Operation times out"},
-                {"step": 9, "type": "permission_revoked", "description": "Permission revoked mid-task"},
+                {
+                    "step": 9,
+                    "type": "permission_revoked",
+                    "description": "Permission revoked mid-task",
+                },
             ]
 
-    def inject(self, step: int, obstacles: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def inject(
+        self, step: int, obstacles: List[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
         """
         Check if an obstacle should be injected at this step.
 
@@ -485,11 +561,9 @@ class ObstacleInjector:
         """
         for obstacle in obstacles:
             if obstacle["step"] == step:
-                self.obstacle_log.append({
-                    "step": step,
-                    "obstacle": obstacle,
-                    "timestamp": time.time()
-                })
+                self.obstacle_log.append(
+                    {"step": step, "obstacle": obstacle, "timestamp": time.time()}
+                )
                 return obstacle
         return None
 
@@ -518,7 +592,7 @@ class FailureInjector:
         "rate_limited",
         "network_error",
         "parse_error",
-        "validation_error"
+        "validation_error",
     ]
 
     def __init__(self, seed: int = 42):
@@ -528,9 +602,7 @@ class FailureInjector:
         self.failure_log: List[Dict[str, Any]] = []
 
     def get_failure_sequence(
-        self,
-        types: Optional[List[str]] = None,
-        count: int = 3
+        self, types: Optional[List[str]] = None, count: int = 3
     ) -> List[Dict[str, Any]]:
         """
         Generate a sequence of failures to inject.
@@ -546,12 +618,14 @@ class FailureInjector:
         failures = []
 
         for i, failure_type in enumerate(types[:count]):
-            failures.append({
-                "step": (i + 1) * 2,  # Inject at steps 2, 4, 6, ...
-                "type": failure_type,
-                "description": self._get_failure_description(failure_type),
-                "recoverable": True
-            })
+            failures.append(
+                {
+                    "step": (i + 1) * 2,  # Inject at steps 2, 4, 6, ...
+                    "type": failure_type,
+                    "description": self._get_failure_description(failure_type),
+                    "recoverable": True,
+                }
+            )
 
         return failures
 
@@ -565,14 +639,12 @@ class FailureInjector:
             "rate_limited": "API rate limit exceeded",
             "network_error": "Network connection failed",
             "parse_error": "Failed to parse response",
-            "validation_error": "Input validation failed"
+            "validation_error": "Input validation failed",
         }
         return descriptions.get(failure_type, "Unknown failure")
 
     def inject(
-        self,
-        step: int,
-        failures: List[Dict[str, Any]]
+        self, step: int, failures: List[Dict[str, Any]]
     ) -> Optional[Dict[str, Any]]:
         """
         Check if a failure should be injected at this step.
@@ -586,11 +658,9 @@ class FailureInjector:
         """
         for failure in failures:
             if failure["step"] == step:
-                self.failure_log.append({
-                    "step": step,
-                    "failure": failure,
-                    "timestamp": time.time()
-                })
+                self.failure_log.append(
+                    {"step": step, "failure": failure, "timestamp": time.time()}
+                )
                 return failure
         return None
 
@@ -606,6 +676,7 @@ class FailureInjector:
 # ============================================================
 # Mock Agents for Testing
 # ============================================================
+
 
 class MockAgent(ABC):
     """Base class for mock agents used in testing."""
@@ -676,11 +747,13 @@ class GenuineAgent(MockAgent):
         else:
             action = "comprehensive_search"
 
-        self.execution_trace.append({
-            "step": self.step_count,
-            "action": action,
-            "state_hash": hashlib.md5(str(state).encode()).hexdigest()[:8]
-        })
+        self.execution_trace.append(
+            {
+                "step": self.step_count,
+                "action": action,
+                "state_hash": hashlib.md5(str(state).encode()).hexdigest()[:8],
+            }
+        )
         self.step_count += 1
 
         return action
@@ -690,11 +763,7 @@ class GenuineAgent(MockAgent):
         # Simulate progress
         self.goal_progress += 0.2
 
-        return {
-            "success": True,
-            "progress": self.goal_progress,
-            "action": action
-        }
+        return {"success": True, "progress": self.goal_progress, "action": action}
 
     def should_terminate(self, state: Dict[str, Any], goal: str) -> bool:
         """Terminate based on goal satisfaction, not fixed steps."""
@@ -714,13 +783,17 @@ class GenuineAgent(MockAgent):
             "rate_limited": "wait_and_retry",
             "network_error": "use_cached_data",
             "parse_error": "request_structured_format",
-            "validation_error": "fix_input_and_retry"
+            "validation_error": "fix_input_and_retry",
         }
 
         recovery = recovery_strategies.get(failure_type, "generic_retry")
 
         # Track strategy changes
-        if recovery not in self.strategy_history[-3:] if self.strategy_history else True:
+        if (
+            recovery not in self.strategy_history[-3:]
+            if self.strategy_history
+            else True
+        ):
             self.strategy_history.append(recovery)
 
         return recovery
@@ -748,14 +821,18 @@ class ScriptedAgent(MockAgent):
     def select_action(self, state: Dict[str, Any], goal: str) -> str:
         """Always return next action in predetermined sequence."""
         # FAILS action selection freedom: ignores state
-        action = self.SCRIPTED_SEQUENCE[self.sequence_index % len(self.SCRIPTED_SEQUENCE)]
+        action = self.SCRIPTED_SEQUENCE[
+            self.sequence_index % len(self.SCRIPTED_SEQUENCE)
+        ]
         self.sequence_index += 1
 
-        self.execution_trace.append({
-            "step": self.step_count,
-            "action": action,
-            "state_hash": hashlib.md5(str(state).encode()).hexdigest()[:8]
-        })
+        self.execution_trace.append(
+            {
+                "step": self.step_count,
+                "action": action,
+                "state_hash": hashlib.md5(str(state).encode()).hexdigest()[:8],
+            }
+        )
         self.step_count += 1
 
         return action
@@ -801,10 +878,7 @@ class FragileAgent(MockAgent):
         else:
             action = "local_search"
 
-        self.execution_trace.append({
-            "step": self.step_count,
-            "action": action
-        })
+        self.execution_trace.append({"step": self.step_count, "action": action})
         self.step_count += 1
 
         return action
@@ -850,10 +924,7 @@ class FixedStepAgent(MockAgent):
         else:
             action = "search"
 
-        self.execution_trace.append({
-            "step": self.step_count,
-            "action": action
-        })
+        self.execution_trace.append({"step": self.step_count, "action": action})
         self.step_count += 1
 
         return action
@@ -879,6 +950,7 @@ class FixedStepAgent(MockAgent):
 # ============================================================
 # Main Validator Class
 # ============================================================
+
 
 class AutonomyValidator:
     """
@@ -907,7 +979,7 @@ class AutonomyValidator:
         self,
         seed: int = 42,
         verbose: bool = False,
-        thresholds: Optional[AutonomyThresholds] = None
+        thresholds: Optional[AutonomyThresholds] = None,
     ):
         """
         Initialize autonomy validator.
@@ -928,9 +1000,7 @@ class AutonomyValidator:
         random.seed(seed)
 
     def validate_action_selection_freedom(
-        self,
-        agent: Any,
-        test_scenarios: Optional[List[TestScenario]] = None
+        self, agent: Any, test_scenarios: Optional[List[TestScenario]] = None
     ) -> TestResult:
         """
         Verify agent selects different actions based on state, not predetermined branching.
@@ -958,13 +1028,13 @@ class AutonomyValidator:
         if test_scenarios is None:
             goal = "Complete the requested task effectively"
             test_scenarios = (
-                self.scenario_generator.generate_resource_scenarios(goal) +
-                self.scenario_generator.generate_context_scenarios(goal) +
-                self.scenario_generator.generate_constraint_scenarios(goal)
+                self.scenario_generator.generate_resource_scenarios(goal)
+                + self.scenario_generator.generate_context_scenarios(goal)
+                + self.scenario_generator.generate_constraint_scenarios(goal)
             )
 
         # Reset agent if possible
-        if hasattr(agent, 'reset'):
+        if hasattr(agent, "reset"):
             agent.reset()
 
         # Track actions per goal
@@ -972,7 +1042,7 @@ class AutonomyValidator:
         execution_trace = []
 
         for scenario in test_scenarios:
-            if hasattr(agent, 'reset'):
+            if hasattr(agent, "reset"):
                 agent.reset()
 
             # Get action for this scenario
@@ -980,12 +1050,14 @@ class AutonomyValidator:
             state_hash = hashlib.md5(str(scenario.state).encode()).hexdigest()[:8]
 
             actions_by_goal[scenario.goal].append((state_hash, action))
-            execution_trace.append({
-                "scenario_id": scenario.scenario_id,
-                "goal": scenario.goal,
-                "state_hash": state_hash,
-                "action": action
-            })
+            execution_trace.append(
+                {
+                    "scenario_id": scenario.scenario_id,
+                    "goal": scenario.goal,
+                    "state_hash": state_hash,
+                    "action": action,
+                }
+            )
 
         # Analyze: for each goal, check if actions vary by state
         goals_with_variation = 0
@@ -1005,7 +1077,7 @@ class AutonomyValidator:
             variation_details[goal[:30]] = {
                 "unique_states": len(unique_states),
                 "unique_actions": len(unique_actions),
-                "has_variation": has_variation
+                "has_variation": has_variation,
             }
 
         # PASS if most goals show action variation based on state
@@ -1030,9 +1102,9 @@ class AutonomyValidator:
                 "goals_tested": total_goals,
                 "goals_with_variation": goals_with_variation,
                 "variation_ratio": variation_ratio,
-                "variation_details": variation_details
+                "variation_details": variation_details,
             },
-            execution_trace=execution_trace
+            execution_trace=execution_trace,
         )
 
     def validate_goal_directed_persistence(
@@ -1040,7 +1112,7 @@ class AutonomyValidator:
         agent: Any,
         goal: str = "Complete a multi-step research task",
         max_steps: int = 20,
-        obstacle_difficulty: str = "medium"
+        obstacle_difficulty: str = "medium",
     ) -> TestResult:
         """
         Verify agent persists toward goal across obstacles with strategy adaptation.
@@ -1069,7 +1141,7 @@ class AutonomyValidator:
             logger.info("Validating goal-directed persistence...")
 
         # Reset agent and injector
-        if hasattr(agent, 'reset'):
+        if hasattr(agent, "reset"):
             agent.reset()
         self.obstacle_injector.clear_log()
 
@@ -1095,12 +1167,14 @@ class AutonomyValidator:
                 # Agent must handle obstacle
                 recovery_action = agent.handle_failure(obstacle, state)
 
-                execution_trace.append({
-                    "step": step,
-                    "type": "obstacle",
-                    "obstacle": obstacle,
-                    "recovery": recovery_action
-                })
+                execution_trace.append(
+                    {
+                        "step": step,
+                        "type": "obstacle",
+                        "obstacle": obstacle,
+                        "recovery": recovery_action,
+                    }
+                )
 
                 # Check if agent gave up
                 if recovery_action in ["give_up", "abort", "terminate"]:
@@ -1113,11 +1187,7 @@ class AutonomyValidator:
             action = agent.select_action(state, goal)
             strategies_used.add(action)
 
-            execution_trace.append({
-                "step": step,
-                "type": "action",
-                "action": action
-            })
+            execution_trace.append({"step": step, "type": "action", "action": action})
 
             # Execute and update state
             result = agent.execute(action, state)
@@ -1126,15 +1196,15 @@ class AutonomyValidator:
 
             # Check termination
             if agent.should_terminate(state, goal):
-                execution_trace.append({
-                    "step": step,
-                    "type": "termination",
-                    "progress": goal_progress
-                })
+                execution_trace.append(
+                    {"step": step, "type": "termination", "progress": goal_progress}
+                )
                 break
 
         # Analyze results
-        strategy_changes = len(strategies_used) - 1  # First strategy doesn't count as change
+        strategy_changes = (
+            len(strategies_used) - 1
+        )  # First strategy doesn't count as change
         persistence_ratio = continued_after_obstacle / max(obstacles_encountered, 1)
 
         # PASS criteria (using configurable thresholds):
@@ -1144,10 +1214,10 @@ class AutonomyValidator:
         # 4. Made progress toward goal
 
         passed = (
-            obstacles_encountered > 0 and
-            persistence_ratio >= self.thresholds.persistence_obstacle_ratio and
-            strategy_changes >= self.thresholds.persistence_strategy_changes and
-            goal_progress >= self.thresholds.persistence_progress
+            obstacles_encountered > 0
+            and persistence_ratio >= self.thresholds.persistence_obstacle_ratio
+            and strategy_changes >= self.thresholds.persistence_strategy_changes
+            and goal_progress >= self.thresholds.persistence_progress
         )
 
         failure_reason = None
@@ -1156,11 +1226,17 @@ class AutonomyValidator:
             if obstacles_encountered == 0:
                 reasons.append("No obstacles encountered")
             if persistence_ratio < self.thresholds.persistence_obstacle_ratio:
-                reasons.append(f"Gave up too easily ({continued_after_obstacle}/{obstacles_encountered} obstacles handled, need {self.thresholds.persistence_obstacle_ratio:.0%})")
+                reasons.append(
+                    f"Gave up too easily ({continued_after_obstacle}/{obstacles_encountered} obstacles handled, need {self.thresholds.persistence_obstacle_ratio:.0%})"
+                )
             if strategy_changes < self.thresholds.persistence_strategy_changes:
-                reasons.append(f"Insufficient strategy changes ({strategy_changes}, need {self.thresholds.persistence_strategy_changes})")
+                reasons.append(
+                    f"Insufficient strategy changes ({strategy_changes}, need {self.thresholds.persistence_strategy_changes})"
+                )
             if goal_progress < self.thresholds.persistence_progress:
-                reasons.append(f"Insufficient progress ({goal_progress:.0%}, need {self.thresholds.persistence_progress:.0%})")
+                reasons.append(
+                    f"Insufficient progress ({goal_progress:.0%}, need {self.thresholds.persistence_progress:.0%})"
+                )
             failure_reason = "; ".join(reasons)
 
         return TestResult(
@@ -1175,15 +1251,13 @@ class AutonomyValidator:
                 "strategy_changes": strategy_changes,
                 "strategies_used": list(strategies_used),
                 "goal_progress": goal_progress,
-                "total_steps": len(execution_trace)
+                "total_steps": len(execution_trace),
             },
-            execution_trace=execution_trace
+            execution_trace=execution_trace,
         )
 
     def validate_dynamic_termination(
-        self,
-        agent: Any,
-        goals: Optional[List[Dict[str, Any]]] = None
+        self, agent: Any, goals: Optional[List[Dict[str, Any]]] = None
     ) -> TestResult:
         """
         Verify agent terminates based on goal satisfaction, not fixed step count.
@@ -1214,20 +1288,20 @@ class AutonomyValidator:
                     "goal": "Return the number 42",
                     "complexity": "simple",
                     "expected_steps_range": (1, 3),
-                    "state": {"answer": 42}
+                    "state": {"answer": 42},
                 },
                 {
                     "goal": "Search for information about Python",
                     "complexity": "medium",
                     "expected_steps_range": (4, 10),
-                    "state": {"topic": "Python", "needs_search": True}
+                    "state": {"topic": "Python", "needs_search": True},
                 },
                 {
                     "goal": "Research and summarize the history of AI, including key milestones",
                     "complexity": "complex",
                     "expected_steps_range": (10, 25),
-                    "state": {"topic": "AI history", "requires_multiple_sources": True}
-                }
+                    "state": {"topic": "AI history", "requires_multiple_sources": True},
+                },
             ]
 
         # Run each goal and track step counts
@@ -1236,7 +1310,7 @@ class AutonomyValidator:
         complexities = []
 
         for goal_config in goals:
-            if hasattr(agent, 'reset'):
+            if hasattr(agent, "reset"):
                 agent.reset()
 
             goal = goal_config["goal"]
@@ -1258,12 +1332,14 @@ class AutonomyValidator:
             step_counts.append(steps_taken)
             complexities.append(complexity)
 
-            execution_trace.append({
-                "goal": goal[:50],
-                "complexity": complexity,
-                "steps_taken": steps_taken,
-                "expected_range": goal_config.get("expected_steps_range", (1, 30))
-            })
+            execution_trace.append(
+                {
+                    "goal": goal[:50],
+                    "complexity": complexity,
+                    "steps_taken": steps_taken,
+                    "expected_range": goal_config.get("expected_steps_range", (1, 30)),
+                }
+            )
 
         # Analyze: check if step counts vary with complexity
         unique_step_counts = len(set(step_counts))
@@ -1278,7 +1354,7 @@ class AutonomyValidator:
         correlation_pairs.sort(key=lambda x: x[0])
 
         is_monotonic = all(
-            correlation_pairs[i][1] <= correlation_pairs[i+1][1]
+            correlation_pairs[i][1] <= correlation_pairs[i + 1][1]
             for i in range(len(correlation_pairs) - 1)
         )
 
@@ -1287,18 +1363,22 @@ class AutonomyValidator:
         # 2. Step counts roughly correlate with complexity
 
         passed = (
-            unique_step_counts >= self.thresholds.termination_unique_counts and
-            step_count_variance >= self.thresholds.termination_variance and
-            is_monotonic
+            unique_step_counts >= self.thresholds.termination_unique_counts
+            and step_count_variance >= self.thresholds.termination_variance
+            and is_monotonic
         )
 
         failure_reason = None
         if not passed:
             reasons = []
             if unique_step_counts < self.thresholds.termination_unique_counts:
-                reasons.append(f"Same step count ({step_counts[0]}) for all goals (need {self.thresholds.termination_unique_counts} unique)")
+                reasons.append(
+                    f"Same step count ({step_counts[0]}) for all goals (need {self.thresholds.termination_unique_counts} unique)"
+                )
             if step_count_variance < self.thresholds.termination_variance:
-                reasons.append(f"Insufficient variance (variance={step_count_variance}, need {self.thresholds.termination_variance})")
+                reasons.append(
+                    f"Insufficient variance (variance={step_count_variance}, need {self.thresholds.termination_variance})"
+                )
             if not is_monotonic:
                 reasons.append("Step counts don't correlate with goal complexity")
             failure_reason = "; ".join(reasons)
@@ -1313,16 +1393,16 @@ class AutonomyValidator:
                 "complexities": complexities,
                 "unique_step_counts": unique_step_counts,
                 "step_count_variance": step_count_variance,
-                "complexity_correlation": is_monotonic
+                "complexity_correlation": is_monotonic,
             },
-            execution_trace=execution_trace
+            execution_trace=execution_trace,
         )
 
     def validate_error_recovery(
         self,
         agent: Any,
         goal: str = "Complete task despite failures",
-        failure_types: Optional[List[str]] = None
+        failure_types: Optional[List[str]] = None,
     ) -> TestResult:
         """
         Verify agent recovers from failures without predetermined fallback scripts.
@@ -1348,7 +1428,7 @@ class AutonomyValidator:
             logger.info("Validating error recovery...")
 
         # Reset agent and injector
-        if hasattr(agent, 'reset'):
+        if hasattr(agent, "reset"):
             agent.reset()
         self.failure_injector.clear_log()
 
@@ -1357,13 +1437,12 @@ class AutonomyValidator:
             "tool_unavailable",
             "invalid_response",
             "timeout",
-            "permission_denied"
+            "permission_denied",
         ]
 
         # Get failures to inject
         failures = self.failure_injector.get_failure_sequence(
-            types=failure_types,
-            count=len(failure_types)
+            types=failure_types, count=len(failure_types)
         )
 
         # Track execution
@@ -1375,17 +1454,16 @@ class AutonomyValidator:
         state = {"goal": goal, "resources": {"api_quota": 100}}
 
         for i, failure in enumerate(failures):
-            if hasattr(agent, 'reset'):
+            if hasattr(agent, "reset"):
                 agent.reset()
 
             # Inject failure
             failure_type = failure["type"]
             recovery_action = agent.handle_failure(failure, state)
 
-            execution_trace.append({
-                "failure_type": failure_type,
-                "recovery_action": recovery_action
-            })
+            execution_trace.append(
+                {"failure_type": failure_type, "recovery_action": recovery_action}
+            )
 
             recovery_actions[failure_type] = recovery_action
 
@@ -1403,20 +1481,27 @@ class AutonomyValidator:
         # 2. Different recovery strategies for different failure types
 
         recovery_ratio = recovery_attempts / total_failures if total_failures > 0 else 0
-        strategy_diversity = unique_recoveries / total_failures if total_failures > 0 else 0
+        strategy_diversity = (
+            unique_recoveries / total_failures if total_failures > 0 else 0
+        )
 
         passed = (
-            recovery_ratio >= self.thresholds.recovery_attempt_ratio and
-            unique_recoveries >= min(self.thresholds.recovery_strategy_diversity, total_failures)
+            recovery_ratio >= self.thresholds.recovery_attempt_ratio
+            and unique_recoveries
+            >= min(self.thresholds.recovery_strategy_diversity, total_failures)
         )
 
         failure_reason = None
         if not passed:
             reasons = []
             if recovery_ratio < self.thresholds.recovery_attempt_ratio:
-                reasons.append(f"Gave up too often ({gave_up_count}/{total_failures} failures, need {self.thresholds.recovery_attempt_ratio:.0%} recovery)")
+                reasons.append(
+                    f"Gave up too often ({gave_up_count}/{total_failures} failures, need {self.thresholds.recovery_attempt_ratio:.0%} recovery)"
+                )
             if unique_recoveries < self.thresholds.recovery_strategy_diversity:
-                reasons.append(f"Same recovery for all failures ({unique_recoveries} unique, need {self.thresholds.recovery_strategy_diversity})")
+                reasons.append(
+                    f"Same recovery for all failures ({unique_recoveries} unique, need {self.thresholds.recovery_strategy_diversity})"
+                )
             failure_reason = "; ".join(reasons)
 
         return TestResult(
@@ -1431,9 +1516,9 @@ class AutonomyValidator:
                 "recovery_ratio": recovery_ratio,
                 "unique_recovery_strategies": unique_recoveries,
                 "recovery_actions": recovery_actions,
-                "strategy_diversity": strategy_diversity
+                "strategy_diversity": strategy_diversity,
             },
-            execution_trace=execution_trace
+            execution_trace=execution_trace,
         )
 
     def validate_all(self, agent: Any) -> AutonomyValidationResult:
@@ -1449,7 +1534,9 @@ class AutonomyValidator:
         start_time = time.time()
 
         if self.verbose:
-            logger.info(f"Starting full autonomy validation for {getattr(agent, 'name', 'agent')}...")
+            logger.info(
+                f"Starting full autonomy validation for {getattr(agent, 'name', 'agent')}..."
+            )
 
         # Run all validations
         asf_result = self.validate_action_selection_freedom(agent)
@@ -1466,7 +1553,7 @@ class AutonomyValidator:
             asf_evidence=asf_result.evidence,
             gdp_evidence=gdp_result.evidence,
             dt_evidence=dt_result.evidence,
-            er_evidence=er_result.evidence
+            er_evidence=er_result.evidence,
         )
 
         # Build test results dict for weighted classification
@@ -1474,7 +1561,7 @@ class AutonomyValidator:
             AutonomyCriterion.ACTION_SELECTION_FREEDOM: asf_result,
             AutonomyCriterion.GOAL_DIRECTED_PERSISTENCE: gdp_result,
             AutonomyCriterion.DYNAMIC_TERMINATION: dt_result,
-            AutonomyCriterion.ERROR_RECOVERY: er_result
+            AutonomyCriterion.ERROR_RECOVERY: er_result,
         }
 
         # Classify autonomy level using weighted scoring
@@ -1488,24 +1575,26 @@ class AutonomyValidator:
                 AutonomyCriterion.ACTION_SELECTION_FREEDOM: asf_result,
                 AutonomyCriterion.GOAL_DIRECTED_PERSISTENCE: gdp_result,
                 AutonomyCriterion.DYNAMIC_TERMINATION: dt_result,
-                AutonomyCriterion.ERROR_RECOVERY: er_result
+                AutonomyCriterion.ERROR_RECOVERY: er_result,
             },
             validation_time_seconds=time.time() - start_time,
             agent_info={
-                "name": getattr(agent, 'name', 'unknown'),
-                "type": type(agent).__name__
-            }
+                "name": getattr(agent, "name", "unknown"),
+                "type": type(agent).__name__,
+            },
         )
 
         if self.verbose:
-            logger.info(f"Validation complete: {result.level.name} ({result.criteria_met}/4 criteria)")
+            logger.info(
+                f"Validation complete: {result.level.name} ({result.criteria_met}/4 criteria)"
+            )
 
         return result
 
     def classify_autonomy_level(
         self,
         criteria: AutonomyCriteria,
-        test_results: Optional[Dict[AutonomyCriterion, TestResult]] = None
+        test_results: Optional[Dict[AutonomyCriterion, TestResult]] = None,
     ) -> AutonomyLevel:
         """
         Classify autonomy level using weighted criteria (Table IV).
@@ -1535,7 +1624,7 @@ class AutonomyValidator:
             AutonomyCriterion.ACTION_SELECTION_FREEDOM: criteria.action_selection_freedom,
             AutonomyCriterion.GOAL_DIRECTED_PERSISTENCE: criteria.goal_directed_persistence,
             AutonomyCriterion.DYNAMIC_TERMINATION: criteria.dynamic_termination,
-            AutonomyCriterion.ERROR_RECOVERY: criteria.error_recovery
+            AutonomyCriterion.ERROR_RECOVERY: criteria.error_recovery,
         }
 
         for criterion, passed in criterion_map.items():
@@ -1568,7 +1657,7 @@ class AutonomyValidator:
     def compute_weighted_autonomy_score(
         self,
         criteria: AutonomyCriteria,
-        test_results: Dict[AutonomyCriterion, TestResult]
+        test_results: Dict[AutonomyCriterion, TestResult],
     ) -> Dict[str, Any]:
         """
         Compute detailed weighted autonomy score with breakdown.
@@ -1587,20 +1676,20 @@ class AutonomyValidator:
         criterion_map = {
             AutonomyCriterion.ACTION_SELECTION_FREEDOM: (
                 "action_selection_freedom",
-                criteria.action_selection_freedom
+                criteria.action_selection_freedom,
             ),
             AutonomyCriterion.GOAL_DIRECTED_PERSISTENCE: (
                 "goal_directed_persistence",
-                criteria.goal_directed_persistence
+                criteria.goal_directed_persistence,
             ),
             AutonomyCriterion.DYNAMIC_TERMINATION: (
                 "dynamic_termination",
-                criteria.dynamic_termination
+                criteria.dynamic_termination,
             ),
             AutonomyCriterion.ERROR_RECOVERY: (
                 "error_recovery",
-                criteria.error_recovery
-            )
+                criteria.error_recovery,
+            ),
         }
 
         for criterion, (name, passed) in criterion_map.items():
@@ -1617,8 +1706,12 @@ class AutonomyValidator:
             per_criterion[name] = {
                 "passed": passed,
                 "weight": weight,
-                "confidence": test_results[criterion].confidence if criterion in test_results else 1.0,
-                "weighted_score": score
+                "confidence": (
+                    test_results[criterion].confidence
+                    if criterion in test_results
+                    else 1.0
+                ),
+                "weighted_score": score,
             }
 
         normalized = total_weighted / max_weighted if max_weighted > 0 else 0
@@ -1628,5 +1721,5 @@ class AutonomyValidator:
             "raw_score": total_weighted,
             "max_score": max_weighted,
             "per_criterion_scores": per_criterion,
-            "autonomy_level": self.classify_autonomy_level(criteria, test_results).name
+            "autonomy_level": self.classify_autonomy_level(criteria, test_results).name,
         }

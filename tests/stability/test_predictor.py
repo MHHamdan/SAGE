@@ -58,20 +58,28 @@ def _make_synthetic_records(
                 drift = min(1.0, 0.05 * turn + rng.uniform(0, 0.05))
             else:
                 drift = max(0.0, 0.10 + rng.uniform(-0.02, 0.02))
-            sig = _sig(drift=drift, osc=drift * 0.5, fid=max(0, 1 - drift),
-                       prog=max(0, 1 - drift), turn=turn)
-            feats = extract_features(sig, list(signal_history))
-            records.append(TraceRecord(
-                task_id=task_id,
+            sig = _sig(
+                drift=drift,
+                osc=drift * 0.5,
+                fid=max(0, 1 - drift),
+                prog=max(0, 1 - drift),
                 turn=turn,
-                features=feats,
-                task_failed=task_failed,
-            ))
+            )
+            feats = extract_features(sig, list(signal_history))
+            records.append(
+                TraceRecord(
+                    task_id=task_id,
+                    turn=turn,
+                    features=feats,
+                    task_failed=task_failed,
+                )
+            )
             signal_history.append(sig)
     return records
 
 
 # ── Feature extraction ─────────────────────────────────────────────────────────
+
 
 class TestExtractFeatures:
     def test_shape(self):
@@ -102,6 +110,7 @@ class TestExtractFeatures:
 
 # ── build_training_data ────────────────────────────────────────────────────────
 
+
 class TestBuildTrainingData:
     def test_output_shapes(self):
         records = _make_synthetic_records(n_tasks=10, total_turns=10)
@@ -111,7 +120,9 @@ class TestBuildTrainingData:
         assert groups.shape == (len(records),)
 
     def test_positive_labels_only_at_end_for_failed_tasks(self):
-        records = _make_synthetic_records(n_tasks=10, total_turns=20, fail_rate=1.0, seed=1)
+        records = _make_synthetic_records(
+            n_tasks=10, total_turns=20, fail_rate=1.0, seed=1
+        )
         k = 5
         total_turns = 20
         X, y, groups = build_training_data(records, k=k, total_turns=total_turns)
@@ -123,12 +134,15 @@ class TestBuildTrainingData:
                 assert not rec.task_failed or rec.turn < total_turns - k + 1
 
     def test_no_positives_for_successful_tasks(self):
-        records = _make_synthetic_records(n_tasks=10, total_turns=20, fail_rate=0.0, seed=2)
+        records = _make_synthetic_records(
+            n_tasks=10, total_turns=20, fail_rate=0.0, seed=2
+        )
         X, y, _ = build_training_data(records, k=5, total_turns=20)
         assert y.sum() == 0, "No positives when all tasks succeed"
 
 
 # ── assert_no_leakage ─────────────────────────────────────────────────────────
+
 
 class TestAntiLeakage:
     def test_no_leakage_passes_for_disjoint(self):
@@ -148,6 +162,7 @@ class TestAntiLeakage:
 
 # ── FailurePredictor ──────────────────────────────────────────────────────────
 
+
 class TestFailurePredictor:
     def test_fit_predict(self):
         records = _make_synthetic_records(n_tasks=40, total_turns=20, seed=0)
@@ -166,10 +181,12 @@ class TestFailurePredictor:
         """Predictor should achieve AUC > 0.6 on clearly separable synthetic data."""
         records = _make_synthetic_records(n_tasks=80, total_turns=20, seed=42)
         pred = FailurePredictor(k=5, random_state=42)
-        cv_result = pred.cross_validate(records, n_splits=3, total_turns=20, n_bootstrap=100)
-        assert cv_result["auc_mean"] > 0.6, (
-            f"Expected AUC > 0.6 on separable data, got {cv_result['auc_mean']:.3f}"
+        cv_result = pred.cross_validate(
+            records, n_splits=3, total_turns=20, n_bootstrap=100
         )
+        assert (
+            cv_result["auc_mean"] > 0.6
+        ), f"Expected AUC > 0.6 on separable data, got {cv_result['auc_mean']:.3f}"
 
     def test_cv_no_leakage_asserted(self):
         """cross_validate must not raise leakage error on valid data."""
@@ -191,7 +208,9 @@ class TestFailurePredictor:
         pred.fit(records, total_turns=20)
         p_high = pred.predict_proba(_sig(drift=0.9, osc=0.7, fid=0.1, turn=18), [])
         p_low = pred.predict_proba(_sig(drift=0.05, osc=0.0, fid=0.98, turn=5), [])
-        assert p_high > p_low, "High-drift late-turn signal should predict higher failure"
+        assert (
+            p_high > p_low
+        ), "High-drift late-turn signal should predict higher failure"
 
     def test_mlp_variant_works(self):
         records = _make_synthetic_records(n_tasks=40, total_turns=10, seed=9)
@@ -203,5 +222,7 @@ class TestFailurePredictor:
     def test_cv_returns_correct_k(self):
         records = _make_synthetic_records(n_tasks=20, total_turns=10, seed=2)
         pred = FailurePredictor(k=3, random_state=2)
-        result = pred.cross_validate(records, n_splits=3, total_turns=10, n_bootstrap=20)
+        result = pred.cross_validate(
+            records, n_splits=3, total_turns=10, n_bootstrap=20
+        )
         assert result["k"] == 3

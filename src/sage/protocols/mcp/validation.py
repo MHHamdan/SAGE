@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class MCPValidationError(Exception):
     """Exception raised for MCP validation failures."""
+
     pass
 
 
@@ -135,14 +136,10 @@ def _validate_number(name: str, value: Any, schema: Dict[str, Any]):
     maximum = schema.get("maximum")
 
     if minimum is not None and value < minimum:
-        raise MCPValidationError(
-            f"Parameter '{name}' must be >= {minimum}"
-        )
+        raise MCPValidationError(f"Parameter '{name}' must be >= {minimum}")
 
     if maximum is not None and value > maximum:
-        raise MCPValidationError(
-            f"Parameter '{name}' must be <= {maximum}"
-        )
+        raise MCPValidationError(f"Parameter '{name}' must be <= {maximum}")
 
 
 def validate_resource(

@@ -22,45 +22,44 @@ import numpy as np
 
 # Read and execute control_loop.py directly to avoid package __init__.py
 control_loop_path = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'src',
-    'sage', 'core', 'control_loop.py'
+    os.path.dirname(__file__), "..", "..", "src", "sage", "core", "control_loop.py"
 )
 
 # Create a module namespace with required imports
-control_loop = types.ModuleType('control_loop')
-control_loop.__dict__['__file__'] = control_loop_path
+control_loop = types.ModuleType("control_loop")
+control_loop.__dict__["__file__"] = control_loop_path
 
 # Pre-populate with standard imports the module needs
-control_loop.__dict__['time'] = time
-control_loop.__dict__['hashlib'] = hashlib
-control_loop.__dict__['logging'] = logging
-control_loop.__dict__['dataclass'] = dc_dataclass
-control_loop.__dict__['field'] = field
-control_loop.__dict__['Enum'] = Enum
-control_loop.__dict__['deque'] = deque
-control_loop.__dict__['np'] = np
-control_loop.__dict__['Any'] = Any
-control_loop.__dict__['Dict'] = Dict
-control_loop.__dict__['List'] = List
-control_loop.__dict__['Optional'] = Optional
-control_loop.__dict__['Callable'] = Callable
+control_loop.__dict__["time"] = time
+control_loop.__dict__["hashlib"] = hashlib
+control_loop.__dict__["logging"] = logging
+control_loop.__dict__["dataclass"] = dc_dataclass
+control_loop.__dict__["field"] = field
+control_loop.__dict__["Enum"] = Enum
+control_loop.__dict__["deque"] = deque
+control_loop.__dict__["np"] = np
+control_loop.__dict__["Any"] = Any
+control_loop.__dict__["Dict"] = Dict
+control_loop.__dict__["List"] = List
+control_loop.__dict__["Optional"] = Optional
+control_loop.__dict__["Callable"] = Callable
 
 # Register the module before executing
-sys.modules['control_loop'] = control_loop
+sys.modules["control_loop"] = control_loop
 
 # Execute the module code
-with open(control_loop_path, 'r') as f:
+with open(control_loop_path, "r") as f:
     code = f.read()
-exec(compile(code, control_loop_path, 'exec'), control_loop.__dict__)
+exec(compile(code, control_loop_path, "exec"), control_loop.__dict__)
 
 # Extract classes
-CycleMetrics = control_loop.__dict__['CycleMetrics']
-PhaseMetrics = control_loop.__dict__['PhaseMetrics']
-ControlPhase = control_loop.__dict__['ControlPhase']
-StabilityStatus = control_loop.__dict__['StabilityStatus']
-StabilityAnalysis = control_loop.__dict__['StabilityAnalysis']
-StabilityAnalyzer = control_loop.__dict__['StabilityAnalyzer']
-ClosedLoopController = control_loop.__dict__['ClosedLoopController']
+CycleMetrics = control_loop.__dict__["CycleMetrics"]
+PhaseMetrics = control_loop.__dict__["PhaseMetrics"]
+ControlPhase = control_loop.__dict__["ControlPhase"]
+StabilityStatus = control_loop.__dict__["StabilityStatus"]
+StabilityAnalysis = control_loop.__dict__["StabilityAnalysis"]
+StabilityAnalyzer = control_loop.__dict__["StabilityAnalyzer"]
+ClosedLoopController = control_loop.__dict__["ClosedLoopController"]
 
 
 def create_cycle_metrics(
@@ -68,7 +67,7 @@ def create_cycle_metrics(
     action_hash: str,
     state_hash: str = "default_state",
     observation_hash: str = "default_obs",
-    goal_error: float = 0.0
+    goal_error: float = 0.0,
 ) -> CycleMetrics:
     """Helper to create test CycleMetrics."""
     return CycleMetrics(
@@ -77,7 +76,7 @@ def create_cycle_metrics(
         action_hash=action_hash,
         state_hash=state_hash,
         observation_hash=observation_hash,
-        goal_error=goal_error
+        goal_error=goal_error,
     )
 
 
@@ -85,94 +84,90 @@ def create_cycle_metrics(
 # OSCILLATION DETECTION TESTS (Section III-F-3)
 # =============================================================================
 
+
 def test_oscillation_detection_period_2():
     """Test detection of period-2 oscillation: A -> B -> A -> B -> ..."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        oscillation_threshold=3
-    )
+    analyzer = StabilityAnalyzer(window_size=20, oscillation_threshold=3)
 
     # Create A-B-A-B-A-B-A-B pattern (period 2)
     # Important: use different state_hash to avoid triggering deadlock detection
     history = []
     actions = ["action_A", "action_B"]
     for i in range(12):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=actions[i % 2],
-            state_hash=f"state_{i}"  # Different states to avoid deadlock
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=actions[i % 2],
+                state_hash=f"state_{i}",  # Different states to avoid deadlock
+            )
+        )
 
     result = analyzer.analyze(history)
 
-    assert result.is_oscillating, \
-        f"Should detect period-2 oscillation. Got: {result.is_oscillating}"
-    assert result.oscillation_period == 2, f"Period should be 2, got {result.oscillation_period}"
+    assert (
+        result.is_oscillating
+    ), f"Should detect period-2 oscillation. Got: {result.is_oscillating}"
+    assert (
+        result.oscillation_period == 2
+    ), f"Period should be 2, got {result.oscillation_period}"
     assert result.status == StabilityStatus.OSCILLATING, f"Status: {result.status}"
     print("✓ test_oscillation_detection_period_2 passed")
 
 
 def test_oscillation_detection_period_3():
     """Test detection of period-3 oscillation: A -> B -> C -> A -> B -> C -> ..."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        oscillation_threshold=3
-    )
+    analyzer = StabilityAnalyzer(window_size=20, oscillation_threshold=3)
 
     # Create A-B-C-A-B-C pattern (period 3)
     # Use different state_hash to avoid deadlock detection
     history = []
     actions = ["action_A", "action_B", "action_C"]
     for i in range(12):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=actions[i % 3],
-            state_hash=f"state_{i}"
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i, action_hash=actions[i % 3], state_hash=f"state_{i}"
+            )
+        )
 
     result = analyzer.analyze(history)
 
     assert result.is_oscillating, "Should detect period-3 oscillation"
-    assert result.oscillation_period == 3, f"Period should be 3, got {result.oscillation_period}"
+    assert (
+        result.oscillation_period == 3
+    ), f"Period should be 3, got {result.oscillation_period}"
     print("✓ test_oscillation_detection_period_3 passed")
 
 
 def test_no_oscillation_with_diverse_actions():
     """Test that diverse actions don't trigger oscillation."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        oscillation_threshold=3
-    )
+    analyzer = StabilityAnalyzer(window_size=20, oscillation_threshold=3)
 
     # Create diverse actions with no pattern
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"unique_action_{i}"
-        ))
+        history.append(
+            create_cycle_metrics(cycle_number=i, action_hash=f"unique_action_{i}")
+        )
 
     result = analyzer.analyze(history)
 
-    assert not result.is_oscillating, "Should not detect oscillation with unique actions"
+    assert (
+        not result.is_oscillating
+    ), "Should not detect oscillation with unique actions"
     print("✓ test_no_oscillation_with_diverse_actions passed")
 
 
 def test_oscillation_requires_minimum_repetitions():
     """Test that oscillation needs minimum threshold repetitions."""
     analyzer = StabilityAnalyzer(
-        window_size=20,
-        oscillation_threshold=5  # High threshold
+        window_size=20, oscillation_threshold=5  # High threshold
     )
 
     # Only 4 repetitions of A-B pattern
     history = []
     actions = ["action_A", "action_B"]
     for i in range(4):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=actions[i % 2]
-        ))
+        history.append(create_cycle_metrics(cycle_number=i, action_hash=actions[i % 2]))
 
     result = analyzer.analyze(history)
 
@@ -185,21 +180,21 @@ def test_oscillation_requires_minimum_repetitions():
 # DEADLOCK DETECTION TESTS (Section III-F-3)
 # =============================================================================
 
+
 def test_deadlock_detection():
     """Test detection of deadlock - state unchanged despite actions."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        deadlock_threshold=5
-    )
+    analyzer = StabilityAnalyzer(window_size=20, deadlock_threshold=5)
 
     # Create history with same state but different actions
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",  # Different actions
-            state_hash="stuck_state"     # Same state - deadlock!
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",  # Different actions
+                state_hash="stuck_state",  # Same state - deadlock!
+            )
+        )
 
     result = analyzer.analyze(history)
 
@@ -211,19 +206,18 @@ def test_deadlock_detection():
 
 def test_no_deadlock_with_changing_states():
     """Test that changing states don't trigger deadlock."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        deadlock_threshold=5
-    )
+    analyzer = StabilityAnalyzer(window_size=20, deadlock_threshold=5)
 
     # Create history with changing states
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",
-            state_hash=f"state_{i}"  # Different states
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",
+                state_hash=f"state_{i}",  # Different states
+            )
+        )
 
     result = analyzer.analyze(history)
 
@@ -233,19 +227,18 @@ def test_no_deadlock_with_changing_states():
 
 def test_deadlock_requires_consecutive_same_states():
     """Test that deadlock requires consecutive identical states."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        deadlock_threshold=5
-    )
+    analyzer = StabilityAnalyzer(window_size=20, deadlock_threshold=5)
 
     # Alternating states shouldn't trigger deadlock
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",
-            state_hash=f"state_{i % 2}"  # Alternating states
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",
+                state_hash=f"state_{i % 2}",  # Alternating states
+            )
+        )
 
     result = analyzer.analyze(history)
 
@@ -256,20 +249,20 @@ def test_deadlock_requires_consecutive_same_states():
 def test_deadlock_takes_priority_over_oscillation():
     """Test that deadlock status takes priority over oscillation."""
     analyzer = StabilityAnalyzer(
-        window_size=20,
-        deadlock_threshold=5,
-        oscillation_threshold=3
+        window_size=20, deadlock_threshold=5, oscillation_threshold=3
     )
 
     # Create both oscillation and deadlock conditions
     history = []
     actions = ["A", "B"]
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=actions[i % 2],  # Oscillating actions
-            state_hash="stuck_state"      # Deadlocked state
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=actions[i % 2],  # Oscillating actions
+                state_hash="stuck_state",  # Deadlocked state
+            )
+        )
 
     result = analyzer.analyze(history)
 
@@ -282,22 +275,24 @@ def test_deadlock_takes_priority_over_oscillation():
 # DIVERGENCE DETECTION TESTS (Section III-F-3, Equation 9)
 # =============================================================================
 
+
 def test_divergence_detection():
     """Test detection of goal divergence - increasing goal error."""
     analyzer = StabilityAnalyzer(
-        window_size=20,
-        divergence_threshold=0.05  # Low threshold for testing
+        window_size=20, divergence_threshold=0.05  # Low threshold for testing
     )
 
     # Create history with monotonically increasing goal error
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",
-            state_hash=f"state_{i}",
-            goal_error=0.1 + i * 0.1  # Increasing: 0.1, 0.2, 0.3, ...
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",
+                state_hash=f"state_{i}",
+                goal_error=0.1 + i * 0.1,  # Increasing: 0.1, 0.2, 0.3, ...
+            )
+        )
 
     result = analyzer.analyze(history)
 
@@ -309,43 +304,43 @@ def test_divergence_detection():
 
 def test_no_divergence_with_stable_goal_error():
     """Test no divergence detected with stable goal error."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        divergence_threshold=0.1
-    )
+    analyzer = StabilityAnalyzer(window_size=20, divergence_threshold=0.1)
 
     # Create history with stable goal error
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",
-            state_hash=f"state_{i}",
-            goal_error=0.2  # Constant goal error
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",
+                state_hash=f"state_{i}",
+                goal_error=0.2,  # Constant goal error
+            )
+        )
 
     result = analyzer.analyze(history)
 
-    assert not result.is_diverging, "Should not detect divergence with stable goal error"
+    assert (
+        not result.is_diverging
+    ), "Should not detect divergence with stable goal error"
     print("✓ test_no_divergence_with_stable_goal_error passed")
 
 
 def test_no_divergence_with_decreasing_goal_error():
     """Test no divergence when goal error is decreasing (converging)."""
-    analyzer = StabilityAnalyzer(
-        window_size=20,
-        divergence_threshold=0.05
-    )
+    analyzer = StabilityAnalyzer(window_size=20, divergence_threshold=0.05)
 
     # Create history with decreasing goal error (converging to goal)
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",
-            state_hash=f"state_{i}",
-            goal_error=1.0 - i * 0.1  # Decreasing: 1.0, 0.9, 0.8, ...
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",
+                state_hash=f"state_{i}",
+                goal_error=1.0 - i * 0.1,  # Decreasing: 1.0, 0.9, 0.8, ...
+            )
+        )
 
     result = analyzer.analyze(history)
 
@@ -361,23 +356,25 @@ def test_divergence_rate_computation():
     # Linear increase: 0.0, 0.1, 0.2, ...
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",
-            goal_error=i * 0.1
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i, action_hash=f"action_{i}", goal_error=i * 0.1
+            )
+        )
 
     result = analyzer.analyze(history)
 
     # Slope should be approximately 0.1
-    assert abs(result.divergence_rate - 0.1) < 0.02, \
-        f"Expected rate ~0.1, got {result.divergence_rate}"
+    assert (
+        abs(result.divergence_rate - 0.1) < 0.02
+    ), f"Expected rate ~0.1, got {result.divergence_rate}"
     print("✓ test_divergence_rate_computation passed")
 
 
 # =============================================================================
 # REACTIVITY ASSESSMENT TESTS
 # =============================================================================
+
 
 def test_high_reactivity_score():
     """Test high reactivity when actions change more than observations."""
@@ -386,17 +383,20 @@ def test_high_reactivity_score():
     # Observations change rarely but actions change frequently
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",      # Every action different
-            observation_hash=f"obs_{i // 5}"  # Observation changes every 5
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",  # Every action different
+                observation_hash=f"obs_{i // 5}",  # Observation changes every 5
+            )
+        )
 
     result = analyzer.analyze(history)
 
     # High reactivity = actions change more than observations warrant
-    assert result.reactivity_score > 0.5, \
-        f"Reactivity should be high, got {result.reactivity_score}"
+    assert (
+        result.reactivity_score > 0.5
+    ), f"Reactivity should be high, got {result.reactivity_score}"
     print("✓ test_high_reactivity_score passed")
 
 
@@ -407,23 +407,27 @@ def test_low_reactivity_score():
     # Observations change frequently but actions stay same
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash="same_action",       # Same action
-            observation_hash=f"obs_{i}"       # Every observation different
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash="same_action",  # Same action
+                observation_hash=f"obs_{i}",  # Every observation different
+            )
+        )
 
     result = analyzer.analyze(history)
 
     # Low reactivity = actions don't respond to observations
-    assert result.reactivity_score < 0.5, \
-        f"Reactivity should be low, got {result.reactivity_score}"
+    assert (
+        result.reactivity_score < 0.5
+    ), f"Reactivity should be low, got {result.reactivity_score}"
     print("✓ test_low_reactivity_score passed")
 
 
 # =============================================================================
 # STABILITY STATUS DETERMINATION TESTS
 # =============================================================================
+
 
 def test_stable_status_when_no_issues():
     """Test STABLE status when no pathologies detected."""
@@ -432,12 +436,14 @@ def test_stable_status_when_no_issues():
     # Create healthy history with no pathologies
     history = []
     for i in range(10):
-        history.append(create_cycle_metrics(
-            cycle_number=i,
-            action_hash=f"action_{i}",
-            state_hash=f"state_{i}",
-            goal_error=0.1  # Stable, low goal error
-        ))
+        history.append(
+            create_cycle_metrics(
+                cycle_number=i,
+                action_hash=f"action_{i}",
+                state_hash=f"state_{i}",
+                goal_error=0.1,  # Stable, low goal error
+            )
+        )
 
     result = analyzer.analyze(history)
 
@@ -485,6 +491,7 @@ def test_confidence_increases_with_window_size():
 # CYCLE METRICS TESTS
 # =============================================================================
 
+
 def test_cycle_metrics_latency_computation():
     """Test CycleMetrics latency computation."""
     import time as time_module
@@ -493,19 +500,13 @@ def test_cycle_metrics_latency_computation():
 
     # Add phase metrics
     metrics.sense_metrics = PhaseMetrics(
-        phase=ControlPhase.SENSE,
-        start_time=0.0,
-        end_time=0.1  # 100ms
+        phase=ControlPhase.SENSE, start_time=0.0, end_time=0.1  # 100ms
     )
     metrics.decide_metrics = PhaseMetrics(
-        phase=ControlPhase.DECIDE,
-        start_time=0.1,
-        end_time=0.3  # 200ms
+        phase=ControlPhase.DECIDE, start_time=0.1, end_time=0.3  # 200ms
     )
     metrics.act_metrics = PhaseMetrics(
-        phase=ControlPhase.ACT,
-        start_time=0.3,
-        end_time=0.35  # 50ms
+        phase=ControlPhase.ACT, start_time=0.3, end_time=0.35  # 50ms
     )
 
     assert abs(metrics.sense_metrics.latency_ms - 100) < 0.1
@@ -536,6 +537,7 @@ def test_cycle_metrics_latency_breakdown():
 # STABILITY ANALYSIS SERIALIZATION TESTS
 # =============================================================================
 
+
 def test_stability_analysis_to_dict():
     """Test StabilityAnalysis serialization."""
     analysis = StabilityAnalysis(
@@ -546,7 +548,7 @@ def test_stability_analysis_to_dict():
         is_deadlocked=False,
         is_diverging=False,
         reactivity_score=0.7,
-        confidence=0.9
+        confidence=0.9,
     )
 
     d = analysis.to_dict()
@@ -564,6 +566,7 @@ def test_stability_analysis_to_dict():
 # =============================================================================
 # MOCK AGENT FOR CONTROLLER TESTS
 # =============================================================================
+
 
 class MockAgent:
     """Simple mock agent for testing ClosedLoopController."""
@@ -597,11 +600,7 @@ class MockAgent:
 def test_closed_loop_controller_run_cycle():
     """Test ClosedLoopController.run_cycle()."""
     agent = MockAgent(["action_A", "action_B"])
-    controller = ClosedLoopController(
-        agent=agent,
-        goal="test goal",
-        max_cycles=100
-    )
+    controller = ClosedLoopController(agent=agent, goal="test goal", max_cycles=100)
 
     metrics = controller.run_cycle("observation_1")
 
@@ -620,10 +619,7 @@ def test_closed_loop_controller_detects_oscillation():
     # Agent that oscillates between two actions
     agent = MockAgent(["A", "B"])
     controller = ClosedLoopController(
-        agent=agent,
-        goal="test goal",
-        max_cycles=100,
-        stability_window=20
+        agent=agent, goal="test goal", max_cycles=100, stability_window=20
     )
 
     # Run multiple cycles to trigger oscillation detection
@@ -640,11 +636,7 @@ def test_closed_loop_controller_detects_oscillation():
 def test_closed_loop_controller_max_cycles_termination():
     """Test controller terminates at max_cycles."""
     agent = MockAgent(["action"])
-    controller = ClosedLoopController(
-        agent=agent,
-        goal="test",
-        max_cycles=5
-    )
+    controller = ClosedLoopController(agent=agent, goal="test", max_cycles=5)
 
     # Run to max
     for i in range(5):
@@ -658,11 +650,7 @@ def test_closed_loop_controller_max_cycles_termination():
 def test_closed_loop_controller_agent_completion():
     """Test controller terminates when agent signals completion."""
     agent = MockAgent(["action"])
-    controller = ClosedLoopController(
-        agent=agent,
-        goal="test",
-        max_cycles=100
-    )
+    controller = ClosedLoopController(agent=agent, goal="test", max_cycles=100)
 
     controller.run_cycle("obs_1")
     assert not controller.should_terminate()
@@ -675,11 +663,7 @@ def test_closed_loop_controller_agent_completion():
 def test_closed_loop_controller_summary():
     """Test controller summary generation."""
     agent = MockAgent(["action_A", "action_B"])
-    controller = ClosedLoopController(
-        agent=agent,
-        goal="test",
-        max_cycles=100
-    )
+    controller = ClosedLoopController(agent=agent, goal="test", max_cycles=100)
 
     for i in range(5):
         controller.run_cycle(f"obs_{i}")
@@ -697,11 +681,7 @@ def test_closed_loop_controller_summary():
 def test_closed_loop_controller_reset():
     """Test controller reset functionality."""
     agent = MockAgent(["action"])
-    controller = ClosedLoopController(
-        agent=agent,
-        goal="test",
-        max_cycles=100
-    )
+    controller = ClosedLoopController(agent=agent, goal="test", max_cycles=100)
 
     for i in range(5):
         controller.run_cycle(f"obs_{i}")
@@ -775,6 +755,7 @@ if __name__ == "__main__":
             failed += 1
         except Exception as e:
             import traceback
+
             print(f"✗ {test_fn.__name__} ERROR: {e}")
             traceback.print_exc()
             failed += 1

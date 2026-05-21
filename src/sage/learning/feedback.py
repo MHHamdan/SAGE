@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 
 class FeedbackType(Enum):
     """Types of feedback signals."""
+
     HUMAN = "human"  # Human evaluator feedback
     AUTOMATED = "automated"  # Automated metrics
     ENVIRONMENT = "environment"  # Environment rewards
@@ -47,6 +48,7 @@ class FeedbackType(Enum):
 
 class FeedbackSource(Enum):
     """Sources of feedback."""
+
     EVALUATOR = "evaluator"  # Human evaluator
     USER = "user"  # End user
     SUPERVISOR = "supervisor"  # Human supervisor
@@ -71,6 +73,7 @@ class Feedback:
         metadata: Additional metadata
         dimensions: Multi-dimensional ratings
     """
+
     feedback_id: str = ""
     feedback_type: FeedbackType = FeedbackType.HUMAN
     source: FeedbackSource = FeedbackSource.EVALUATOR
@@ -115,6 +118,7 @@ class AggregatedFeedback:
         dimension_averages: Average per dimension
         common_themes: Common themes from comments
     """
+
     period_start: datetime
     period_end: datetime
     total_count: int
@@ -391,9 +395,7 @@ class FeedbackCollector:
                 dimension_totals[dim].append(val)
 
         dimension_averages = {
-            dim: sum(vals) / len(vals)
-            for dim, vals in dimension_totals.items()
-            if vals
+            dim: sum(vals) / len(vals) for dim, vals in dimension_totals.items() if vals
         }
 
         # Period bounds
@@ -433,20 +435,19 @@ class FeedbackCollector:
             start = now - bucket_duration * (buckets - i)
             end = now - bucket_duration * (buckets - i - 1)
 
-            items = [
-                f for f in self._feedback_items
-                if start <= f.timestamp < end
-            ]
+            items = [f for f in self._feedback_items if start <= f.timestamp < end]
 
             ratings = [f.rating for f in items if f.rating is not None]
 
-            trends.append({
-                "bucket": i,
-                "start": start.isoformat(),
-                "end": end.isoformat(),
-                "count": len(items),
-                "average_rating": sum(ratings) / len(ratings) if ratings else None,
-            })
+            trends.append(
+                {
+                    "bucket": i,
+                    "start": start.isoformat(),
+                    "end": end.isoformat(),
+                    "count": len(items),
+                    "average_rating": sum(ratings) / len(ratings) if ratings else None,
+                }
+            )
 
         return trends
 
@@ -461,9 +462,7 @@ class FeedbackCollector:
         """
         if format == "json":
             return json.dumps(
-                [f.to_dict() for f in self._feedback_items],
-                indent=2,
-                default=str
+                [f.to_dict() for f in self._feedback_items], indent=2, default=str
             )
 
         elif format == "csv":

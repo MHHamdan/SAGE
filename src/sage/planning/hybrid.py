@@ -16,8 +16,14 @@ from .planner_base import BasePlanner
 from .deliberative import DeliberativePlanner
 from .reactive import ReactivePlanner
 from .schemas import (
-    Plan, PlanStep, PlanningContext, PlanningResult,
-    PlanStatus, StepStatus, create_plan, create_step,
+    Plan,
+    PlanStep,
+    PlanningContext,
+    PlanningResult,
+    PlanStatus,
+    StepStatus,
+    create_plan,
+    create_step,
 )
 
 logger = logging.getLogger(__name__)
@@ -203,10 +209,12 @@ class HybridPlanner(BasePlanner):
             )
 
             if observation:
-                sub_context.history.append({
-                    "action": "observation",
-                    "result": observation,
-                })
+                sub_context.history.append(
+                    {
+                        "action": "observation",
+                        "result": observation,
+                    }
+                )
 
             # Use reactive planner to refine
             refinement = self._reactive.plan(sub_context)
@@ -300,15 +308,16 @@ class HybridPlanner(BasePlanner):
 
         # Keep completed steps, replan remaining
         completed_steps = [
-            s for s in current_plan.steps
-            if s.status == StepStatus.COMPLETED
+            s for s in current_plan.steps if s.status == StepStatus.COMPLETED
         ]
 
         # Update context with what's done
-        context.history.append({
-            "action": "partial_completion",
-            "result": f"Completed {len(completed_steps)} steps before failure: {failure_reason}",
-        })
+        context.history.append(
+            {
+                "action": "partial_completion",
+                "result": f"Completed {len(completed_steps)} steps before failure: {failure_reason}",
+            }
+        )
 
         # Add constraint about the failure
         context.constraints.append(
@@ -370,7 +379,9 @@ Begin:"""
 
             elif line.upper().startswith("RISK:"):
                 risk_str = line.split(":", 1)[1].strip().lower()
-                current_step["risk"] = {"low": 0.2, "medium": 0.5, "high": 0.8}.get(risk_str, 0.3)
+                current_step["risk"] = {"low": 0.2, "medium": 0.5, "high": 0.8}.get(
+                    risk_str, 0.3
+                )
 
         if current_step:
             steps.append(current_step)

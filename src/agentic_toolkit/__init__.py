@@ -42,7 +42,7 @@ def _install_aliases() -> None:
             module = importlib.import_module(module_info.name)
         except Exception:  # pragma: no cover - best-effort alias
             continue
-        alias = "agentic_toolkit." + module_info.name[len("sage."):]
+        alias = "agentic_toolkit." + module_info.name[len("sage.") :]
         sys.modules[alias] = module
 
 

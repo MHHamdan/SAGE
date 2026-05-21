@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class TaskDifficulty(Enum):
     """Task difficulty levels."""
+
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
@@ -21,6 +22,7 @@ class TaskDifficulty(Enum):
 
 class TaskCategory(Enum):
     """Task categories."""
+
     REASONING = "reasoning"
     TOOL_USE = "tool_use"
     PLANNING = "planning"
@@ -45,6 +47,7 @@ class BenchmarkTask:
         timeout_seconds: Maximum time allowed
         metadata: Additional task metadata
     """
+
     task_id: str
     name: str
     description: str
@@ -102,6 +105,7 @@ class BenchmarkResult:
         error: Error message if failed
         metrics: Additional metrics
     """
+
     task_id: str
     success: bool
     output: Any = None
@@ -246,7 +250,11 @@ class Benchmark(ABC):
             "mean_steps": total_steps / total,
             "total_duration_seconds": total_time,
             "mean_duration_seconds": total_time / total,
-            "cnsr": (successes / total) / (total_cost / total) if total_cost > 0 else float('inf'),
+            "cnsr": (
+                (successes / total) / (total_cost / total)
+                if total_cost > 0
+                else float("inf")
+            ),
         }
 
     def reset(self):
@@ -375,7 +383,12 @@ class ToolUseBenchmark(Benchmark):
                 difficulty=TaskDifficulty.MEDIUM,
                 input_data={
                     "instruction": "Calculate 15% of 250",
-                    "available_tools": ["search", "calculator", "translator", "file_write"],
+                    "available_tools": [
+                        "search",
+                        "calculator",
+                        "translator",
+                        "file_write",
+                    ],
                 },
                 expected_output="calculator",
             ),
@@ -421,7 +434,13 @@ class PlanningBenchmark(Benchmark):
                 difficulty=TaskDifficulty.EASY,
                 input_data={
                     "goal": "Make a cup of tea",
-                    "available_actions": ["boil_water", "get_cup", "add_tea", "pour_water", "wait"],
+                    "available_actions": [
+                        "boil_water",
+                        "get_cup",
+                        "add_tea",
+                        "pour_water",
+                        "wait",
+                    ],
                 },
                 max_steps=10,
             ),
@@ -434,7 +453,12 @@ class PlanningBenchmark(Benchmark):
                 input_data={
                     "goal": "Go to work",
                     "conditions": {"weather": "unknown", "car_available": "unknown"},
-                    "available_actions": ["check_weather", "take_car", "take_bus", "bring_umbrella"],
+                    "available_actions": [
+                        "check_weather",
+                        "take_car",
+                        "take_bus",
+                        "bring_umbrella",
+                    ],
                 },
                 max_steps=15,
             ),
@@ -448,7 +472,12 @@ class PlanningBenchmark(Benchmark):
                     "goal": "Complete project",
                     "subtasks": ["design", "implement", "test", "document"],
                     "resources": {"time": 10, "budget": 100},
-                    "task_costs": {"design": 3, "implement": 5, "test": 2, "document": 1},
+                    "task_costs": {
+                        "design": 3,
+                        "implement": 5,
+                        "test": 2,
+                        "document": 1,
+                    },
                 },
                 max_steps=20,
             ),

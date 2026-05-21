@@ -96,13 +96,15 @@ class TestPolicyEnforcement:
         )
 
         engine = PolicyEngine()
-        engine.add_rule(PolicyRule(
-            name="no_delete",
-            condition=lambda ctx: "delete" in ctx.get("action", ""),
-            action="*",
-            decision=PolicyDecision.DENY,
-            reason="Delete operations forbidden",
-        ))
+        engine.add_rule(
+            PolicyRule(
+                name="no_delete",
+                condition=lambda ctx: "delete" in ctx.get("action", ""),
+                action="*",
+                decision=PolicyDecision.DENY,
+                reason="Delete operations forbidden",
+            )
+        )
 
         # Delete should be denied
         context = {"action": "delete_file", "path": "/data/important.txt"}
@@ -123,13 +125,15 @@ class TestPolicyEnforcement:
         )
 
         engine = PolicyEngine()
-        engine.add_rule(PolicyRule(
-            name="approve_external",
-            condition=lambda ctx: ctx.get("external", False),
-            action="*",
-            decision=PolicyDecision.REQUIRE_APPROVAL,
-            reason="External operations require approval",
-        ))
+        engine.add_rule(
+            PolicyRule(
+                name="approve_external",
+                condition=lambda ctx: ctx.get("external", False),
+                action="*",
+                decision=PolicyDecision.REQUIRE_APPROVAL,
+                reason="External operations require approval",
+            )
+        )
 
         context = {"action": "api_call", "external": True}
         decision = engine.evaluate(context)

@@ -59,6 +59,7 @@ class IncidentType(Enum):
     - TIMEOUT: Operation exceeded time limit
     - RESOURCE_EXHAUSTION: Resource limits exceeded (memory, tokens, etc.)
     """
+
     HUMAN_INTERVENTION = "human_intervention"
     GUARDRAIL_ACTIVATION = "guardrail_activation"
     POLICY_VIOLATION = "policy_violation"
@@ -80,6 +81,7 @@ class IncidentSeverity(Enum):
     - HIGH (4): Serious issue, requires prompt attention
     - CRITICAL (5): Critical issue, requires immediate action
     """
+
     INFO = 1
     LOW = 2
     MEDIUM = 3
@@ -123,6 +125,7 @@ class Incident:
         resolution_timestamp: When it was resolved
         tags: Custom tags for categorization
     """
+
     incident_id: str
     timestamp: datetime
     incident_type: IncidentType
@@ -148,9 +151,10 @@ class Incident:
             "resolution": self.resolution,
             "resolution_timestamp": (
                 self.resolution_timestamp.isoformat()
-                if self.resolution_timestamp else None
+                if self.resolution_timestamp
+                else None
             ),
-            "tags": self.tags
+            "tags": self.tags,
         }
 
     @classmethod
@@ -167,9 +171,10 @@ class Incident:
             resolution=data.get("resolution"),
             resolution_timestamp=(
                 datetime.fromisoformat(data["resolution_timestamp"])
-                if data.get("resolution_timestamp") else None
+                if data.get("resolution_timestamp")
+                else None
             ),
-            tags=data.get("tags", [])
+            tags=data.get("tags", []),
         )
 
     def time_to_resolution(self) -> Optional[timedelta]:
@@ -195,6 +200,7 @@ class IncidentStatistics:
         window_start: Start of analysis window
         window_end: End of analysis window
     """
+
     total_incidents: int
     incidents_by_type: Dict[IncidentType, int]
     incidents_by_severity: Dict[IncidentSeverity, int]
@@ -220,12 +226,15 @@ class IncidentStatistics:
             "incident_rate_per_hour": self.incident_rate_per_hour,
             "mean_time_to_resolution_seconds": (
                 self.mean_time_to_resolution.total_seconds()
-                if self.mean_time_to_resolution else None
+                if self.mean_time_to_resolution
+                else None
             ),
             "unresolved_count": self.unresolved_count,
             "trend": self.trend,
-            "window_start": self.window_start.isoformat() if self.window_start else None,
-            "window_end": self.window_end.isoformat() if self.window_end else None
+            "window_start": (
+                self.window_start.isoformat() if self.window_start else None
+            ),
+            "window_end": self.window_end.isoformat() if self.window_end else None,
         }
 
 
@@ -270,7 +279,7 @@ class IncidentTracker:
     def __init__(
         self,
         task_counter: Optional[Callable[[], int]] = None,
-        alert_callback: Optional[Callable[[Incident], None]] = None
+        alert_callback: Optional[Callable[[Incident], None]] = None,
     ):
         """Initialize the incident tracker.
 
@@ -294,7 +303,7 @@ class IncidentTracker:
         description: str,
         context: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
-        timestamp: Optional[datetime] = None
+        timestamp: Optional[datetime] = None,
     ) -> Incident:
         """Record a new incident.
 
@@ -318,15 +327,16 @@ class IncidentTracker:
             severity=severity,
             description=description,
             context=context or {},
-            tags=tags or []
+            tags=tags or [],
         )
 
         self._incidents.append(incident)
 
         # Update hourly count
         hour_key = now.strftime("%Y-%m-%d-%H")
-        self._incident_counts_by_hour[hour_key] = \
+        self._incident_counts_by_hour[hour_key] = (
             self._incident_counts_by_hour.get(hour_key, 0) + 1
+        )
 
         # Log based on severity
         log_msg = (
@@ -345,10 +355,7 @@ class IncidentTracker:
         return incident
 
     def resolve_incident(
-        self,
-        incident_id: str,
-        resolution: str,
-        timestamp: Optional[datetime] = None
+        self, incident_id: str, resolution: str, timestamp: Optional[datetime] = None
     ) -> bool:
         """Mark an incident as resolved.
 
@@ -397,7 +404,7 @@ class IncidentTracker:
         until: Optional[datetime] = None,
         resolved_only: bool = False,
         unresolved_only: bool = False,
-        tags: Optional[List[str]] = None
+        tags: Optional[List[str]] = None,
     ) -> List[Incident]:
         """Get filtered list of incidents.
 
@@ -438,17 +445,11 @@ class IncidentTracker:
             result = [i for i in result if not i.resolved]
 
         if tags:
-            result = [
-                i for i in result
-                if any(tag in i.tags for tag in tags)
-            ]
+            result = [i for i in result if any(tag in i.tags for tag in tags)]
 
         return result
 
-    def get_statistics(
-        self,
-        window_hours: Optional[int] = None
-    ) -> IncidentStatistics:
+    def get_statistics(self, window_hours: Optional[int] = None) -> IncidentStatistics:
         """Get aggregated incident statistics.
 
         Args:
@@ -486,8 +487,7 @@ class IncidentTracker:
         # Calculate rates
         total = len(incidents)
         hours_elapsed = max(
-            (now - window_start).total_seconds() / 3600,
-            0.001  # Avoid division by zero
+            (now - window_start).total_seconds() / 3600, 0.001  # Avoid division by zero
         )
         rate_per_hour = total / hours_elapsed
 
@@ -522,7 +522,7 @@ class IncidentTracker:
             unresolved_count=unresolved,
             trend=trend,
             window_start=window_start,
-            window_end=now
+            window_end=now,
         )
 
     def get_incident_rate(self, window_hours: int = 1) -> float:
@@ -542,7 +542,7 @@ class IncidentTracker:
         self,
         max_rate_per_hour: float = 5.0,
         max_critical_count: int = 1,
-        window_hours: int = 1
+        window_hours: int = 1,
     ) -> tuple[bool, Optional[str]]:
         """Check if incident thresholds are breached.
 
@@ -560,22 +560,25 @@ class IncidentTracker:
         # Check rate
         rate = len(recent_incidents) / max(window_hours, 0.001)
         if rate > max_rate_per_hour:
-            return True, f"Incident rate {rate:.2f}/hour exceeds threshold {max_rate_per_hour}"
+            return (
+                True,
+                f"Incident rate {rate:.2f}/hour exceeds threshold {max_rate_per_hour}",
+            )
 
         # Check critical count
         critical_count = sum(
-            1 for i in recent_incidents
-            if i.severity == IncidentSeverity.CRITICAL
+            1 for i in recent_incidents if i.severity == IncidentSeverity.CRITICAL
         )
         if critical_count > max_critical_count:
-            return True, f"Critical incidents ({critical_count}) exceed threshold ({max_critical_count})"
+            return (
+                True,
+                f"Critical incidents ({critical_count}) exceed threshold ({max_critical_count})",
+            )
 
         return False, None
 
     def export_report(
-        self,
-        format: str = "json",
-        window_hours: Optional[int] = None
+        self, format: str = "json", window_hours: Optional[int] = None
     ) -> str:
         """Export incident report for compliance.
 
@@ -591,21 +594,25 @@ class IncidentTracker:
         """
         stats = self.get_statistics(window_hours)
         incidents = self.get_incidents(
-            since=(datetime.now() - timedelta(hours=window_hours))
-            if window_hours else None
+            since=(
+                (datetime.now() - timedelta(hours=window_hours))
+                if window_hours
+                else None
+            )
         )
 
         if format == "json":
-            return json.dumps({
-                "report_generated": datetime.now().isoformat(),
-                "statistics": stats.to_dict(),
-                "incidents": [i.to_dict() for i in incidents]
-            }, indent=2)
+            return json.dumps(
+                {
+                    "report_generated": datetime.now().isoformat(),
+                    "statistics": stats.to_dict(),
+                    "incidents": [i.to_dict() for i in incidents],
+                },
+                indent=2,
+            )
 
         elif format == "csv":
-            lines = [
-                "incident_id,timestamp,type,severity,description,resolved"
-            ]
+            lines = ["incident_id,timestamp,type,severity,description,resolved"]
             for i in incidents:
                 desc = i.description.replace('"', '""')[:100]
                 lines.append(
@@ -624,7 +631,7 @@ class IncidentTracker:
                 f"- **Incident Rate**: {stats.incident_rate_per_hour:.2f}/hour",
                 f"- **Unresolved**: {stats.unresolved_count}",
                 f"- **Trend**: {stats.trend}",
-                f"\n## Incidents by Type\n"
+                f"\n## Incidents by Type\n",
             ]
             for t, count in stats.incidents_by_type.items():
                 md_lines.append(f"- {t.value}: {count}")
@@ -635,9 +642,7 @@ class IncidentTracker:
 
             md_lines.append(f"\n## Incident Details\n")
             for i in incidents[:20]:  # Limit to 20 most recent
-                md_lines.append(
-                    f"\n### [{i.severity.name}] {i.incident_type.value}"
-                )
+                md_lines.append(f"\n### [{i.severity.name}] {i.incident_type.value}")
                 md_lines.append(f"\n- **Time**: {i.timestamp.isoformat()}")
                 md_lines.append(f"- **Description**: {i.description}")
                 md_lines.append(f"- **Resolved**: {i.resolved}")
@@ -663,13 +668,9 @@ class IncidentTracker:
         midpoint = now - timedelta(hours=window_hours / 2)
 
         first_half = sum(
-            1 for i in self._incidents
-            if window_start <= i.timestamp < midpoint
+            1 for i in self._incidents if window_start <= i.timestamp < midpoint
         )
-        second_half = sum(
-            1 for i in self._incidents
-            if midpoint <= i.timestamp <= now
-        )
+        second_half = sum(1 for i in self._incidents if midpoint <= i.timestamp <= now)
 
         # Normalize by time (in case window doesn't have equal halves)
         first_rate = first_half / (window_hours / 2) if first_half > 0 else 0
@@ -693,8 +694,7 @@ class IncidentTracker:
         return sorted(unresolved, key=lambda i: -i.severity.value)
 
     def get_critical_incidents(
-        self,
-        window_hours: Optional[int] = None
+        self, window_hours: Optional[int] = None
     ) -> List[Incident]:
         """Get critical severity incidents.
 
@@ -706,8 +706,11 @@ class IncidentTracker:
         """
         return self.get_incidents(
             severity_min=IncidentSeverity.CRITICAL,
-            since=(datetime.now() - timedelta(hours=window_hours))
-            if window_hours else None
+            since=(
+                (datetime.now() - timedelta(hours=window_hours))
+                if window_hours
+                else None
+            ),
         )
 
     def clear(self) -> None:
@@ -723,7 +726,7 @@ class IncidentTracker:
         return {
             "incident_count": len(self._incidents),
             "start_time": self._start_time.isoformat(),
-            "statistics": self.get_statistics().to_dict()
+            "statistics": self.get_statistics().to_dict(),
         }
 
 
@@ -753,8 +756,7 @@ class AggregatedIncidentTracker:
         self._trackers[name] = tracker
 
     def get_combined_statistics(
-        self,
-        window_hours: Optional[int] = None
+        self, window_hours: Optional[int] = None
     ) -> Dict[str, IncidentStatistics]:
         """Get statistics from all trackers.
 
@@ -770,8 +772,7 @@ class AggregatedIncidentTracker:
         }
 
     def get_all_incidents(
-        self,
-        severity_min: Optional[IncidentSeverity] = None
+        self, severity_min: Optional[IncidentSeverity] = None
     ) -> List[tuple[str, Incident]]:
         """Get all incidents from all trackers.
 
@@ -791,9 +792,7 @@ class AggregatedIncidentTracker:
         return all_incidents
 
     def check_any_threshold_breach(
-        self,
-        max_rate_per_hour: float = 5.0,
-        max_critical_count: int = 1
+        self, max_rate_per_hour: float = 5.0, max_critical_count: int = 1
     ) -> Dict[str, tuple[bool, Optional[str]]]:
         """Check thresholds across all trackers.
 
@@ -805,8 +804,6 @@ class AggregatedIncidentTracker:
             Dict mapping tracker name to (breached, reason) tuples
         """
         return {
-            name: tracker.check_threshold_breach(
-                max_rate_per_hour, max_critical_count
-            )
+            name: tracker.check_threshold_breach(max_rate_per_hour, max_critical_count)
             for name, tracker in self._trackers.items()
         }

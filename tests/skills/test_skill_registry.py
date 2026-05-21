@@ -62,9 +62,13 @@ class TestSkillRegistry:
         registry = SkillRegistry()
 
         skills = [
-            Skill(name="search_web", description="Search the web", function=lambda: None),
+            Skill(
+                name="search_web", description="Search the web", function=lambda: None
+            ),
             Skill(name="read_file", description="Read a file", function=lambda: None),
-            Skill(name="write_file", description="Write to a file", function=lambda: None),
+            Skill(
+                name="write_file", description="Write to a file", function=lambda: None
+            ),
         ]
 
         for skill in skills:

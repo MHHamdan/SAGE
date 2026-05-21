@@ -32,10 +32,10 @@ from sage.learning.experience import (
     PrioritizedExperienceBuffer,
 )
 
-
 # ============================================================================
 # DeploymentConfig Tests
 # ============================================================================
+
 
 class TestDeploymentConfig:
     """Tests for DeploymentConfig dataclass."""
@@ -66,6 +66,7 @@ class TestDeploymentConfig:
 # ============================================================================
 # DeploymentMetrics Tests
 # ============================================================================
+
 
 class TestDeploymentMetrics:
     """Tests for DeploymentMetrics dataclass."""
@@ -100,6 +101,7 @@ class TestDeploymentMetrics:
 # ============================================================================
 # DeploymentLoop Tests
 # ============================================================================
+
 
 class TestDeploymentLoop:
     """Tests for DeploymentLoop class."""
@@ -276,6 +278,7 @@ class TestDeploymentLoop:
 # ABTestDeployment Tests
 # ============================================================================
 
+
 class TestABTestDeployment:
     """Tests for ABTestDeployment class."""
 
@@ -347,6 +350,7 @@ class TestABTestDeployment:
 # ============================================================================
 # FeedbackCollector Tests
 # ============================================================================
+
 
 class TestFeedbackCollector:
     """Tests for FeedbackCollector class."""
@@ -446,6 +450,7 @@ class TestFeedbackCollector:
 # ============================================================================
 # ExperienceBuffer Tests
 # ============================================================================
+
 
 class TestExperienceBuffer:
     """Tests for ExperienceBuffer class."""
@@ -577,6 +582,7 @@ class TestExperienceBuffer:
 # PrioritizedExperienceBuffer Tests
 # ============================================================================
 
+
 class TestPrioritizedExperienceBuffer:
     """Tests for PrioritizedExperienceBuffer class."""
 
@@ -603,33 +609,41 @@ class TestPrioritizedExperienceBuffer:
         buffer = PrioritizedExperienceBuffer(max_size=10)
 
         for i in range(20):
-            buffer.add(Experience(
-                state={"i": i},
-                action={},
-                reward=i,
-            ))
+            buffer.add(
+                Experience(
+                    state={"i": i},
+                    action={},
+                    reward=i,
+                )
+            )
 
         assert len(buffer) == 10
 
     def test_sample(self, buffer):
         """Test prioritized sampling."""
         for i in range(50):
-            buffer.add(Experience(
-                state={"i": i},
-                action={},
-                reward=i,
-            ), priority=float(i + 1))
+            buffer.add(
+                Experience(
+                    state={"i": i},
+                    action={},
+                    reward=i,
+                ),
+                priority=float(i + 1),
+            )
 
         batch = buffer.sample(batch_size=10)
         assert len(batch) == 10
 
     def test_update_priorities(self, buffer):
         """Test updating priorities."""
-        exp = buffer.add(Experience(
-            state={},
-            action={},
-            reward=1.0,
-        ), priority=1.0)
+        exp = buffer.add(
+            Experience(
+                state={},
+                action={},
+                reward=1.0,
+            ),
+            priority=1.0,
+        )
 
         buffer.update_priorities({exp.experience_id: 5.0})
 
@@ -639,11 +653,13 @@ class TestPrioritizedExperienceBuffer:
     def test_get_statistics(self, buffer):
         """Test getting statistics."""
         for i in range(10):
-            buffer.add(Experience(
-                state={"i": i},
-                action={},
-                reward=i,
-            ))
+            buffer.add(
+                Experience(
+                    state={"i": i},
+                    action={},
+                    reward=i,
+                )
+            )
 
         stats = buffer.get_statistics()
 
@@ -655,6 +671,7 @@ class TestPrioritizedExperienceBuffer:
 # ExperienceBatch Tests
 # ============================================================================
 
+
 class TestExperienceBatch:
     """Tests for ExperienceBatch dataclass."""
 
@@ -662,8 +679,7 @@ class TestExperienceBatch:
     def batch(self):
         """Create a batch."""
         experiences = [
-            Experience(state={"i": i}, action={}, reward=float(i))
-            for i in range(5)
+            Experience(state={"i": i}, action={}, reward=float(i)) for i in range(5)
         ]
         return ExperienceBatch(experiences=experiences)
 

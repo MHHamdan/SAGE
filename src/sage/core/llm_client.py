@@ -11,9 +11,7 @@ class BaseLLMClient(ABC):
     """Abstract base class for LLM clients."""
 
     @abstractmethod
-    def invoke(
-        self, messages: List[BaseMessage], **kwargs
-    ) -> Union[str, BaseMessage]:
+    def invoke(self, messages: List[BaseMessage], **kwargs) -> Union[str, BaseMessage]:
         """Invoke the LLM with messages."""
         pass
 

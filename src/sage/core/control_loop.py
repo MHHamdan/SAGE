@@ -28,13 +28,15 @@ logger = logging.getLogger(__name__)
 
 class ControlPhase(Enum):
     """Phases of the control loop (Equation 4 in paper)."""
-    SENSE = "sense"      # o_t -> s_t
-    DECIDE = "decide"    # s_t -> a_t
-    ACT = "act"          # a_t -> o_{t+1}
+
+    SENSE = "sense"  # o_t -> s_t
+    DECIDE = "decide"  # s_t -> a_t
+    ACT = "act"  # a_t -> o_{t+1}
 
 
 class StabilityStatus(Enum):
     """Overall stability assessment."""
+
     STABLE = "stable"
     OSCILLATING = "oscillating"
     DEADLOCKED = "deadlocked"
@@ -45,6 +47,7 @@ class StabilityStatus(Enum):
 @dataclass
 class PhaseMetrics:
     """Metrics for a single control loop phase."""
+
     phase: ControlPhase
     start_time: float
     end_time: float
@@ -58,6 +61,7 @@ class PhaseMetrics:
 @dataclass
 class CycleMetrics:
     """Metrics for a complete sense-decide-act cycle."""
+
     cycle_number: int
     timestamp: float
 
@@ -93,7 +97,7 @@ class CycleMetrics:
             "sense_ms": self.sense_metrics.latency_ms if self.sense_metrics else 0.0,
             "decide_ms": self.decide_metrics.latency_ms if self.decide_metrics else 0.0,
             "act_ms": self.act_metrics.latency_ms if self.act_metrics else 0.0,
-            "total_ms": self.total_latency_ms
+            "total_ms": self.total_latency_ms,
         }
 
 
@@ -137,18 +141,15 @@ class StabilityAnalysis:
             "oscillation": {
                 "detected": self.is_oscillating,
                 "period": self.oscillation_period,
-                "actions": self.oscillation_actions
+                "actions": self.oscillation_actions,
             },
             "deadlock": {
                 "detected": self.is_deadlocked,
-                "duration_cycles": self.deadlock_duration_cycles
+                "duration_cycles": self.deadlock_duration_cycles,
             },
-            "divergence": {
-                "detected": self.is_diverging,
-                "rate": self.divergence_rate
-            },
+            "divergence": {"detected": self.is_diverging, "rate": self.divergence_rate},
             "reactivity_score": self.reactivity_score,
-            "confidence": self.confidence
+            "confidence": self.confidence,
         }
 
 
@@ -167,7 +168,7 @@ class StabilityAnalyzer:
         window_size: int = 20,
         oscillation_threshold: int = 3,
         deadlock_threshold: int = 5,
-        divergence_threshold: float = 0.1
+        divergence_threshold: float = 0.1,
     ):
         """
         Initialize stability analyzer.
@@ -197,15 +198,13 @@ class StabilityAnalyzer:
             return StabilityAnalysis(
                 status=StabilityStatus.UNKNOWN,
                 confidence=0.0,
-                analysis_window_size=len(cycle_history)
+                analysis_window_size=len(cycle_history),
             )
 
         # Use most recent window_size cycles
-        window = cycle_history[-self.window_size:]
+        window = cycle_history[-self.window_size :]
 
-        analysis = StabilityAnalysis(
-            analysis_window_size=len(window)
-        )
+        analysis = StabilityAnalysis(analysis_window_size=len(window))
 
         # Run detection algorithms
         self._detect_oscillation(window, analysis)
@@ -222,9 +221,7 @@ class StabilityAnalyzer:
         return analysis
 
     def _detect_oscillation(
-        self,
-        window: List[CycleMetrics],
-        analysis: StabilityAnalysis
+        self, window: List[CycleMetrics], analysis: StabilityAnalysis
     ) -> None:
         """
         Detect action oscillation patterns.
@@ -250,7 +247,9 @@ class StabilityAnalyzer:
 
             # Calculate what fraction are matching
             total_comparisons = len(action_sequence) - period
-            match_ratio = repetitions / total_comparisons if total_comparisons > 0 else 0
+            match_ratio = (
+                repetitions / total_comparisons if total_comparisons > 0 else 0
+            )
 
             if match_ratio > 0.8 and repetitions >= self.oscillation_threshold:
                 analysis.is_oscillating = True
@@ -260,9 +259,7 @@ class StabilityAnalyzer:
                 return
 
     def _detect_deadlock(
-        self,
-        window: List[CycleMetrics],
-        analysis: StabilityAnalysis
+        self, window: List[CycleMetrics], analysis: StabilityAnalysis
     ) -> None:
         """
         Detect deadlock - state unchanged despite actions.
@@ -282,7 +279,7 @@ class StabilityAnalyzer:
         max_consecutive = 1
 
         for i in range(1, len(state_hashes)):
-            if state_hashes[i] == state_hashes[i-1]:
+            if state_hashes[i] == state_hashes[i - 1]:
                 consecutive_same += 1
                 max_consecutive = max(max_consecutive, consecutive_same)
             else:
@@ -293,9 +290,7 @@ class StabilityAnalyzer:
             analysis.deadlock_duration_cycles = max_consecutive
 
     def _detect_divergence(
-        self,
-        window: List[CycleMetrics],
-        analysis: StabilityAnalysis
+        self, window: List[CycleMetrics], analysis: StabilityAnalysis
     ) -> None:
         """
         Detect slow divergence from goals.
@@ -322,8 +317,7 @@ class StabilityAnalyzer:
         if n * sum_x_sq - sum_x**2 == 0:
             return
 
-        slope = (n * np.sum(x * y) - sum_x * np.sum(y)) / \
-                (n * sum_x_sq - sum_x**2)
+        slope = (n * np.sum(x * y) - sum_x * np.sum(y)) / (n * sum_x_sq - sum_x**2)
 
         analysis.divergence_rate = float(slope)
 
@@ -331,9 +325,7 @@ class StabilityAnalyzer:
             analysis.is_diverging = True
 
     def _compute_reactivity(
-        self,
-        window: List[CycleMetrics],
-        analysis: StabilityAnalysis
+        self, window: List[CycleMetrics], analysis: StabilityAnalysis
     ) -> None:
         """
         Compute reactivity score.
@@ -351,9 +343,9 @@ class StabilityAnalyzer:
         action_changes = 0
 
         for i in range(1, len(window)):
-            if window[i].observation_hash != window[i-1].observation_hash:
+            if window[i].observation_hash != window[i - 1].observation_hash:
                 observation_changes += 1
-            if window[i].action_hash != window[i-1].action_hash:
+            if window[i].action_hash != window[i - 1].action_hash:
                 action_changes += 1
 
         if observation_changes == 0:
@@ -411,7 +403,7 @@ class ClosedLoopController:
         goal: str,
         embedding_fn: Optional[Callable[[str], np.ndarray]] = None,
         max_cycles: int = 100,
-        stability_window: int = 20
+        stability_window: int = 20,
     ):
         """
         Initialize closed-loop controller.
@@ -463,10 +455,7 @@ class ClosedLoopController:
         self.cycle_count += 1
         cycle_start = time.time()
 
-        metrics = CycleMetrics(
-            cycle_number=self.cycle_count,
-            timestamp=cycle_start
-        )
+        metrics = CycleMetrics(cycle_number=self.cycle_count, timestamp=cycle_start)
 
         # ============ SENSE PHASE ============
         # o_t -> s_t
@@ -476,7 +465,7 @@ class ClosedLoopController:
         metrics.observation_hash = self._hash_value(observation)
 
         # Call agent's sense method
-        if hasattr(self.agent, 'sense'):
+        if hasattr(self.agent, "sense"):
             self._current_state = self.agent.sense(observation)
         else:
             # Fallback: observation becomes state
@@ -486,9 +475,7 @@ class ClosedLoopController:
 
         sense_end = time.time()
         metrics.sense_metrics = PhaseMetrics(
-            phase=ControlPhase.SENSE,
-            start_time=sense_start,
-            end_time=sense_end
+            phase=ControlPhase.SENSE, start_time=sense_start, end_time=sense_end
         )
 
         # ============ DECIDE PHASE ============
@@ -496,9 +483,9 @@ class ClosedLoopController:
         decide_start = time.time()
 
         # Call agent's planning/decision method
-        if hasattr(self.agent, 'plan'):
+        if hasattr(self.agent, "plan"):
             self._current_action = self.agent.plan(self._current_state)
-        elif hasattr(self.agent, 'select_action'):
+        elif hasattr(self.agent, "select_action"):
             self._current_action = self.agent.select_action(self._current_state)
         else:
             raise AttributeError("Agent must have 'plan' or 'select_action' method")
@@ -507,9 +494,7 @@ class ClosedLoopController:
 
         decide_end = time.time()
         metrics.decide_metrics = PhaseMetrics(
-            phase=ControlPhase.DECIDE,
-            start_time=decide_start,
-            end_time=decide_end
+            phase=ControlPhase.DECIDE, start_time=decide_start, end_time=decide_end
         )
 
         # Compute goal drift if embedding function available
@@ -521,18 +506,16 @@ class ClosedLoopController:
         act_start = time.time()
 
         # Call agent's act method
-        if hasattr(self.agent, 'act'):
+        if hasattr(self.agent, "act"):
             result = self.agent.act(self._current_action)
-        elif hasattr(self.agent, 'execute'):
+        elif hasattr(self.agent, "execute"):
             result = self.agent.execute(self._current_action)
         else:
             raise AttributeError("Agent must have 'act' or 'execute' method")
 
         act_end = time.time()
         metrics.act_metrics = PhaseMetrics(
-            phase=ControlPhase.ACT,
-            start_time=act_start,
-            end_time=act_end
+            phase=ControlPhase.ACT, start_time=act_start, end_time=act_end
         )
 
         # Store metrics
@@ -561,7 +544,7 @@ class ClosedLoopController:
         # Infer current goal from recent actions/reasoning
         # This is an approximation - in practice would analyze reasoning traces
         current_context = str(self._current_action)
-        if hasattr(self._current_action, 'reasoning'):
+        if hasattr(self._current_action, "reasoning"):
             current_context = self._current_action.reasoning
 
         current_embedding = self.embedding_fn(current_context)
@@ -573,7 +556,9 @@ class ClosedLoopController:
         if norm_goal == 0 or norm_current == 0:
             return 0.0
 
-        similarity = np.dot(self.goal_embedding, current_embedding) / (norm_goal * norm_current)
+        similarity = np.dot(self.goal_embedding, current_embedding) / (
+            norm_goal * norm_current
+        )
 
         # Drift = 1 - similarity
         return float(1.0 - similarity)
@@ -616,7 +601,7 @@ class ClosedLoopController:
             return True
 
         # Check if agent signals completion
-        if hasattr(self.agent, 'is_complete') and self.agent.is_complete():
+        if hasattr(self.agent, "is_complete") and self.agent.is_complete():
             self.terminated = True
             return True
 
@@ -637,13 +622,13 @@ class ClosedLoopController:
                 "mean_ms": float(np.mean(latencies)) if latencies else 0,
                 "max_ms": float(max(latencies)) if latencies else 0,
                 "min_ms": float(min(latencies)) if latencies else 0,
-                "std_ms": float(np.std(latencies)) if latencies else 0
+                "std_ms": float(np.std(latencies)) if latencies else 0,
             },
             "goal_drift": {
                 "final": goal_errors[-1] if goal_errors else 0,
                 "max": float(max(goal_errors)) if goal_errors else 0,
-                "mean": float(np.mean(goal_errors)) if goal_errors else 0
-            }
+                "mean": float(np.mean(goal_errors)) if goal_errors else 0,
+            },
         }
 
     def reset(self) -> None:
@@ -660,10 +645,9 @@ class ClosedLoopController:
 # Integration with existing BaseAgent
 # ============================================================
 
+
 def wrap_agent_with_control_loop(
-    agent: Any,
-    goal: str,
-    embedding_fn: Optional[Callable] = None
+    agent: Any, goal: str, embedding_fn: Optional[Callable] = None
 ) -> ClosedLoopController:
     """
     Convenience function to wrap an existing agent in a control loop.
@@ -676,8 +660,4 @@ def wrap_agent_with_control_loop(
     Returns:
         ClosedLoopController wrapping the agent
     """
-    return ClosedLoopController(
-        agent=agent,
-        goal=goal,
-        embedding_fn=embedding_fn
-    )
+    return ClosedLoopController(agent=agent, goal=goal, embedding_fn=embedding_fn)

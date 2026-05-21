@@ -16,10 +16,10 @@ from sage.human_oversight.audit import (
     AuditEventType,
 )
 
-
 # ============================================================================
 # AuditEntry Tests
 # ============================================================================
+
 
 class TestAuditEntry:
     """Tests for AuditEntry dataclass."""
@@ -58,6 +58,7 @@ class TestAuditEntry:
 # ============================================================================
 # AuditLogger Tests
 # ============================================================================
+
 
 class TestAuditLogger:
     """Tests for AuditLogger class."""
@@ -178,16 +179,13 @@ class TestAuditLogger:
     def test_get_events_by_request(self, logger):
         """Test filtering by request ID."""
         logger.log_event(
-            event_type=AuditEventType.APPROVAL_REQUESTED,
-            request_id="req-001"
+            event_type=AuditEventType.APPROVAL_REQUESTED, request_id="req-001"
         )
         logger.log_event(
-            event_type=AuditEventType.APPROVAL_GRANTED,
-            request_id="req-001"
+            event_type=AuditEventType.APPROVAL_GRANTED, request_id="req-001"
         )
         logger.log_event(
-            event_type=AuditEventType.APPROVAL_REQUESTED,
-            request_id="req-002"
+            event_type=AuditEventType.APPROVAL_REQUESTED, request_id="req-002"
         )
 
         req1_events = logger.get_events_by_request("req-001")
@@ -237,10 +235,7 @@ class TestAuditLogger:
 
     def test_export_json(self, logger):
         """Test JSON export."""
-        logger.log_event(
-            event_type=AuditEventType.APPROVAL_REQUESTED,
-            actor="agent-1"
-        )
+        logger.log_event(event_type=AuditEventType.APPROVAL_REQUESTED, actor="agent-1")
 
         export = logger.export(format="json")
         parsed = json.loads(export)
@@ -250,10 +245,7 @@ class TestAuditLogger:
 
     def test_export_csv(self, logger):
         """Test CSV export."""
-        logger.log_event(
-            event_type=AuditEventType.APPROVAL_REQUESTED,
-            actor="agent-1"
-        )
+        logger.log_event(event_type=AuditEventType.APPROVAL_REQUESTED, actor="agent-1")
 
         export = logger.export(format="csv")
         assert "entry_id,timestamp,event_type" in export
@@ -262,9 +254,7 @@ class TestAuditLogger:
     def test_export_markdown(self, logger):
         """Test Markdown export."""
         logger.log_event(
-            event_type=AuditEventType.HUMAN_INTERVENTION,
-            actor="admin",
-            action="stop"
+            event_type=AuditEventType.HUMAN_INTERVENTION, actor="admin", action="stop"
         )
 
         export = logger.export(format="markdown")
@@ -280,7 +270,7 @@ class TestAuditLogger:
         """Test saving to file."""
         logger.log_event(event_type=AuditEventType.SESSION_START)
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             path = Path(f.name)
 
         try:
@@ -297,17 +287,15 @@ class TestAuditLogger:
         logger.log_event(
             event_type=AuditEventType.APPROVAL_REQUESTED,
             actor="agent-1",
-            outcome="pending"
+            outcome="pending",
         )
         logger.log_event(
             event_type=AuditEventType.APPROVAL_GRANTED,
             actor="admin",
-            outcome="approved"
+            outcome="approved",
         )
         logger.log_event(
-            event_type=AuditEventType.APPROVAL_DENIED,
-            actor="admin",
-            outcome="denied"
+            event_type=AuditEventType.APPROVAL_DENIED, actor="admin", outcome="denied"
         )
 
         stats = logger.get_statistics()
@@ -342,6 +330,7 @@ class TestAuditLogger:
 # ============================================================================
 # AuditEventType Tests
 # ============================================================================
+
 
 class TestAuditEventType:
     """Tests for AuditEventType enum."""

@@ -11,8 +11,14 @@ from typing import Optional, List, Dict, Any, Callable
 
 from .planner_base import BasePlanner
 from .schemas import (
-    Plan, PlanStep, PlanningContext, PlanningResult,
-    PlanStatus, StepStatus, create_plan, create_step,
+    Plan,
+    PlanStep,
+    PlanningContext,
+    PlanningResult,
+    PlanStatus,
+    StepStatus,
+    create_plan,
+    create_step,
 )
 
 logger = logging.getLogger(__name__)
@@ -168,10 +174,16 @@ class ReactivePlanner(BasePlanner):
 
             # Add observation to context
             if observation:
-                context.history.append({
-                    "action": current_plan.steps[-1].action if current_plan.steps else "unknown",
-                    "result": observation,
-                })
+                context.history.append(
+                    {
+                        "action": (
+                            current_plan.steps[-1].action
+                            if current_plan.steps
+                            else "unknown"
+                        ),
+                        "result": observation,
+                    }
+                )
 
             # Generate next thought and action
             react_result = self._react_step(context)
@@ -230,10 +242,12 @@ class ReactivePlanner(BasePlanner):
             PlanningResult with recovery step
         """
         # Add failure to history
-        context.history.append({
-            "action": "error",
-            "result": f"Previous action failed: {failure_reason}",
-        })
+        context.history.append(
+            {
+                "action": "error",
+                "result": f"Previous action failed: {failure_reason}",
+            }
+        )
 
         # Get next step considering the failure
         return self.get_next_step(context, current_plan, f"Error: {failure_reason}")
@@ -272,7 +286,11 @@ class ReactivePlanner(BasePlanner):
         Returns:
             Formatted prompt
         """
-        tools_str = ", ".join(context.available_tools) if context.available_tools else "think, respond"
+        tools_str = (
+            ", ".join(context.available_tools)
+            if context.available_tools
+            else "think, respond"
+        )
 
         prompt = f"""You are an AI assistant using the ReAct (Reasoning and Acting) framework.
 
@@ -421,12 +439,14 @@ class ReActAgent:
 
             observation = self._execute_action(action, params)
 
-            history.append({
-                "thought": current_step.description,
-                "action": action,
-                "parameters": params,
-                "observation": observation,
-            })
+            history.append(
+                {
+                    "thought": current_step.description,
+                    "action": action,
+                    "parameters": params,
+                    "observation": observation,
+                }
+            )
 
             # Get next step
             result = self.planner.get_next_step(context, plan, observation)

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 class ArbitrationMode(Enum):
     """Modes for resolving agent decisions."""
+
     MAJORITY_VOTE = "majority_vote"
     WEIGHTED_VOTE = "weighted_vote"
     SUPERVISOR_OVERRIDE = "supervisor_override"
@@ -22,6 +23,7 @@ class ArbitrationMode(Enum):
 @dataclass
 class AgentVote:
     """Vote from an agent."""
+
     agent_name: str
     decision: str
     confidence: float = 1.0
@@ -32,6 +34,7 @@ class AgentVote:
 @dataclass
 class ArbitrationResult:
     """Result of arbitration."""
+
     final_decision: str
     mode_used: ArbitrationMode
     votes: List[AgentVote] = field(default_factory=list)
@@ -95,17 +98,21 @@ class CoordinatorAgent:
         for agent in self.agents:
             try:
                 response = agent.run(task)
-                responses.append({
-                    "agent": agent.name,
-                    "response": response,
-                    "success": True,
-                })
+                responses.append(
+                    {
+                        "agent": agent.name,
+                        "response": response,
+                        "success": True,
+                    }
+                )
             except Exception as e:
-                responses.append({
-                    "agent": agent.name,
-                    "error": str(e),
-                    "success": False,
-                })
+                responses.append(
+                    {
+                        "agent": agent.name,
+                        "error": str(e),
+                        "success": False,
+                    }
+                )
 
         # Arbitrate if multiple successful responses
         successful = [r for r in responses if r["success"]]
@@ -207,10 +214,7 @@ class CoordinatorAgent:
             return self._weighted_vote(votes)
 
         # Provide supervisor with agent responses
-        summary = "\n".join(
-            f"- {v.agent_name}: {v.decision[:200]}"
-            for v in votes
-        )
+        summary = "\n".join(f"- {v.agent_name}: {v.decision[:200]}" for v in votes)
 
         supervisor_prompt = f"""Task: {task}
 

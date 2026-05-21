@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 # ── Agent state ────────────────────────────────────────────────────────────────
 
+
 @dataclass
 class AgentState:
     """Simulation state for one agent episode.
@@ -37,6 +38,7 @@ class AgentState:
     numpy arrays are stored by reference; interventions must copy before
     modifying to preserve pure-function semantics.
     """
+
     goal_embedding: np.ndarray
     state_embedding: np.ndarray
     context_turns: list[str]
@@ -69,6 +71,7 @@ class EscalationRequest(Exception):
 
 # ── Intervention protocol ──────────────────────────────────────────────────────
 
+
 @runtime_checkable
 class Intervention(Protocol):
     name: str
@@ -86,7 +89,10 @@ def _unit(v: np.ndarray) -> np.ndarray:
 def _log_intervention(name: str, pre_hash: str, post_hash: str, rationale: str) -> None:
     logger.debug(
         "Intervention %s applied | pre=%s post=%s | %s",
-        name, pre_hash[:8], post_hash[:8], rationale,
+        name,
+        pre_hash[:8],
+        post_hash[:8],
+        rationale,
     )
 
 
@@ -96,6 +102,7 @@ def _embed_hash(emb: np.ndarray) -> str:
 
 # ── Concrete interventions ─────────────────────────────────────────────────────
 
+
 @dataclass
 class GoalReanchor:
     """Re-inject original goal embedding into context with recovery_pull fraction.
@@ -103,6 +110,7 @@ class GoalReanchor:
     Reversible: yes (the original state could be restored).
     Cost: one small LLM call ($0.01).
     """
+
     name: str = field(default="GoalReanchor", init=False)
     estimated_cost: float = field(default=0.01, init=False)
     reversible: bool = field(default=True, init=False)
@@ -132,6 +140,7 @@ class ContextCompress:
     Simulation effect: slight nudge toward goal (compressed context = less
     accumulated drift noise).
     """
+
     name: str = field(default="ContextCompress", init=False)
     estimated_cost: float = field(default=0.05, init=False)
     reversible: bool = field(default=False, init=False)
@@ -140,7 +149,7 @@ class ContextCompress:
 
     def apply(self, state: AgentState) -> AgentState:
         pre = _embed_hash(state.state_embedding)
-        truncated = state.context_turns[-self.keep_recent_n:]
+        truncated = state.context_turns[-self.keep_recent_n :]
         # Small recovery from clearing old noisy context
         new_emb = _unit(
             (1.0 - self.compress_recovery) * state.state_embedding
@@ -151,7 +160,12 @@ class ContextCompress:
             state_embedding=new_emb,
             intervention_count=state.intervention_count + 1,
         )
-        _log_intervention(self.name, pre, _embed_hash(new_emb), f"compressed to last {self.keep_recent_n} turns")
+        _log_intervention(
+            self.name,
+            pre,
+            _embed_hash(new_emb),
+            f"compressed to last {self.keep_recent_n} turns",
+        )
         return new_state
 
 
@@ -165,6 +179,7 @@ class ForceReplan:
     Simulation effect: aggressive recovery toward goal (replanning resets
     direction).
     """
+
     name: str = field(default="ForceReplan", init=False)
     estimated_cost: float = field(default=0.06, init=False)
     reversible: bool = field(default=True, init=False)
@@ -195,6 +210,7 @@ class SchemaValidatedRetry:
 
     Simulation effect: very small recovery (tool correction = minor drift fix).
     """
+
     name: str = field(default="SchemaValidatedRetry", init=False)
     estimated_cost: float = field(default=0.01, init=False)
     reversible: bool = field(default=True, init=False)
@@ -212,7 +228,9 @@ class SchemaValidatedRetry:
             last_tool_output=new_tool_output,
             intervention_count=state.intervention_count + 1,
         )
-        _log_intervention(self.name, pre, _embed_hash(new_emb), "schema-validated retry")
+        _log_intervention(
+            self.name, pre, _embed_hash(new_emb), "schema-validated retry"
+        )
         return new_state
 
 
@@ -223,6 +241,7 @@ class HumanEscalate:
     Reversible: N/A (execution ends).
     Cost: $0 (handoff only; no LLM call).
     """
+
     name: str = field(default="HumanEscalate", init=False)
     estimated_cost: float = field(default=0.0, init=False)
     reversible: bool = field(default=False, init=False)

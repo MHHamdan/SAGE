@@ -38,6 +38,7 @@ def _sig(drift=0.2, osc=0.1, fid=0.9, prog=0.7, turn=1, cost=0.0) -> MonitorSign
 
 # ── NoControl ─────────────────────────────────────────────────────────────────
 
+
 class TestNoControl:
     def test_always_noop(self):
         nc = NoControl()
@@ -64,13 +65,16 @@ class TestNoControl:
 
 # ── FixedScheduleController ───────────────────────────────────────────────────
 
+
 class TestFixedScheduleController:
     def test_fires_exactly_at_multiples_of_k(self):
         ctrl = FixedScheduleController(reanchor_every_k=10)
         for turn in range(1, 51):
             d = ctrl.decide(_sig(turn=turn))
             if turn % 10 == 0:
-                assert d.intervention is not None, f"Expected intervention at turn {turn}"
+                assert (
+                    d.intervention is not None
+                ), f"Expected intervention at turn {turn}"
             else:
                 assert d.intervention is None, f"Unexpected intervention at turn {turn}"
 
@@ -92,13 +96,18 @@ class TestFixedScheduleController:
     def test_deterministic(self):
         """Same input → same output after reset."""
         ctrl = FixedScheduleController(reanchor_every_k=10)
-        decisions_1 = [ctrl.decide(_sig(turn=t)).intervention is not None for t in range(1, 21)]
+        decisions_1 = [
+            ctrl.decide(_sig(turn=t)).intervention is not None for t in range(1, 21)
+        ]
         ctrl.reset()
-        decisions_2 = [ctrl.decide(_sig(turn=t)).intervention is not None for t in range(1, 21)]
+        decisions_2 = [
+            ctrl.decide(_sig(turn=t)).intervention is not None for t in range(1, 21)
+        ]
         assert decisions_1 == decisions_2
 
 
 # ── ThresholdController ───────────────────────────────────────────────────────
+
 
 class TestThresholdController:
     def test_fires_on_high_drift(self):
@@ -143,16 +152,23 @@ class TestThresholdController:
         assert d.intervention is not None, "Reset should clear cooldown"
 
     def test_drift_priority_over_oscillation(self):
-        ctrl = ThresholdController(drift_threshold=0.30, oscillation_threshold=0.60, cooldown_turns=0)
+        ctrl = ThresholdController(
+            drift_threshold=0.30, oscillation_threshold=0.60, cooldown_turns=0
+        )
         d = ctrl.decide(_sig(drift=0.50, osc=0.80))
-        assert d.intervention.name == "GoalReanchor", "Drift has priority over oscillation"
+        assert (
+            d.intervention.name == "GoalReanchor"
+        ), "Drift has priority over oscillation"
 
     def test_deterministic(self):
         """Identical signal sequences → identical decision sequences."""
+
         def _run(ctrl):
             signals = [
-                _sig(drift=0.10, turn=1), _sig(drift=0.50, turn=2),
-                _sig(drift=0.50, turn=3), _sig(drift=0.50, turn=4),
+                _sig(drift=0.10, turn=1),
+                _sig(drift=0.50, turn=2),
+                _sig(drift=0.50, turn=3),
+                _sig(drift=0.50, turn=4),
                 _sig(drift=0.50, turn=5),
             ]
             return [ctrl.decide(s).intervention is not None for s in signals]
@@ -170,8 +186,10 @@ class TestThresholdController:
 
 # ── PredictiveController ──────────────────────────────────────────────────────
 
+
 class _MockPredictor:
     """Returns a fixed probability for testing."""
+
     def __init__(self, p: float = 0.0):
         self.p = p
 
@@ -181,17 +199,23 @@ class _MockPredictor:
 
 class TestPredictiveController:
     def test_fires_above_threshold(self):
-        ctrl = PredictiveController(predictor=_MockPredictor(p=0.8), fire_at_p=0.5, cooldown_turns=0)
+        ctrl = PredictiveController(
+            predictor=_MockPredictor(p=0.8), fire_at_p=0.5, cooldown_turns=0
+        )
         d = ctrl.decide(_sig(turn=1))
         assert d.intervention is not None
 
     def test_no_fire_below_threshold(self):
-        ctrl = PredictiveController(predictor=_MockPredictor(p=0.2), fire_at_p=0.5, cooldown_turns=0)
+        ctrl = PredictiveController(
+            predictor=_MockPredictor(p=0.2), fire_at_p=0.5, cooldown_turns=0
+        )
         d = ctrl.decide(_sig(turn=1))
         assert d.intervention is None
 
     def test_cooldown_respected(self):
-        ctrl = PredictiveController(predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=3)
+        ctrl = PredictiveController(
+            predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=3
+        )
         d1 = ctrl.decide(_sig(turn=1))
         assert d1.intervention is not None
         d2 = ctrl.decide(_sig(turn=2))
@@ -200,39 +224,52 @@ class TestPredictiveController:
         assert d3.intervention is not None
 
     def test_reset_clears_state(self):
-        ctrl = PredictiveController(predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=5)
+        ctrl = PredictiveController(
+            predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=5
+        )
         ctrl.decide(_sig(turn=1))
         ctrl.reset()
         d = ctrl.decide(_sig(turn=2))
         assert d.intervention is not None, "Reset should clear cooldown and history"
 
     def test_chooses_reanchor_when_drift_dominant(self):
-        ctrl = PredictiveController(predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=0)
+        ctrl = PredictiveController(
+            predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=0
+        )
         d = ctrl.decide(_sig(drift=0.8, osc=0.1, turn=1))
         assert d.intervention is not None
         assert d.intervention.name == "GoalReanchor"
 
     def test_chooses_replan_when_oscillation_dominant(self):
-        ctrl = PredictiveController(predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=0)
+        ctrl = PredictiveController(
+            predictor=_MockPredictor(p=0.9), fire_at_p=0.5, cooldown_turns=0
+        )
         d = ctrl.decide(_sig(drift=0.1, osc=0.9, turn=1))
         assert d.intervention.name == "ForceReplan"
 
     def test_deterministic(self):
         """Same signals → same decisions from two independent instances."""
         sigs = [_sig(drift=0.3, turn=t) for t in range(1, 11)]
-        ctrl_a = PredictiveController(predictor=_MockPredictor(p=0.7), fire_at_p=0.5, cooldown_turns=2)
-        ctrl_b = PredictiveController(predictor=_MockPredictor(p=0.7), fire_at_p=0.5, cooldown_turns=2)
+        ctrl_a = PredictiveController(
+            predictor=_MockPredictor(p=0.7), fire_at_p=0.5, cooldown_turns=2
+        )
+        ctrl_b = PredictiveController(
+            predictor=_MockPredictor(p=0.7), fire_at_p=0.5, cooldown_turns=2
+        )
         da = [ctrl_a.decide(s).intervention is not None for s in sigs]
         db = [ctrl_b.decide(s).intervention is not None for s in sigs]
         assert da == db
 
     def test_confidence_equals_predicted_probability(self):
-        ctrl = PredictiveController(predictor=_MockPredictor(p=0.75), fire_at_p=0.5, cooldown_turns=0)
+        ctrl = PredictiveController(
+            predictor=_MockPredictor(p=0.75), fire_at_p=0.5, cooldown_turns=0
+        )
         d = ctrl.decide(_sig(turn=1))
         assert d.confidence == pytest.approx(0.75)
 
 
 # ── MonitorSignals dataclass ──────────────────────────────────────────────────
+
 
 class TestMonitorSignals:
     def test_frozen(self):

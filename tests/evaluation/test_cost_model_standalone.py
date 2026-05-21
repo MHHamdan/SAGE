@@ -9,8 +9,7 @@ import importlib.util
 
 # Direct import from the metrics.py file without package init
 metrics_path = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'src',
-    'sage', 'evaluation', 'metrics.py'
+    os.path.dirname(__file__), "..", "..", "src", "sage", "evaluation", "metrics.py"
 )
 spec = importlib.util.spec_from_file_location("metrics", metrics_path)
 metrics = importlib.util.module_from_spec(spec)
@@ -40,9 +39,9 @@ def test_total_cost_computation():
     """Test total cost is sum of all 4 components (Equation 5)."""
     cost = TaskCostBreakdown(
         inference_cost=0.10,  # C_inference
-        tool_cost=0.05,       # C_tools
-        latency_cost=0.02,    # C_latency
-        human_cost=5.00       # C_human
+        tool_cost=0.05,  # C_tools
+        latency_cost=0.02,  # C_latency
+        human_cost=5.00,  # C_human
     )
     expected_total = 0.10 + 0.05 + 0.02 + 5.00
     assert abs(cost.total_cost - expected_total) < 1e-10
@@ -72,16 +71,10 @@ def test_all_four_components_contribute():
 def test_cost_addition():
     """Test adding two cost breakdowns."""
     cost1 = TaskCostBreakdown(
-        inference_cost=0.10,
-        tool_cost=0.05,
-        latency_cost=0.02,
-        human_cost=5.00
+        inference_cost=0.10, tool_cost=0.05, latency_cost=0.02, human_cost=5.00
     )
     cost2 = TaskCostBreakdown(
-        inference_cost=0.20,
-        tool_cost=0.10,
-        latency_cost=0.03,
-        human_cost=0.00
+        inference_cost=0.20, tool_cost=0.10, latency_cost=0.03, human_cost=0.00
     )
     total = cost1 + cost2
     # Use tolerance for floating point
@@ -99,13 +92,13 @@ def test_compute_cost_from_usage():
         output_tokens=500,
         tool_calls=5,
         latency_seconds=10.0,
-        human_interventions=0
+        human_interventions=0,
     )
     # Default rates: token=0, tool=0.001, latency=0.0001, human=5.0
     assert cost.inference_cost == 0.0  # 0 token cost for local
-    assert cost.tool_cost == 0.005     # 5 * 0.001
+    assert cost.tool_cost == 0.005  # 5 * 0.001
     assert cost.latency_cost == 0.001  # 10 * 0.0001
-    assert cost.human_cost == 0.0      # 0 interventions
+    assert cost.human_cost == 0.0  # 0 interventions
     print("✓ test_compute_cost_from_usage passed")
 
 
@@ -122,14 +115,10 @@ def test_basic_cnsr_computation():
     """Test basic CNSR computation (Equation 6)."""
     results = [
         TaskResult(
-            task_id="task_1",
-            success=True,
-            cost=TaskCostBreakdown(inference_cost=0.50)
+            task_id="task_1", success=True, cost=TaskCostBreakdown(inference_cost=0.50)
         ),
         TaskResult(
-            task_id="task_2",
-            success=True,
-            cost=TaskCostBreakdown(inference_cost=0.50)
+            task_id="task_2", success=True, cost=TaskCostBreakdown(inference_cost=0.50)
         ),
     ]
     metrics = compute_cnsr_from_results(results)
@@ -147,11 +136,8 @@ def test_all_cost_components_in_cnsr():
             task_id="task_1",
             success=True,
             cost=TaskCostBreakdown(
-                inference_cost=0.10,
-                tool_cost=0.05,
-                latency_cost=0.02,
-                human_cost=0.03
-            )
+                inference_cost=0.10, tool_cost=0.05, latency_cost=0.02, human_cost=0.03
+            ),
         ),
     ]
     metrics = compute_cnsr_from_results(results)
@@ -173,21 +159,15 @@ def test_cost_breakdown_in_results():
             task_id="task_1",
             success=True,
             cost=TaskCostBreakdown(
-                inference_cost=0.10,
-                tool_cost=0.05,
-                latency_cost=0.02,
-                human_cost=5.00
-            )
+                inference_cost=0.10, tool_cost=0.05, latency_cost=0.02, human_cost=5.00
+            ),
         ),
         TaskResult(
             task_id="task_2",
             success=False,
             cost=TaskCostBreakdown(
-                inference_cost=0.20,
-                tool_cost=0.10,
-                latency_cost=0.03,
-                human_cost=0.00
-            )
+                inference_cost=0.20, tool_cost=0.10, latency_cost=0.03, human_cost=0.00
+            ),
         ),
     ]
     metrics = compute_cnsr_from_results(results)
@@ -200,9 +180,9 @@ def test_cost_breakdown_in_results():
 
     # Check mean values with tolerance for floating point
     assert abs(breakdown["mean_inference_cost"] - 0.15) < 1e-10  # (0.10 + 0.20) / 2
-    assert abs(breakdown["mean_tool_cost"] - 0.075) < 1e-10      # (0.05 + 0.10) / 2
-    assert abs(breakdown["mean_latency_cost"] - 0.025) < 1e-10   # (0.02 + 0.03) / 2
-    assert abs(breakdown["mean_human_cost"] - 2.50) < 1e-10      # (5.00 + 0.00) / 2
+    assert abs(breakdown["mean_tool_cost"] - 0.075) < 1e-10  # (0.05 + 0.10) / 2
+    assert abs(breakdown["mean_latency_cost"] - 0.025) < 1e-10  # (0.02 + 0.03) / 2
+    assert abs(breakdown["mean_human_cost"] - 2.50) < 1e-10  # (5.00 + 0.00) / 2
     print("✓ test_cost_breakdown_in_results passed")
 
 
@@ -210,17 +190,21 @@ def test_paper_example_system_a():
     """Test paper example: System A - 80% success at $0.50/task."""
     results = []
     for i in range(80):
-        results.append(TaskResult(
-            task_id=f"a_{i}",
-            success=True,
-            cost=TaskCostBreakdown(inference_cost=0.50)
-        ))
+        results.append(
+            TaskResult(
+                task_id=f"a_{i}",
+                success=True,
+                cost=TaskCostBreakdown(inference_cost=0.50),
+            )
+        )
     for i in range(20):
-        results.append(TaskResult(
-            task_id=f"a_fail_{i}",
-            success=False,
-            cost=TaskCostBreakdown(inference_cost=0.50)
-        ))
+        results.append(
+            TaskResult(
+                task_id=f"a_fail_{i}",
+                success=False,
+                cost=TaskCostBreakdown(inference_cost=0.50),
+            )
+        )
 
     metrics = compute_cnsr_from_results(results)
     # CNSR = 0.80 / 0.50 = 1.6
@@ -234,17 +218,21 @@ def test_paper_example_system_b():
     """Test paper example: System B - 90% success at $2.00/task."""
     results = []
     for i in range(90):
-        results.append(TaskResult(
-            task_id=f"b_{i}",
-            success=True,
-            cost=TaskCostBreakdown(inference_cost=2.00)
-        ))
+        results.append(
+            TaskResult(
+                task_id=f"b_{i}",
+                success=True,
+                cost=TaskCostBreakdown(inference_cost=2.00),
+            )
+        )
     for i in range(10):
-        results.append(TaskResult(
-            task_id=f"b_fail_{i}",
-            success=False,
-            cost=TaskCostBreakdown(inference_cost=2.00)
-        ))
+        results.append(
+            TaskResult(
+                task_id=f"b_fail_{i}",
+                success=False,
+                cost=TaskCostBreakdown(inference_cost=2.00),
+            )
+        )
 
     metrics = compute_cnsr_from_results(results)
     # CNSR = 0.90 / 2.00 = 0.45
@@ -258,21 +246,29 @@ def test_system_a_better_than_b_by_cnsr():
     """System A (lower success, lower cost) beats System B by CNSR."""
     # System A: 80% @ $0.50 -> CNSR 1.6
     results_a = [
-        TaskResult(task_id=f"a_{i}", success=(i < 80),
-                  cost=TaskCostBreakdown(inference_cost=0.50))
+        TaskResult(
+            task_id=f"a_{i}",
+            success=(i < 80),
+            cost=TaskCostBreakdown(inference_cost=0.50),
+        )
         for i in range(100)
     ]
     # System B: 90% @ $2.00 -> CNSR 0.45
     results_b = [
-        TaskResult(task_id=f"b_{i}", success=(i < 90),
-                  cost=TaskCostBreakdown(inference_cost=2.00))
+        TaskResult(
+            task_id=f"b_{i}",
+            success=(i < 90),
+            cost=TaskCostBreakdown(inference_cost=2.00),
+        )
         for i in range(100)
     ]
 
     cnsr_a = compute_cnsr_from_results(results_a)["cnsr"]
     cnsr_b = compute_cnsr_from_results(results_b)["cnsr"]
 
-    assert cnsr_a > cnsr_b, "System A should have higher CNSR despite lower success rate"
+    assert (
+        cnsr_a > cnsr_b
+    ), "System A should have higher CNSR despite lower success rate"
     print("✓ test_system_a_better_than_b_by_cnsr passed")
 
 
@@ -284,11 +280,8 @@ def test_human_intervention_impact_on_cnsr():
             task_id="auto_1",
             success=True,
             cost=TaskCostBreakdown(
-                inference_cost=0.10,
-                tool_cost=0.05,
-                latency_cost=0.01,
-                human_cost=0.0
-            )
+                inference_cost=0.10, tool_cost=0.05, latency_cost=0.01, human_cost=0.0
+            ),
         )
     ]
 
@@ -301,8 +294,8 @@ def test_human_intervention_impact_on_cnsr():
                 inference_cost=0.10,
                 tool_cost=0.05,
                 latency_cost=0.01,
-                human_cost=5.0  # One human intervention
-            )
+                human_cost=5.0,  # One human intervention
+            ),
         )
     ]
 
@@ -310,8 +303,9 @@ def test_human_intervention_impact_on_cnsr():
     cnsr_human = compute_cnsr_from_results(results_human)["cnsr"]
 
     # CNSR with human intervention should be much lower
-    assert cnsr_human < cnsr_auto / 10, \
-        "Human intervention should dramatically reduce CNSR"
+    assert (
+        cnsr_human < cnsr_auto / 10
+    ), "Human intervention should dramatically reduce CNSR"
     print("✓ test_human_intervention_impact_on_cnsr passed")
 
 
@@ -328,7 +322,7 @@ def test_backwards_compatibility():
         TaskResult(
             task_id=f"t_{i}",
             success=(i < 80),
-            cost=TaskCostBreakdown(inference_cost=0.50)
+            cost=TaskCostBreakdown(inference_cost=0.50),
         )
         for i in range(100)
     ]

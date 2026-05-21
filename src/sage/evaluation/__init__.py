@@ -185,7 +185,9 @@ def goal_drift_score(
         ...     print("Warning: significant goal drift detected")
     """
     # Cosine similarity computation
-    dot_product = sum(a * b for a, b in zip(original_goal_embedding, current_goal_embedding))
+    dot_product = sum(
+        a * b for a, b in zip(original_goal_embedding, current_goal_embedding)
+    )
     norm_a = sum(a * a for a in original_goal_embedding) ** 0.5
     norm_b = sum(b * b for b in current_goal_embedding) ** 0.5
 
@@ -377,7 +379,9 @@ class LongHorizonEvaluator:
         # Calculate cost variance
         if len(self.costs) >= 2:
             mean_cost = total_cost / total_tasks if total_tasks else 0
-            cost_variance = sum((c - mean_cost) ** 2 for c in self.costs) / len(self.costs)
+            cost_variance = sum((c - mean_cost) ** 2 for c in self.costs) / len(
+                self.costs
+            )
         else:
             cost_variance = 0.0
 

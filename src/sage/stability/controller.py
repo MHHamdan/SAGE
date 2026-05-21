@@ -32,12 +32,14 @@ logger = logging.getLogger(__name__)
 
 # ── Signal + decision types ────────────────────────────────────────────────────
 
+
 @dataclass(frozen=True)
 class MonitorSignals:
     """Compact summary of monitor state, consumed by all controllers."""
-    drift_score: float           # [0, 1]; 0 = aligned with goal
-    oscillation_score: float     # [0, 1]; fraction of recent action overlap
-    fidelity_score: float        # [0, 1]; schema validation pass rate
+
+    drift_score: float  # [0, 1]; 0 = aligned with goal
+    oscillation_score: float  # [0, 1]; fraction of recent action overlap
+    fidelity_score: float  # [0, 1]; schema validation pass rate
     convergence_progress: float  # [0, 1]; best goal similarity seen so far
     turn: int
     cost_so_far: float
@@ -46,12 +48,14 @@ class MonitorSignals:
 @dataclass(frozen=True)
 class InterventionDecision:
     """Output of Controller.decide()."""
+
     intervention: Optional[Intervention]  # None = NoOp
     rationale: str
-    confidence: float                     # [0, 1]
+    confidence: float  # [0, 1]
 
 
 # ── Controller protocol ────────────────────────────────────────────────────────
+
 
 @runtime_checkable
 class Controller(Protocol):
@@ -60,6 +64,7 @@ class Controller(Protocol):
 
 
 # ── Concrete policies ─────────────────────────────────────────────────────────
+
 
 class NoControl:
     """Baseline: never intervenes.  Required for fair comparison."""
@@ -84,9 +89,12 @@ class FixedScheduleController:
     Non-trivial baseline: tests whether *any* periodic intervention beats
     NoControl, isolating the value of adaptive timing vs. fixed timing.
     """
+
     name: str = field(default="FixedSchedule", init=False)
     reanchor_every_k: int = 10
-    _intervention: GoalReanchor = field(default_factory=GoalReanchor, init=False, repr=False)
+    _intervention: GoalReanchor = field(
+        default_factory=GoalReanchor, init=False, repr=False
+    )
 
     def decide(self, signals: MonitorSignals) -> InterventionDecision:
         if signals.turn % self.reanchor_every_k == 0:
@@ -117,6 +125,7 @@ class ThresholdController:
     Cooldown prevents thrashing: no intervention more often than every
     cooldown_turns turns.
     """
+
     name: str = field(default="ThresholdController", init=False)
     drift_threshold: float = 0.30
     oscillation_threshold: float = 0.60
@@ -124,12 +133,19 @@ class ThresholdController:
     cooldown_turns: int = 3
 
     _last_intervention_turn: int = field(default=-1000, init=False, repr=False)
-    _reanchor: GoalReanchor = field(default_factory=GoalReanchor, init=False, repr=False)
+    _reanchor: GoalReanchor = field(
+        default_factory=GoalReanchor, init=False, repr=False
+    )
     _replan: ForceReplan = field(default_factory=ForceReplan, init=False, repr=False)
-    _retry: SchemaValidatedRetry = field(default_factory=SchemaValidatedRetry, init=False, repr=False)
+    _retry: SchemaValidatedRetry = field(
+        default_factory=SchemaValidatedRetry, init=False, repr=False
+    )
 
     def _in_cooldown(self, turn: int) -> bool:
-        return self._last_intervention_turn > -1000 and (turn - self._last_intervention_turn) < self.cooldown_turns
+        return (
+            self._last_intervention_turn > -1000
+            and (turn - self._last_intervention_turn) < self.cooldown_turns
+        )
 
     def decide(self, signals: MonitorSignals) -> InterventionDecision:
         if self._in_cooldown(signals.turn):
@@ -150,7 +166,9 @@ class ThresholdController:
 
         if signals.oscillation_score > self.oscillation_threshold:
             self._last_intervention_turn = signals.turn
-            conf = min(1.0, signals.oscillation_score / max(self.oscillation_threshold, 1e-6))
+            conf = min(
+                1.0, signals.oscillation_score / max(self.oscillation_threshold, 1e-6)
+            )
             return InterventionDecision(
                 intervention=self._replan,
                 rationale=f"oscillation={signals.oscillation_score:.3f} > threshold={self.oscillation_threshold}",
@@ -159,7 +177,11 @@ class ThresholdController:
 
         if signals.fidelity_score < self.fidelity_threshold:
             self._last_intervention_turn = signals.turn
-            conf = min(1.0, (self.fidelity_threshold - signals.fidelity_score) / max(self.fidelity_threshold, 1e-6))
+            conf = min(
+                1.0,
+                (self.fidelity_threshold - signals.fidelity_score)
+                / max(self.fidelity_threshold, 1e-6),
+            )
             return InterventionDecision(
                 intervention=self._retry,
                 rationale=f"fidelity={signals.fidelity_score:.3f} < threshold={self.fidelity_threshold}",
@@ -184,6 +206,7 @@ class PredictiveController:
     fire_at_p.  Same cooldown mechanic as ThresholdController for fair
     comparison.
     """
+
     name: str = field(default="PredictiveController", init=False)
     predictor: object  # FailurePredictor — typed as object to avoid circular import
     lead_time_k: int = 5
@@ -192,11 +215,16 @@ class PredictiveController:
 
     _last_intervention_turn: int = field(default=-1000, init=False, repr=False)
     _signal_history: list = field(default_factory=list, init=False, repr=False)
-    _reanchor: GoalReanchor = field(default_factory=GoalReanchor, init=False, repr=False)
+    _reanchor: GoalReanchor = field(
+        default_factory=GoalReanchor, init=False, repr=False
+    )
     _replan: ForceReplan = field(default_factory=ForceReplan, init=False, repr=False)
 
     def _in_cooldown(self, turn: int) -> bool:
-        return self._last_intervention_turn > -1000 and (turn - self._last_intervention_turn) < self.cooldown_turns
+        return (
+            self._last_intervention_turn > -1000
+            and (turn - self._last_intervention_turn) < self.cooldown_turns
+        )
 
     def decide(self, signals: MonitorSignals) -> InterventionDecision:
         self._signal_history.append(signals)
@@ -238,4 +266,9 @@ class PredictiveController:
 
 # ── Registry ──────────────────────────────────────────────────────────────────
 
-CONTROLLER_NAMES = ["NoControl", "FixedSchedule", "ThresholdController", "PredictiveController"]
+CONTROLLER_NAMES = [
+    "NoControl",
+    "FixedSchedule",
+    "ThresholdController",
+    "PredictiveController",
+]

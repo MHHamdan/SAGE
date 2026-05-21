@@ -25,19 +25,19 @@ from sage.evaluation.autonomy_validator import (
     GenuineAgent,
     ScriptedAgent,
     FragileAgent,
-    FixedStepAgent
+    FixedStepAgent,
 )
 
 from sage.evaluation.autonomy_benchmarks import (
     ALL_AUTONOMY_TASKS,
     TASKS_BY_CRITERION,
-    get_autonomy_benchmark_statistics
+    get_autonomy_benchmark_statistics,
 )
-
 
 # ============================================================
 # Test Action Selection Freedom
 # ============================================================
+
 
 class TestActionSelectionFreedom:
     """Tests for action selection freedom validation."""
@@ -61,12 +61,15 @@ class TestActionSelectionFreedom:
         result = validator.validate_action_selection_freedom(agent)
 
         assert result.passed is False
-        assert "predetermined" in result.failure_reason.lower() or \
-               "same" in result.failure_reason.lower() or \
-               result.evidence["variation_ratio"] < 0.5
+        assert (
+            "predetermined" in result.failure_reason.lower()
+            or "same" in result.failure_reason.lower()
+            or result.evidence["variation_ratio"] < 0.5
+        )
 
     def test_conditional_branching_is_not_freedom(self):
         """Agent with predetermined if/else branches should show limited variation."""
+
         # Create a mock agent with conditional but limited branching
         class ConditionalAgent:
             def __init__(self):
@@ -109,6 +112,7 @@ class TestActionSelectionFreedom:
 # Test Goal-Directed Persistence
 # ============================================================
 
+
 class TestGoalDirectedPersistence:
     """Tests for goal-directed persistence validation."""
 
@@ -131,11 +135,14 @@ class TestGoalDirectedPersistence:
         result = validator.validate_goal_directed_persistence(agent)
 
         assert result.passed is False
-        assert "gave up" in result.failure_reason.lower() or \
-               result.evidence["persistence_ratio"] < 0.5
+        assert (
+            "gave up" in result.failure_reason.lower()
+            or result.evidence["persistence_ratio"] < 0.5
+        )
 
     def test_agent_persists_without_adaptation_fails(self):
         """Agent that retries same approach repeatedly should have low strategy changes."""
+
         class StubornAgent:
             def __init__(self):
                 self.name = "StubornAgent"
@@ -180,6 +187,7 @@ class TestGoalDirectedPersistence:
 # Test Dynamic Termination
 # ============================================================
 
+
 class TestDynamicTermination:
     """Tests for dynamic termination validation."""
 
@@ -205,6 +213,7 @@ class TestDynamicTermination:
 
     def test_premature_termination_detection(self):
         """Test detection of premature termination."""
+
         class PrematureAgent:
             def __init__(self):
                 self.name = "PrematureAgent"
@@ -238,6 +247,7 @@ class TestDynamicTermination:
 # ============================================================
 # Test Error Recovery
 # ============================================================
+
 
 class TestErrorRecovery:
     """Tests for error recovery validation."""
@@ -287,6 +297,7 @@ class TestErrorRecovery:
 # Test Autonomy Level Classification
 # ============================================================
 
+
 class TestAutonomyLevelClassification:
     """Tests for autonomy level classification."""
 
@@ -296,7 +307,7 @@ class TestAutonomyLevelClassification:
             action_selection_freedom=False,
             goal_directed_persistence=False,
             dynamic_termination=False,
-            error_recovery=False
+            error_recovery=False,
         )
 
         level = AutonomyLevel.from_criteria_count(criteria.criteria_met)
@@ -310,7 +321,7 @@ class TestAutonomyLevelClassification:
             action_selection_freedom=True,
             goal_directed_persistence=False,
             dynamic_termination=False,
-            error_recovery=False
+            error_recovery=False,
         )
 
         level = AutonomyLevel.from_criteria_count(criteria.criteria_met)
@@ -324,7 +335,7 @@ class TestAutonomyLevelClassification:
             action_selection_freedom=True,
             goal_directed_persistence=True,
             dynamic_termination=False,
-            error_recovery=False
+            error_recovery=False,
         )
 
         level = AutonomyLevel.from_criteria_count(criteria.criteria_met)
@@ -338,7 +349,7 @@ class TestAutonomyLevelClassification:
             action_selection_freedom=True,
             goal_directed_persistence=True,
             dynamic_termination=True,
-            error_recovery=False
+            error_recovery=False,
         )
 
         level = AutonomyLevel.from_criteria_count(criteria.criteria_met)
@@ -352,7 +363,7 @@ class TestAutonomyLevelClassification:
             action_selection_freedom=True,
             goal_directed_persistence=True,
             dynamic_termination=True,
-            error_recovery=True
+            error_recovery=True,
         )
 
         level = AutonomyLevel.from_criteria_count(criteria.criteria_met)
@@ -365,6 +376,7 @@ class TestAutonomyLevelClassification:
 # ============================================================
 # Test Full Validation Pipeline
 # ============================================================
+
 
 class TestFullValidation:
     """Tests for the complete validation pipeline."""
@@ -397,10 +409,10 @@ class TestFullValidation:
 
         result = validator.validate_all(agent)
 
-        assert hasattr(result, 'level')
-        assert hasattr(result, 'criteria')
-        assert hasattr(result, 'test_results')
-        assert hasattr(result, 'validation_time_seconds')
+        assert hasattr(result, "level")
+        assert hasattr(result, "criteria")
+        assert hasattr(result, "test_results")
+        assert hasattr(result, "validation_time_seconds")
 
         assert len(result.test_results) == 4
         assert AutonomyCriterion.ACTION_SELECTION_FREEDOM in result.test_results
@@ -426,6 +438,7 @@ class TestFullValidation:
 # Test Benchmark Coverage
 # ============================================================
 
+
 class TestBenchmarkCoverage:
     """Tests for benchmark task coverage."""
 
@@ -439,7 +452,9 @@ class TestBenchmarkCoverage:
         """Each criterion should have exactly 4 tasks."""
         for criterion in AutonomyCriterion:
             tasks = TASKS_BY_CRITERION.get(criterion, [])
-            assert len(tasks) == 4, f"Criterion {criterion.value} has {len(tasks)} tasks, expected 4"
+            assert (
+                len(tasks) == 4
+            ), f"Criterion {criterion.value} has {len(tasks)} tasks, expected 4"
 
     def test_total_sixteen_tasks(self):
         """Should have exactly 16 autonomy tasks."""
@@ -476,6 +491,7 @@ class TestBenchmarkCoverage:
 # Test Paper Alignment
 # ============================================================
 
+
 class TestPaperAlignment:
     """Tests for alignment with paper Section IV-A."""
 
@@ -489,7 +505,7 @@ class TestPaperAlignment:
             "action_selection_freedom",
             "goal_directed_persistence",
             "dynamic_termination",
-            "error_recovery"
+            "error_recovery",
         }
         assert criterion_names == expected
 
@@ -504,7 +520,7 @@ class TestPaperAlignment:
             "CONDITIONAL",
             "GUIDED_AGENT",
             "BOUNDED_AGENT",
-            "FULL_AGENT"
+            "FULL_AGENT",
         }
         assert level_names == expected
 
@@ -522,7 +538,7 @@ class TestPaperAlignment:
             action_selection_freedom=True,
             goal_directed_persistence=True,
             dynamic_termination=True,
-            error_recovery=False
+            error_recovery=False,
         )
         assert partial.is_genuine_agent is False
 
@@ -530,7 +546,7 @@ class TestPaperAlignment:
             action_selection_freedom=True,
             goal_directed_persistence=True,
             dynamic_termination=True,
-            error_recovery=True
+            error_recovery=True,
         )
         assert full.is_genuine_agent is True
 
@@ -538,6 +554,7 @@ class TestPaperAlignment:
 # ============================================================
 # Test Determinism
 # ============================================================
+
 
 class TestDeterminism:
     """Tests for deterministic behavior."""
@@ -555,7 +572,9 @@ class TestDeterminism:
         result2 = validator2.validate_action_selection_freedom(agent)
 
         assert result1.passed == result2.passed
-        assert result1.evidence["variation_ratio"] == result2.evidence["variation_ratio"]
+        assert (
+            result1.evidence["variation_ratio"] == result2.evidence["variation_ratio"]
+        )
 
     def test_different_seed_may_differ(self):
         """Different seeds may produce different scenarios."""

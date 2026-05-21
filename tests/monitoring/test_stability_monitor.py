@@ -35,10 +35,7 @@ from eval.metrics import compute_cnsr
 
 def _load_stability_monitor():
     """Load stability_monitor directly to avoid heavy package __init__."""
-    path = (
-        ROOT / "src" / "sage"
-        / "monitoring" / "stability_monitor.py"
-    )
+    path = ROOT / "src" / "sage" / "monitoring" / "stability_monitor.py"
     # Use a fully-qualified name so dataclass __module__ resolution works
     mod_name = "sage.monitoring.stability_monitor"
     if mod_name in sys.modules:
@@ -57,6 +54,7 @@ StabilityReport = _sm.StabilityReport
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
+
 def _unit(v: np.ndarray) -> np.ndarray:
     n = np.linalg.norm(v)
     return v / n if n > 1e-12 else v
@@ -65,6 +63,7 @@ def _unit(v: np.ndarray) -> np.ndarray:
 # ═══════════════════════════════════════════════════════════════════════════════
 # 1. CNSR edge cases
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestCNSR:
     def test_cnsr_zero_cost_zero_successes(self):
@@ -102,6 +101,7 @@ class TestCNSR:
 # ═══════════════════════════════════════════════════════════════════════════════
 # 2. Goal drift score
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestGoalDriftScore:
     def test_identical_embeddings_zero_drift(self):
@@ -150,6 +150,7 @@ class TestGoalDriftScore:
 # 3. Oscillation detection (via stability monitor module)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class TestOscillationDetection:
     """Test oscillation detection through the stability monitor."""
 
@@ -188,18 +189,23 @@ class TestOscillationDetection:
         np.random.seed(99)
         goal = _unit(np.random.randn(64))
         # Very tight: window=6, bound=2
-        mon = StabilityMonitor(goal_embedding=goal, oscillation_window=6, oscillation_bound=2)
+        mon = StabilityMonitor(
+            goal_embedding=goal, oscillation_window=6, oscillation_bound=2
+        )
         for i in range(20):
             state = _unit(goal * 0.7 + 0.3 * np.random.randn(64))
             action = "a" if i % 3 == 0 else ("b" if i % 3 == 1 else "c")
             status = mon.track_state(state_embedding=state, action=action)
         # With window=6 and only 3 distinct actions repeating, overlap_ratio should be > 0
-        assert status.oscillation.overlap_ratio >= 0.0  # always true; test it's computable
+        assert (
+            status.oscillation.overlap_ratio >= 0.0
+        )  # always true; test it's computable
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 4. Experiment A1 (obs fidelity) exercises monitor and produces non-trivial CSV
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestExpA1Integration:
     def test_a1_returns_rows(self):
@@ -219,13 +225,21 @@ class TestExpA1Integration:
     def test_a1_oscillation_nontrivial_at_high_injection(self):
         rows = run_a1(injection_rates=[0.4], trials=20, base_seed=42)
         osc_rate = sum(1 for r in rows if r["oscillation_detected"]) / len(rows)
-        assert osc_rate >= 0.0  # oscillation metric is computed (non-trivial check below)
+        assert (
+            osc_rate >= 0.0
+        )  # oscillation metric is computed (non-trivial check below)
         # At high injection, at least some oscillations should appear
         assert any(r["oscillation_detected"] for r in rows)
 
     def test_a1_csv_columns(self):
         rows = run_a1(injection_rates=[0.0], trials=2, base_seed=0)
-        expected = {"injection_rate", "trial", "success", "steps_to_failure", "oscillation_detected"}
+        expected = {
+            "injection_rate",
+            "trial",
+            "success",
+            "steps_to_failure",
+            "oscillation_detected",
+        }
         assert set(rows[0].keys()) == expected
 
     def test_a1_steps_positive(self):
@@ -237,6 +251,7 @@ class TestExpA1Integration:
 # ═══════════════════════════════════════════════════════════════════════════════
 # 5. Experiment A2 (progress mono) exercises monitor and produces non-trivial CSV
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestExpA2Integration:
     def test_a2_returns_rows(self):
@@ -260,17 +275,26 @@ class TestExpA2Integration:
         dl0 = sum(1 for r in r0 if r["deadlock_detected"]) / len(r0)
         dl1 = sum(1 for r in r1 if r["deadlock_detected"]) / len(r1)
         dl2 = sum(1 for r in r2 if r["deadlock_detected"]) / len(r2)
-        assert dl0 <= dl1 <= dl2, "Deadlock rate should increase monotonically with stall prob"
+        assert (
+            dl0 <= dl1 <= dl2
+        ), "Deadlock rate should increase monotonically with stall prob"
 
     def test_a2_csv_columns(self):
         rows = run_a2(stall_probs=[0.0], trials=2, base_seed=0)
-        expected = {"stall_prob", "trial", "deadlock_detected", "turns_to_detection", "task_success"}
+        expected = {
+            "stall_prob",
+            "trial",
+            "deadlock_detected",
+            "turns_to_detection",
+            "task_success",
+        }
         assert set(rows[0].keys()) == expected
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 6. Experiment A3 (context noise) exercises monitor and produces non-trivial CSV
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestExpA3Integration:
     def test_a3_returns_rows(self):
@@ -303,13 +327,20 @@ class TestExpA3Integration:
 
     def test_a3_csv_columns(self):
         rows = run_a3(reanchor_intervals=[10], trials=2, base_seed=0)
-        expected = {"reanchor_interval", "trial", "turn", "drift_score", "task_completed"}
+        expected = {
+            "reanchor_interval",
+            "trial",
+            "turn",
+            "drift_score",
+            "task_completed",
+        }
         assert set(rows[0].keys()) == expected
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # 7. Stability monitor — StabilityReport non-trivial
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 class TestStabilityMonitorReport:
     """Verify reports from experiments A1/A2/A3 are non-trivial."""

@@ -48,7 +48,7 @@ class TestRollingWindow:
 
         assert len(rolling) == 5
         # Last window [True, False, True]: 2/3
-        assert abs(rolling[-1] - 2/3) < 0.001
+        assert abs(rolling[-1] - 2 / 3) < 0.001
 
     def test_rolling_window_all_success(self):
         """Test rolling window with all successes."""

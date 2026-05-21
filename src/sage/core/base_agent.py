@@ -10,7 +10,6 @@ from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from sage.core.llm_client import LLMClient
 from sage.core.exceptions import AgentError
 
-
 logger = logging.getLogger(__name__)
 
 

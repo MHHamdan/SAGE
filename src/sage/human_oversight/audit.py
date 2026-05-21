@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 class AuditEventType(Enum):
     """Types of auditable events in human oversight."""
+
     # Approval events
     APPROVAL_REQUESTED = "approval_requested"
     APPROVAL_GRANTED = "approval_granted"
@@ -80,6 +81,7 @@ class AuditEntry:
         session_id: Session identifier (if applicable)
         request_id: Request identifier (if applicable)
     """
+
     entry_id: str
     timestamp: datetime
     event_type: AuditEventType
@@ -363,10 +365,7 @@ class AuditLogger:
         """Get all audit entries."""
         return self._entries.copy()
 
-    def get_events_by_type(
-        self,
-        event_type: AuditEventType
-    ) -> List[AuditEntry]:
+    def get_events_by_type(self, event_type: AuditEventType) -> List[AuditEntry]:
         """Get entries filtered by event type.
 
         Args:
@@ -400,9 +399,7 @@ class AuditLogger:
         return [e for e in self._entries if e.request_id == request_id]
 
     def get_events_in_timerange(
-        self,
-        start: datetime,
-        end: datetime
+        self, start: datetime, end: datetime
     ) -> List[AuditEntry]:
         """Get entries within a time range.
 
@@ -413,15 +410,9 @@ class AuditLogger:
         Returns:
             Filtered list of entries
         """
-        return [
-            e for e in self._entries
-            if start <= e.timestamp <= end
-        ]
+        return [e for e in self._entries if start <= e.timestamp <= end]
 
-    def get_recent_events(
-        self,
-        hours: float = 24
-    ) -> List[AuditEntry]:
+    def get_recent_events(self, hours: float = 24) -> List[AuditEntry]:
         """Get events from the last N hours.
 
         Args:
@@ -472,33 +463,37 @@ class AuditLogger:
 
     def _export_json(self) -> str:
         """Export as JSON."""
-        return json.dumps(
-            [e.to_dict() for e in self._entries],
-            indent=2,
-            default=str
-        )
+        return json.dumps([e.to_dict() for e in self._entries], indent=2, default=str)
 
     def _export_csv(self) -> str:
         """Export as CSV."""
         output = io.StringIO()
         fieldnames = [
-            "entry_id", "timestamp", "event_type", "actor",
-            "action", "target", "outcome", "request_id"
+            "entry_id",
+            "timestamp",
+            "event_type",
+            "actor",
+            "action",
+            "target",
+            "outcome",
+            "request_id",
         ]
         writer = csv.DictWriter(output, fieldnames=fieldnames)
         writer.writeheader()
 
         for entry in self._entries:
-            writer.writerow({
-                "entry_id": entry.entry_id,
-                "timestamp": entry.timestamp.isoformat(),
-                "event_type": entry.event_type.value,
-                "actor": entry.actor or "",
-                "action": entry.action or "",
-                "target": entry.target or "",
-                "outcome": entry.outcome or "",
-                "request_id": entry.request_id or "",
-            })
+            writer.writerow(
+                {
+                    "entry_id": entry.entry_id,
+                    "timestamp": entry.timestamp.isoformat(),
+                    "event_type": entry.event_type.value,
+                    "actor": entry.actor or "",
+                    "action": entry.action or "",
+                    "target": entry.target or "",
+                    "outcome": entry.outcome or "",
+                    "request_id": entry.request_id or "",
+                }
+            )
 
         return output.getvalue()
 
@@ -526,11 +521,13 @@ class AuditLogger:
             )
 
         # Add statistics
-        lines.extend([
-            "",
-            "## Statistics",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Statistics",
+                "",
+            ]
+        )
 
         stats = self.get_statistics()
         for key, value in stats.items():
@@ -594,9 +591,7 @@ class AuditLogger:
             "time_range": {
                 "first": first.isoformat() if first else None,
                 "last": last.isoformat() if last else None,
-                "duration_hours": (
-                    duration.total_seconds() / 3600 if duration else 0
-                ),
+                "duration_hours": (duration.total_seconds() / 3600 if duration else 0),
             },
         }
 

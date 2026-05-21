@@ -10,8 +10,14 @@ from abc import ABC, abstractmethod
 from typing import Optional, List, Dict, Any, Callable
 
 from .schemas import (
-    Plan, PlanStep, PlanningContext, PlanningResult,
-    PlanStatus, StepStatus, create_plan, create_step,
+    Plan,
+    PlanStep,
+    PlanningContext,
+    PlanningResult,
+    PlanStatus,
+    StepStatus,
+    create_plan,
+    create_step,
 )
 
 logger = logging.getLogger(__name__)
@@ -108,8 +114,16 @@ class BasePlanner(ABC):
         Returns:
             Formatted prompt string
         """
-        tools_str = ", ".join(context.available_tools) if context.available_tools else "None specified"
-        constraints_str = "\n".join(f"- {c}" for c in context.constraints) if context.constraints else "None"
+        tools_str = (
+            ", ".join(context.available_tools)
+            if context.available_tools
+            else "None specified"
+        )
+        constraints_str = (
+            "\n".join(f"- {c}" for c in context.constraints)
+            if context.constraints
+            else "None"
+        )
 
         prompt = f"""You are an AI planning assistant. Create a detailed step-by-step plan to accomplish the following task.
 
@@ -207,7 +221,9 @@ Begin your plan:"""
 
             elif line.upper().startswith("RISK:"):
                 risk_str = line.split(":", 1)[1].strip().lower()
-                step_data["risk"] = {"low": 0.2, "medium": 0.5, "high": 0.8}.get(risk_str, 0.3)
+                step_data["risk"] = {"low": 0.2, "medium": 0.5, "high": 0.8}.get(
+                    risk_str, 0.3
+                )
 
             elif line.upper().startswith("DEPENDS_ON:"):
                 deps_str = line.split(":", 1)[1].strip()
@@ -334,10 +350,12 @@ class SimplePlanner(BasePlanner):
             PlanningResult with new plan
         """
         # Add failure context
-        context.history.append({
-            "action": "replan",
-            "result": f"Previous plan failed: {failure_reason}",
-        })
+        context.history.append(
+            {
+                "action": "replan",
+                "result": f"Previous plan failed: {failure_reason}",
+            }
+        )
 
         result = self.plan(context)
 

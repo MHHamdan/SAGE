@@ -77,7 +77,9 @@ class TestReplayProtection:
 
         # Send messages with increasing sequence numbers
         for seq in [1, 2, 3]:
-            metadata = MessageMetadata.generate(sender_id="agent-1", sequence_number=seq)
+            metadata = MessageMetadata.generate(
+                sender_id="agent-1", sequence_number=seq
+            )
             protection.validate(metadata)
 
         # Replay with old sequence should fail
@@ -100,6 +102,7 @@ class TestNonceManager:
 
         # Second use: replay
         from sage.protocols.a2a import ReplayAttackDetected
+
         with pytest.raises(ReplayAttackDetected):
             manager.check_and_add("nonce1", time.time())
 

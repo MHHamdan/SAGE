@@ -25,8 +25,8 @@ from sage.evaluation.incident_tracker import (
     IncidentStatistics,
 )
 
-
 # Test fixtures
+
 
 @pytest.fixture
 def tracker():
@@ -51,25 +51,26 @@ def populated_tracker():
         incident_type=IncidentType.GUARDRAIL_ACTIVATION,
         severity=IncidentSeverity.MEDIUM,
         description="Blocked dangerous action",
-        context={"task_id": "task_1"}
+        context={"task_id": "task_1"},
     )
     tracker.record_incident(
         incident_type=IncidentType.TOOL_FAILURE,
         severity=IncidentSeverity.LOW,
         description="API timeout",
-        context={"task_id": "task_2"}
+        context={"task_id": "task_2"},
     )
     tracker.record_incident(
         incident_type=IncidentType.POLICY_VIOLATION,
         severity=IncidentSeverity.HIGH,
         description="Attempted unauthorized access",
-        context={"task_id": "task_3"}
+        context={"task_id": "task_3"},
     )
 
     return tracker
 
 
 # Tests for IncidentType enum
+
 
 class TestIncidentType:
     """Tests for IncidentType enum."""
@@ -87,6 +88,7 @@ class TestIncidentType:
 
 
 # Tests for IncidentSeverity enum
+
 
 class TestIncidentSeverity:
     """Tests for IncidentSeverity enum."""
@@ -113,6 +115,7 @@ class TestIncidentSeverity:
 
 # Tests for Incident dataclass
 
+
 class TestIncident:
     """Tests for Incident dataclass."""
 
@@ -124,7 +127,7 @@ class TestIncident:
             incident_type=IncidentType.TOOL_FAILURE,
             severity=IncidentSeverity.MEDIUM,
             description="Test incident",
-            context={"key": "value"}
+            context={"key": "value"},
         )
 
         assert incident.incident_id == "test-123"
@@ -140,7 +143,7 @@ class TestIncident:
             timestamp=now,
             incident_type=IncidentType.GUARDRAIL_ACTIVATION,
             severity=IncidentSeverity.HIGH,
-            description="Test incident"
+            description="Test incident",
         )
 
         data = incident.to_dict()
@@ -156,7 +159,7 @@ class TestIncident:
             "timestamp": datetime.now().isoformat(),
             "incident_type": "tool_failure",
             "severity": "LOW",
-            "description": "Test"
+            "description": "Test",
         }
 
         incident = Incident.from_dict(data)
@@ -175,7 +178,7 @@ class TestIncident:
             description="Test",
             resolved=True,
             resolution="Fixed",
-            resolution_timestamp=now + timedelta(minutes=30)
+            resolution_timestamp=now + timedelta(minutes=30),
         )
 
         ttr = incident.time_to_resolution()
@@ -189,13 +192,14 @@ class TestIncident:
             timestamp=datetime.now(),
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test"
+            description="Test",
         )
 
         assert incident.time_to_resolution() is None
 
 
 # Tests for IncidentTracker recording
+
 
 class TestIncidentTrackerRecording:
     """Tests for incident recording."""
@@ -205,7 +209,7 @@ class TestIncidentTrackerRecording:
         incident = tracker.record_incident(
             incident_type=IncidentType.GUARDRAIL_ACTIVATION,
             severity=IncidentSeverity.MEDIUM,
-            description="Blocked action"
+            description="Blocked action",
         )
 
         assert incident.incident_id is not None
@@ -219,7 +223,7 @@ class TestIncidentTrackerRecording:
             incident_type=IncidentType.POLICY_VIOLATION,
             severity=IncidentSeverity.HIGH,
             description="Access denied",
-            context=context
+            context=context,
         )
 
         assert incident.context == context
@@ -231,7 +235,7 @@ class TestIncidentTrackerRecording:
             incident_type=IncidentType.HUMAN_INTERVENTION,
             severity=IncidentSeverity.HIGH,
             description="User intervention",
-            tags=tags
+            tags=tags,
         )
 
         assert incident.tags == tags
@@ -243,7 +247,7 @@ class TestIncidentTrackerRecording:
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
             description="Old incident",
-            timestamp=past
+            timestamp=past,
         )
 
         assert incident.timestamp == past
@@ -256,7 +260,7 @@ class TestIncidentTrackerRecording:
         incident = tracker.record_incident(
             incident_type=IncidentType.UNEXPECTED_TERMINATION,
             severity=IncidentSeverity.CRITICAL,
-            description="Critical failure"
+            description="Critical failure",
         )
 
         callback.assert_called_once_with(incident)
@@ -269,13 +273,14 @@ class TestIncidentTrackerRecording:
         tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Minor issue"
+            description="Minor issue",
         )
 
         callback.assert_not_called()
 
 
 # Tests for incident resolution
+
 
 class TestIncidentResolution:
     """Tests for resolving incidents."""
@@ -285,12 +290,11 @@ class TestIncidentResolution:
         incident = tracker.record_incident(
             incident_type=IncidentType.TOOL_FAILURE,
             severity=IncidentSeverity.MEDIUM,
-            description="API error"
+            description="API error",
         )
 
         result = tracker.resolve_incident(
-            incident.incident_id,
-            resolution="Retried successfully"
+            incident.incident_id, resolution="Retried successfully"
         )
 
         assert result is True
@@ -300,10 +304,7 @@ class TestIncidentResolution:
 
     def test_resolve_nonexistent_incident(self, tracker):
         """Should return False for nonexistent incident."""
-        result = tracker.resolve_incident(
-            "nonexistent-id",
-            resolution="N/A"
-        )
+        result = tracker.resolve_incident("nonexistent-id", resolution="N/A")
         assert result is False
 
     def test_resolve_with_custom_timestamp(self, tracker):
@@ -311,20 +312,19 @@ class TestIncidentResolution:
         incident = tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test"
+            description="Test",
         )
 
         resolve_time = datetime.now() + timedelta(hours=1)
         tracker.resolve_incident(
-            incident.incident_id,
-            resolution="Fixed",
-            timestamp=resolve_time
+            incident.incident_id, resolution="Fixed", timestamp=resolve_time
         )
 
         assert incident.resolution_timestamp == resolve_time
 
 
 # Tests for incident retrieval
+
 
 class TestIncidentRetrieval:
     """Tests for retrieving incidents."""
@@ -383,13 +383,13 @@ class TestIncidentRetrieval:
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
             description="Old",
-            timestamp=old_time
+            timestamp=old_time,
         )
         tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
             description="New",
-            timestamp=new_time
+            timestamp=new_time,
         )
 
         # Filter for recent only
@@ -402,10 +402,7 @@ class TestIncidentRetrieval:
         """Should filter resolved only."""
         # Resolve one incident
         incidents = populated_tracker.get_incidents()
-        populated_tracker.resolve_incident(
-            incidents[0].incident_id,
-            resolution="Fixed"
-        )
+        populated_tracker.resolve_incident(incidents[0].incident_id, resolution="Fixed")
 
         resolved = populated_tracker.get_incidents(resolved_only=True)
         assert len(resolved) == 1
@@ -417,6 +414,7 @@ class TestIncidentRetrieval:
 
 
 # Tests for statistics computation
+
 
 class TestIncidentStatistics:
     """Tests for statistics computation."""
@@ -442,13 +440,13 @@ class TestIncidentStatistics:
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
             description="Old",
-            timestamp=datetime.now() - timedelta(hours=48)
+            timestamp=datetime.now() - timedelta(hours=48),
         )
         # Record recent incident
         tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Recent"
+            description="Recent",
         )
 
         stats_24h = tracker.get_statistics(window_hours=24)
@@ -460,24 +458,20 @@ class TestIncidentStatistics:
         i1 = tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test 1"
+            description="Test 1",
         )
         i2 = tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test 2"
+            description="Test 2",
         )
 
         # Resolve with known times
         tracker.resolve_incident(
-            i1.incident_id,
-            "Fixed",
-            timestamp=i1.timestamp + timedelta(minutes=10)
+            i1.incident_id, "Fixed", timestamp=i1.timestamp + timedelta(minutes=10)
         )
         tracker.resolve_incident(
-            i2.incident_id,
-            "Fixed",
-            timestamp=i2.timestamp + timedelta(minutes=20)
+            i2.incident_id, "Fixed", timestamp=i2.timestamp + timedelta(minutes=20)
         )
 
         stats = tracker.get_statistics()
@@ -497,6 +491,7 @@ class TestIncidentStatistics:
 
 # Tests for incident rate calculation
 
+
 class TestIncidentRateCalculation:
     """Tests for rate calculation."""
 
@@ -507,7 +502,7 @@ class TestIncidentRateCalculation:
             tracker.record_incident(
                 incident_type=IncidentType.TIMEOUT,
                 severity=IncidentSeverity.LOW,
-                description="Test"
+                description="Test",
             )
 
         rate = tracker.get_incident_rate(window_hours=1)
@@ -519,7 +514,7 @@ class TestIncidentRateCalculation:
         tracker_with_task_counter.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test"
+            description="Test",
         )
 
         stats = tracker_with_task_counter.get_statistics()
@@ -529,6 +524,7 @@ class TestIncidentRateCalculation:
 
 # Tests for threshold breach detection
 
+
 class TestThresholdBreachDetection:
     """Tests for threshold detection."""
 
@@ -537,12 +533,10 @@ class TestThresholdBreachDetection:
         tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test"
+            description="Test",
         )
 
-        breached, reason = tracker.check_threshold_breach(
-            max_rate_per_hour=10.0
-        )
+        breached, reason = tracker.check_threshold_breach(max_rate_per_hour=10.0)
         assert not breached
 
     def test_rate_threshold_breach(self, tracker):
@@ -552,12 +546,11 @@ class TestThresholdBreachDetection:
             tracker.record_incident(
                 incident_type=IncidentType.TIMEOUT,
                 severity=IncidentSeverity.LOW,
-                description="Test"
+                description="Test",
             )
 
         breached, reason = tracker.check_threshold_breach(
-            max_rate_per_hour=5.0,
-            window_hours=1
+            max_rate_per_hour=5.0, window_hours=1
         )
 
         # Should breach if all 10 in 1 hour
@@ -571,23 +564,22 @@ class TestThresholdBreachDetection:
         tracker.record_incident(
             incident_type=IncidentType.UNEXPECTED_TERMINATION,
             severity=IncidentSeverity.CRITICAL,
-            description="Critical 1"
+            description="Critical 1",
         )
         tracker.record_incident(
             incident_type=IncidentType.UNEXPECTED_TERMINATION,
             severity=IncidentSeverity.CRITICAL,
-            description="Critical 2"
+            description="Critical 2",
         )
 
-        breached, reason = tracker.check_threshold_breach(
-            max_critical_count=1
-        )
+        breached, reason = tracker.check_threshold_breach(max_critical_count=1)
 
         assert breached
         assert "critical" in reason.lower()
 
 
 # Tests for report export
+
 
 class TestReportExport:
     """Tests for report export."""
@@ -626,6 +618,7 @@ class TestReportExport:
 
 # Tests for trend detection
 
+
 class TestTrendDetection:
     """Tests for trend detection."""
 
@@ -638,7 +631,7 @@ class TestTrendDetection:
                 incident_type=IncidentType.TIMEOUT,
                 severity=IncidentSeverity.LOW,
                 description="Test",
-                timestamp=now - timedelta(hours=i)
+                timestamp=now - timedelta(hours=i),
             )
 
         stats = tracker.get_statistics(window_hours=24)
@@ -647,6 +640,7 @@ class TestTrendDetection:
 
 
 # Tests for utility methods
+
 
 class TestTrackerUtilities:
     """Tests for utility methods."""
@@ -664,12 +658,12 @@ class TestTrackerUtilities:
         tracker.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Low"
+            description="Low",
         )
         tracker.record_incident(
             incident_type=IncidentType.UNEXPECTED_TERMINATION,
             severity=IncidentSeverity.CRITICAL,
-            description="Critical"
+            description="Critical",
         )
 
         critical = tracker.get_critical_incidents()
@@ -695,6 +689,7 @@ class TestTrackerUtilities:
 
 # Tests for AggregatedIncidentTracker
 
+
 class TestAggregatedIncidentTracker:
     """Tests for multi-tracker aggregation."""
 
@@ -712,12 +707,12 @@ class TestAggregatedIncidentTracker:
         tracker1.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test 1"
+            description="Test 1",
         )
         tracker2.record_incident(
             incident_type=IncidentType.TOOL_FAILURE,
             severity=IncidentSeverity.MEDIUM,
-            description="Test 2"
+            description="Test 2",
         )
 
         combined = agg.get_combined_statistics()
@@ -737,12 +732,12 @@ class TestAggregatedIncidentTracker:
         tracker1.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test 1"
+            description="Test 1",
         )
         tracker2.record_incident(
             incident_type=IncidentType.TIMEOUT,
             severity=IncidentSeverity.LOW,
-            description="Test 2"
+            description="Test 2",
         )
 
         all_incidents = agg.get_all_incidents()
@@ -763,7 +758,7 @@ class TestAggregatedIncidentTracker:
             tracker2.record_incident(
                 incident_type=IncidentType.TIMEOUT,
                 severity=IncidentSeverity.LOW,
-                description="Test"
+                description="Test",
             )
 
         results = agg.check_any_threshold_breach(max_rate_per_hour=5.0)

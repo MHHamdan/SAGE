@@ -18,11 +18,13 @@ logger = logging.getLogger(__name__)
 
 class CapabilityAuthError(Exception):
     """Exception for capability authentication errors."""
+
     pass
 
 
 class TokenStatus(Enum):
     """Token status values."""
+
     VALID = "valid"
     EXPIRED = "expired"
     REVOKED = "revoked"
@@ -41,6 +43,7 @@ class CapabilityToken:
         ...     validity_seconds=3600,
         ... )
     """
+
     token_id: str
     agent_id: str
     capabilities: List[str]
@@ -80,7 +83,9 @@ class CapabilityToken:
         token_id = secrets.token_hex(16)
 
         # Create signature
-        payload = f"{token_id}:{agent_id}:{','.join(sorted(capabilities))}:{issuer}:{now}"
+        payload = (
+            f"{token_id}:{agent_id}:{','.join(sorted(capabilities))}:{issuer}:{now}"
+        )
         signature = hashlib.sha256(f"{payload}:{secret_key}".encode()).hexdigest()
 
         return cls(
@@ -281,9 +286,7 @@ class CapabilityAuth:
 
         # Check capability
         if not token.has_capability(capability):
-            raise CapabilityAuthError(
-                f"Token doesn't grant capability '{capability}'"
-            )
+            raise CapabilityAuthError(f"Token doesn't grant capability '{capability}'")
 
         # Check scope if specified
         if scope and token.scope and token.scope != scope:
@@ -311,7 +314,8 @@ class CapabilityAuth:
             agent_id: Agent whose tokens to revoke
         """
         to_revoke = [
-            token_id for token_id, token in self._issued_tokens.items()
+            token_id
+            for token_id, token in self._issued_tokens.items()
             if token.agent_id == agent_id
         ]
 
@@ -355,7 +359,8 @@ class CapabilityAuth:
     def cleanup_expired_tokens(self):
         """Remove expired tokens from tracking."""
         expired = [
-            token_id for token_id, token in self._issued_tokens.items()
+            token_id
+            for token_id, token in self._issued_tokens.items()
             if token.is_expired()
         ]
 

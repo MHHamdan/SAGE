@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AuditEntry:
     """Single audit log entry."""
+
     timestamp: str
     tool_name: str
     action: str
@@ -139,7 +140,7 @@ class AuditLogger:
 
             # Trim if over limit
             if len(self._entries) > self.max_entries:
-                self._entries = self._entries[-self.max_entries:]
+                self._entries = self._entries[-self.max_entries :]
 
             # Write to file if configured
             if self.output_file:

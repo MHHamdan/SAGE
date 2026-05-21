@@ -12,7 +12,6 @@ from sage.core.base_agent import BaseAgent
 from sage.core.llm_client import LLMClient
 from sage.core.exceptions import AgentError
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -208,8 +207,7 @@ class SupervisorAgent(MultiAgentOrchestrator):
             Selected agent name or None if complete
         """
         agent_descriptions = "\n".join(
-            f"- {agent.name}: {agent.description}"
-            for agent in self.agents
+            f"- {agent.name}: {agent.description}" for agent in self.agents
         )
 
         selection_prompt = f"""
@@ -276,16 +274,20 @@ Respond with just the agent name, or "COMPLETE" if the task is done.
             try:
                 response = agent.run(query)
                 responses.append(f"{selected_name}: {response}")
-                history.append({
-                    "agent": selected_name,
-                    "response": response[:500],
-                })
+                history.append(
+                    {
+                        "agent": selected_name,
+                        "response": response[:500],
+                    }
+                )
             except Exception as e:
                 logger.error(f"Agent {selected_name} failed: {e}")
-                history.append({
-                    "agent": selected_name,
-                    "error": str(e),
-                })
+                history.append(
+                    {
+                        "agent": selected_name,
+                        "error": str(e),
+                    }
+                )
 
             iterations += 1
 

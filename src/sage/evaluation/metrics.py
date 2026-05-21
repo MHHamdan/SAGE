@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 # TASK RESULT WITH FULL COST MODEL (Section XI-C)
 # =============================================================================
 
+
 @dataclass
 class TaskCostBreakdown:
     """
@@ -33,15 +34,18 @@ class TaskCostBreakdown:
         latency_cost: Time cost (seconds * opportunity cost rate)
         human_cost: Human intervention costs (approvals, corrections)
     """
+
     inference_cost: float = 0.0  # C_inference: Token costs
-    tool_cost: float = 0.0       # C_tools: Tool invocation costs
-    latency_cost: float = 0.0    # C_latency: Time costs
-    human_cost: float = 0.0      # C_human: Human intervention costs
+    tool_cost: float = 0.0  # C_tools: Tool invocation costs
+    latency_cost: float = 0.0  # C_latency: Time costs
+    human_cost: float = 0.0  # C_human: Human intervention costs
 
     @property
     def total_cost(self) -> float:
         """Total cost per Equation 5."""
-        return self.inference_cost + self.tool_cost + self.latency_cost + self.human_cost
+        return (
+            self.inference_cost + self.tool_cost + self.latency_cost + self.human_cost
+        )
 
     def to_dict(self) -> Dict[str, float]:
         """Convert to dictionary."""
@@ -50,7 +54,7 @@ class TaskCostBreakdown:
             "tool_cost": self.tool_cost,
             "latency_cost": self.latency_cost,
             "human_cost": self.human_cost,
-            "total_cost": self.total_cost
+            "total_cost": self.total_cost,
         }
 
     def __add__(self, other: "TaskCostBreakdown") -> "TaskCostBreakdown":
@@ -59,7 +63,7 @@ class TaskCostBreakdown:
             inference_cost=self.inference_cost + other.inference_cost,
             tool_cost=self.tool_cost + other.tool_cost,
             latency_cost=self.latency_cost + other.latency_cost,
-            human_cost=self.human_cost + other.human_cost
+            human_cost=self.human_cost + other.human_cost,
         )
 
 
@@ -70,6 +74,7 @@ class TaskResult:
 
     Used for computing CNSR with the proper 4-component cost model.
     """
+
     task_id: str
     success: bool
     cost: TaskCostBreakdown = field(default_factory=TaskCostBreakdown)
@@ -87,13 +92,12 @@ class TaskResult:
             "duration_seconds": self.duration_seconds,
             "steps_taken": self.steps_taken,
             "error": self.error,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
 
 def compute_cnsr_from_results(
-    results: List[TaskResult],
-    epsilon: float = 1e-6
+    results: List[TaskResult], epsilon: float = 1e-6
 ) -> Dict[str, float]:
     """
     Compute CNSR using the full 4-component cost model (Section XI-C).
@@ -116,7 +120,7 @@ def compute_cnsr_from_results(
             "success_rate": 0.0,
             "mean_total_cost": 0.0,
             "total_tasks": 0,
-            "cost_breakdown": TaskCostBreakdown().to_dict()
+            "cost_breakdown": TaskCostBreakdown().to_dict(),
         }
 
     total_tasks = len(results)
@@ -132,7 +136,7 @@ def compute_cnsr_from_results(
 
     # Compute CNSR
     if mean_total_cost < epsilon:
-        cnsr = float('inf') if success_rate > 0 else 0.0
+        cnsr = float("inf") if success_rate > 0 else 0.0
     else:
         cnsr = success_rate / mean_total_cost
 
@@ -151,17 +155,17 @@ def compute_cnsr_from_results(
             "total_tool_cost": total_cost.tool_cost,
             "total_latency_cost": total_cost.latency_cost,
             "total_human_cost": total_cost.human_cost,
-        }
+        },
     }
 
 
 # Default cost rates for compute_cost_from_usage()
 DEFAULT_COST_RATES = {
-    "token_input_per_1k": 0.0,      # $0 for Ollama (local)
-    "token_output_per_1k": 0.0,     # $0 for Ollama (local)
-    "tool_call_cost": 0.001,        # $0.001 per tool call
-    "latency_per_second": 0.0001,   # $0.0001 per second
-    "human_intervention_cost": 5.0  # $5 per intervention
+    "token_input_per_1k": 0.0,  # $0 for Ollama (local)
+    "token_output_per_1k": 0.0,  # $0 for Ollama (local)
+    "tool_call_cost": 0.001,  # $0.001 per tool call
+    "latency_per_second": 0.0001,  # $0.0001 per second
+    "human_intervention_cost": 5.0,  # $5 per intervention
 }
 
 
@@ -171,7 +175,7 @@ def compute_cost_from_usage(
     tool_calls: int = 0,
     latency_seconds: float = 0.0,
     human_interventions: int = 0,
-    rates: Optional[Dict[str, float]] = None
+    rates: Optional[Dict[str, float]] = None,
 ) -> TaskCostBreakdown:
     """
     Compute cost breakdown from usage metrics.
@@ -191,10 +195,9 @@ def compute_cost_from_usage(
     """
     rates = rates or DEFAULT_COST_RATES
 
-    inference_cost = (
-        (input_tokens / 1000) * rates.get("token_input_per_1k", 0) +
-        (output_tokens / 1000) * rates.get("token_output_per_1k", 0)
-    )
+    inference_cost = (input_tokens / 1000) * rates.get("token_input_per_1k", 0) + (
+        output_tokens / 1000
+    ) * rates.get("token_output_per_1k", 0)
 
     tool_cost = tool_calls * rates.get("tool_call_cost", 0.001)
     latency_cost = latency_seconds * rates.get("latency_per_second", 0.0001)
@@ -204,7 +207,7 @@ def compute_cost_from_usage(
         inference_cost=inference_cost,
         tool_cost=tool_cost,
         latency_cost=latency_cost,
-        human_cost=human_cost
+        human_cost=human_cost,
     )
 
 
@@ -226,7 +229,7 @@ def compute_cnsr(
         CNSR score (higher is better)
     """
     if mean_cost < epsilon:
-        return float('inf') if success_rate > 0 else 0.0
+        return float("inf") if success_rate > 0 else 0.0
     return success_rate / mean_cost
 
 
@@ -349,6 +352,7 @@ def compute_mean_reciprocal_rank(
 @dataclass
 class MetricValue:
     """A metric value with metadata."""
+
     name: str
     value: float
     unit: str = ""
@@ -521,7 +525,11 @@ class AggregatedMetrics:
                 continue
 
             mean = sum(values) / len(values)
-            variance = sum((x - mean) ** 2 for x in values) / len(values) if len(values) > 1 else 0
+            variance = (
+                sum((x - mean) ** 2 for x in values) / len(values)
+                if len(values) > 1
+                else 0
+            )
 
             aggregated[metric] = {
                 "mean": mean,
