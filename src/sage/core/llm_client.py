@@ -1,19 +1,17 @@
 """LLM client wrapper for unified model access."""
 
-from typing import Optional, List, Dict, Any, Union
 from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Union
 
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
 
 
 class BaseLLMClient(ABC):
     """Abstract base class for LLM clients."""
 
     @abstractmethod
-    def invoke(
-        self, messages: List[BaseMessage], **kwargs
-    ) -> Union[str, BaseMessage]:
+    def invoke(self, messages: List[BaseMessage], **kwargs) -> Union[str, BaseMessage]:
         """Invoke the LLM with messages."""
         pass
 

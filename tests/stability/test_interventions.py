@@ -17,12 +17,12 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from sage.stability.interventions import (
     AgentState,
-    EscalationRequest,
-    GoalReanchor,
     ContextCompress,
+    EscalationRequest,
     ForceReplan,
-    SchemaValidatedRetry,
+    GoalReanchor,
     HumanEscalate,
+    SchemaValidatedRetry,
 )
 
 
@@ -139,7 +139,9 @@ class TestForceReplan:
         ag, goal = _make_state(drift=0.45)
         sim_reanchor = _cos_sim(GoalReanchor().apply(ag).state_embedding, goal)
         sim_replan = _cos_sim(ForceReplan().apply(ag).state_embedding, goal)
-        assert sim_replan >= sim_reanchor, "ForceReplan has larger recovery_pull than GoalReanchor"
+        assert (
+            sim_replan >= sim_reanchor
+        ), "ForceReplan has larger recovery_pull than GoalReanchor"
 
     def test_reversible(self):
         assert ForceReplan().reversible is True
@@ -186,14 +188,33 @@ class TestCostConvention:
     """Verify the double-counting convention stated in the module docstring."""
 
     def test_all_interventions_have_cost_attr(self):
-        for cls in [GoalReanchor, ContextCompress, ForceReplan, SchemaValidatedRetry, HumanEscalate]:
+        for cls in [
+            GoalReanchor,
+            ContextCompress,
+            ForceReplan,
+            SchemaValidatedRetry,
+            HumanEscalate,
+        ]:
             obj = cls()
             assert isinstance(obj.estimated_cost, float)
             assert obj.estimated_cost >= 0.0
 
     def test_all_interventions_have_name_attr(self):
-        expected = {"GoalReanchor", "ContextCompress", "ForceReplan",
-                    "SchemaValidatedRetry", "HumanEscalate"}
-        found = {cls().name for cls in [GoalReanchor, ContextCompress, ForceReplan,
-                                         SchemaValidatedRetry, HumanEscalate]}
+        expected = {
+            "GoalReanchor",
+            "ContextCompress",
+            "ForceReplan",
+            "SchemaValidatedRetry",
+            "HumanEscalate",
+        }
+        found = {
+            cls().name
+            for cls in [
+                GoalReanchor,
+                ContextCompress,
+                ForceReplan,
+                SchemaValidatedRetry,
+                HumanEscalate,
+            ]
+        }
         assert found == expected

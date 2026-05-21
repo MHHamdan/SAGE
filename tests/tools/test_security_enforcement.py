@@ -9,8 +9,8 @@ class TestPermissionEnforcement:
     def test_forbidden_permission_blocked(self):
         """Verify tools without required permissions are blocked."""
         from sage.tools.permissions import (
-            PermissionManager,
             Permission,
+            PermissionManager,
         )
 
         manager = PermissionManager()
@@ -23,8 +23,8 @@ class TestPermissionEnforcement:
     def test_revoked_permission_blocked(self):
         """Verify revoked permissions are actually revoked."""
         from sage.tools.permissions import (
-            PermissionManager,
             Permission,
+            PermissionManager,
         )
 
         manager = PermissionManager()
@@ -68,7 +68,8 @@ class TestSandboxEnforcement:
     def test_timeout_enforced(self):
         """Verify timeout actually terminates execution."""
         import time
-        from sage.tools.sandbox import Sandbox, ResourceLimits
+
+        from sage.tools.sandbox import ResourceLimits, Sandbox
 
         limits = ResourceLimits(timeout_seconds=0.1)
         sandbox = Sandbox(limits=limits)
@@ -90,19 +91,21 @@ class TestPolicyEnforcement:
     def test_deny_policy_blocks_action(self):
         """Verify DENY policies block execution."""
         from sage.verification.policies import (
+            PolicyDecision,
             PolicyEngine,
             PolicyRule,
-            PolicyDecision,
         )
 
         engine = PolicyEngine()
-        engine.add_rule(PolicyRule(
-            name="no_delete",
-            condition=lambda ctx: "delete" in ctx.get("action", ""),
-            action="*",
-            decision=PolicyDecision.DENY,
-            reason="Delete operations forbidden",
-        ))
+        engine.add_rule(
+            PolicyRule(
+                name="no_delete",
+                condition=lambda ctx: "delete" in ctx.get("action", ""),
+                action="*",
+                decision=PolicyDecision.DENY,
+                reason="Delete operations forbidden",
+            )
+        )
 
         # Delete should be denied
         context = {"action": "delete_file", "path": "/data/important.txt"}
@@ -117,19 +120,21 @@ class TestPolicyEnforcement:
     def test_approval_required_policy(self):
         """Verify REQUIRE_APPROVAL policies trigger approval flow."""
         from sage.verification.policies import (
+            PolicyDecision,
             PolicyEngine,
             PolicyRule,
-            PolicyDecision,
         )
 
         engine = PolicyEngine()
-        engine.add_rule(PolicyRule(
-            name="approve_external",
-            condition=lambda ctx: ctx.get("external", False),
-            action="*",
-            decision=PolicyDecision.REQUIRE_APPROVAL,
-            reason="External operations require approval",
-        ))
+        engine.add_rule(
+            PolicyRule(
+                name="approve_external",
+                condition=lambda ctx: ctx.get("external", False),
+                action="*",
+                decision=PolicyDecision.REQUIRE_APPROVAL,
+                reason="External operations require approval",
+            )
+        )
 
         context = {"action": "api_call", "external": True}
         decision = engine.evaluate(context)

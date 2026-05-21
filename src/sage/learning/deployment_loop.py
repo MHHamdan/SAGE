@@ -26,29 +26,30 @@ Example:
     ...     print(f"Success rate: {update.success_rate:.2%}")
 """
 
+import asyncio
+import json
+import logging
+import uuid
 from dataclasses import dataclass, field
-from typing import (
-    Optional,
-    Callable,
-    Awaitable,
-    Dict,
-    Any,
-    List,
-    AsyncIterator,
-    Union,
-)
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
-import asyncio
-import uuid
-import json
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Union,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class DeploymentStatus(Enum):
     """Status of the deployment loop."""
+
     INITIALIZING = "initializing"
     RUNNING = "running"
     PAUSED = "paused"
@@ -73,6 +74,7 @@ class DeploymentConfig:
         canary_percentage: Percentage of traffic for canary
         max_concurrent_tasks: Maximum concurrent task execution
     """
+
     evaluation_interval: int = 100
     min_tasks_for_eval: int = 50
     success_threshold: float = 0.8
@@ -101,6 +103,7 @@ class DeploymentMetrics:
         total_cost: Total cost for the period
         errors: List of errors encountered
     """
+
     period_id: str
     start_time: datetime
     end_time: Optional[datetime] = None
@@ -143,6 +146,7 @@ class DeploymentState:
         total_successes: Total successes across all periods
         rollback_count: Number of rollbacks performed
     """
+
     deployment_id: str
     status: DeploymentStatus
     agent_version: str
@@ -173,6 +177,7 @@ class DeploymentUpdate:
         message: Optional message
         metrics: Current metrics snapshot
     """
+
     timestamp: datetime
     event_type: str
     tasks_completed: int
@@ -280,7 +285,7 @@ class DeploymentLoop:
 
         try:
             # Handle both sync and async iterators
-            if hasattr(tasks, '__aiter__'):
+            if hasattr(tasks, "__aiter__"):
                 task_iter = tasks.__aiter__()
             else:
                 task_iter = iter(tasks)
@@ -295,7 +300,7 @@ class DeploymentLoop:
 
                 # Get next task
                 try:
-                    if hasattr(task_iter, '__anext__'):
+                    if hasattr(task_iter, "__anext__"):
                         task = await task_iter.__anext__()
                     else:
                         task = next(task_iter)
@@ -321,8 +326,8 @@ class DeploymentLoop:
 
                     # Check for rollback
                     if (
-                        self.config.enable_auto_rollback and
-                        metrics.success_rate < self.config.rollback_threshold
+                        self.config.enable_auto_rollback
+                        and metrics.success_rate < self.config.rollback_threshold
                     ):
                         yield await self._perform_rollback(
                             f"Success rate {metrics.success_rate:.2%} "
@@ -382,7 +387,7 @@ class DeploymentLoop:
 
         try:
             # Execute task
-            if asyncio.iscoroutinefunction(getattr(self.agent, 'run', None)):
+            if asyncio.iscoroutinefunction(getattr(self.agent, "run", None)):
                 output = await self.agent.run(task)
             else:
                 output = self.agent.run(task)
@@ -621,15 +626,13 @@ class ABTestDeployment:
         self.min_samples = min_samples
 
         self.metrics_a = DeploymentMetrics(
-            period_id="agent_a",
-            start_time=datetime.now()
+            period_id="agent_a", start_time=datetime.now()
         )
         self.metrics_b = DeploymentMetrics(
-            period_id="agent_b",
-            start_time=datetime.now()
+            period_id="agent_b", start_time=datetime.now()
         )
 
-        self._rng = __import__('random').Random()
+        self._rng = __import__("random").Random()
 
     async def run_task(self, task: Any) -> Dict[str, Any]:
         """Run a task on one of the agents based on traffic split.
@@ -647,7 +650,7 @@ class ABTestDeployment:
         start_time = datetime.now()
 
         try:
-            if asyncio.iscoroutinefunction(getattr(agent, 'run', None)):
+            if asyncio.iscoroutinefunction(getattr(agent, "run", None)):
                 output = await agent.run(task)
             else:
                 output = agent.run(task)
@@ -683,6 +686,7 @@ class ABTestDeployment:
         Returns:
             Comparison dictionary
         """
+
         def calc_rate(m: DeploymentMetrics) -> float:
             if m.tasks_completed == 0:
                 return 0.0
@@ -709,8 +713,8 @@ class ABTestDeployment:
         """Check if difference is statistically significant."""
         # Simple significance check based on sample size
         if (
-            self.metrics_a.tasks_completed < self.min_samples or
-            self.metrics_b.tasks_completed < self.min_samples
+            self.metrics_a.tasks_completed < self.min_samples
+            or self.metrics_b.tasks_completed < self.min_samples
         ):
             return False
 
@@ -720,12 +724,14 @@ class ABTestDeployment:
         p_a = self.metrics_a.tasks_succeeded / n_a if n_a > 0 else 0
         p_b = self.metrics_b.tasks_succeeded / n_b if n_b > 0 else 0
 
-        p_pooled = (self.metrics_a.tasks_succeeded + self.metrics_b.tasks_succeeded) / (n_a + n_b)
+        p_pooled = (self.metrics_a.tasks_succeeded + self.metrics_b.tasks_succeeded) / (
+            n_a + n_b
+        )
 
         if p_pooled == 0 or p_pooled == 1:
             return False
 
-        se = (p_pooled * (1 - p_pooled) * (1/n_a + 1/n_b)) ** 0.5
+        se = (p_pooled * (1 - p_pooled) * (1 / n_a + 1 / n_b)) ** 0.5
         if se == 0:
             return False
 

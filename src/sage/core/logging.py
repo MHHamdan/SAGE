@@ -11,18 +11,19 @@ This module provides JSONL (JSON Lines) logging for:
 import json
 import logging
 import os
-from typing import Optional, Dict, Any, List, Union
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
-from pathlib import Path
 import threading
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
 
 class LogLevel(Enum):
     """Log levels for structured logging."""
+
     DEBUG = "debug"
     INFO = "info"
     WARNING = "warning"
@@ -32,6 +33,7 @@ class LogLevel(Enum):
 
 class EventType(Enum):
     """Types of events to log."""
+
     EXPERIMENT_START = "experiment_start"
     EXPERIMENT_END = "experiment_end"
     RUN_START = "run_start"
@@ -60,6 +62,7 @@ class IncidentType(Enum):
     - constraint_violated: A plan constraint was violated during execution
     - capability_exceeded: Agent attempted to use unauthorized capability
     """
+
     HUMAN_INTERVENTION = "human_intervention"
     GUARDRAIL_TRIGGERED = "guardrail_triggered"
     POLICY_VIOLATION = "policy_violation"
@@ -79,6 +82,7 @@ class IncidentSeverity(Enum):
     - high: Significant cost (e.g., task blocked)
     - critical: Task termination required
     """
+
     INFO = "info"
     LOW = "low"
     MEDIUM = "medium"
@@ -89,6 +93,7 @@ class IncidentSeverity(Enum):
 @dataclass
 class LogEntry:
     """A single log entry."""
+
     timestamp: str
     event_type: str
     level: str
@@ -153,14 +158,16 @@ class JSONLLogger:
         self._agent_name: Optional[str] = None
 
         # Write initial entry
-        self._write_entry(LogEntry(
-            timestamp=datetime.now().isoformat(),
-            event_type=EventType.EXPERIMENT_START.value,
-            level=LogLevel.INFO.value,
-            message=f"Experiment {experiment_id} started",
-            experiment_id=experiment_id,
-            data={"output_file": str(self.filepath)},
-        ))
+        self._write_entry(
+            LogEntry(
+                timestamp=datetime.now().isoformat(),
+                event_type=EventType.EXPERIMENT_START.value,
+                level=LogLevel.INFO.value,
+                message=f"Experiment {experiment_id} started",
+                experiment_id=experiment_id,
+                data={"output_file": str(self.filepath)},
+            )
+        )
 
         logger.info(f"JSONL logger initialized: {self.filepath}")
 
@@ -479,13 +486,15 @@ class JSONLLogger:
     def close(self):
         """Close the logger and flush remaining entries."""
         with self._lock:
-            self._write_entry(LogEntry(
-                timestamp=datetime.now().isoformat(),
-                event_type=EventType.EXPERIMENT_END.value,
-                level=LogLevel.INFO.value,
-                message=f"Experiment {self.experiment_id} ended",
-                experiment_id=self.experiment_id,
-            ))
+            self._write_entry(
+                LogEntry(
+                    timestamp=datetime.now().isoformat(),
+                    event_type=EventType.EXPERIMENT_END.value,
+                    level=LogLevel.INFO.value,
+                    message=f"Experiment {self.experiment_id} ended",
+                    experiment_id=self.experiment_id,
+                )
+            )
             self._flush()
 
         logger.info(f"JSONL logger closed: {self.filepath}")

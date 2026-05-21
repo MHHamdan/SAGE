@@ -22,26 +22,26 @@ Example:
 
 from .agentbench_adapter import (
     AgentBenchAdapter,
-    AgentBenchTask,
     AgentBenchResult,
     AgentBenchSubset,
-)
-from .swebench_adapter import (
-    SWEBenchAdapter,
-    SWEBenchTask,
-    SWEBenchResult,
-    SWEBenchDifficulty,
-)
-from .hotpotqa_adapter import (
-    HotpotQAAdapter,
-    HotpotQATask,
-    HotpotQAResult,
-    HotpotQAType,
+    AgentBenchTask,
 )
 from .base_adapter import (
     BenchmarkAdapter,
-    BenchmarkTask,
     BenchmarkResult,
+    BenchmarkTask,
+)
+from .hotpotqa_adapter import (
+    HotpotQAAdapter,
+    HotpotQAResult,
+    HotpotQATask,
+    HotpotQAType,
+)
+from .swebench_adapter import (
+    SWEBenchAdapter,
+    SWEBenchDifficulty,
+    SWEBenchResult,
+    SWEBenchTask,
 )
 
 __all__ = [

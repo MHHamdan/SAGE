@@ -1,14 +1,13 @@
 """Vector memory for semantic search and retrieval."""
 
-from typing import List, Dict, Any, Optional
 import logging
+from typing import Any, Dict, List, Optional
 
-from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
+from langchain_openai import OpenAIEmbeddings
 
 from sage.memory.base_memory import BaseMemory
-
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +90,7 @@ class VectorMemory(BaseMemory):
 
         # Trim if exceeds max
         if len(self._documents) > self.max_items:
-            self._documents = self._documents[-self.max_items:]
+            self._documents = self._documents[-self.max_items :]
 
     def add_texts(
         self,
@@ -183,9 +182,7 @@ class VectorMemory(BaseMemory):
         Returns:
             Retriever interface
         """
-        return self._vector_store.as_retriever(
-            search_kwargs=search_kwargs or {"k": 4}
-        )
+        return self._vector_store.as_retriever(search_kwargs=search_kwargs or {"k": 4})
 
     def __repr__(self) -> str:
         return (

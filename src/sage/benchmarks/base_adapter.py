@@ -10,8 +10,8 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Generic, TypeVar
 from enum import Enum
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ class BenchmarkTask:
         expected_output: Expected output (for evaluation)
         metadata: Additional task metadata
     """
+
     task_id: str
     query: str
     expected_output: Optional[Any] = None
@@ -36,7 +37,7 @@ class BenchmarkTask:
             "task_id": self.task_id,
             "query": self.query,
             "expected_output": self.expected_output,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
 
@@ -52,6 +53,7 @@ class BenchmarkResult:
         error: Error message if failed
         metadata: Additional result metadata
     """
+
     task_id: str
     success: bool
     output: Optional[str] = None
@@ -66,12 +68,12 @@ class BenchmarkResult:
             "output": self.output,
             "score": self.score,
             "error": self.error,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
 
-T = TypeVar('T', bound=BenchmarkTask)
-R = TypeVar('R', bound=BenchmarkResult)
+T = TypeVar("T", bound=BenchmarkTask)
+R = TypeVar("R", bound=BenchmarkResult)
 
 
 class BenchmarkAdapter(ABC, Generic[T, R]):
@@ -149,12 +151,7 @@ class BenchmarkAdapter(ABC, Generic[T, R]):
             Dictionary with statistics
         """
         if not results:
-            return {
-                "total": 0,
-                "successes": 0,
-                "success_rate": 0.0,
-                "mean_score": 0.0
-            }
+            return {"total": 0, "successes": 0, "success_rate": 0.0, "mean_score": 0.0}
 
         total = len(results)
         successes = sum(1 for r in results if r.success)
@@ -164,5 +161,5 @@ class BenchmarkAdapter(ABC, Generic[T, R]):
             "total": total,
             "successes": successes,
             "success_rate": successes / total,
-            "mean_score": mean_score
+            "mean_score": mean_score,
         }

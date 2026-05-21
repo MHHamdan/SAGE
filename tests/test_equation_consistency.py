@@ -4,8 +4,9 @@ Each test corresponds to an equation in paper_assets/equations.tex.
 Tests use toy inputs with manually computed expected outputs.
 """
 
-import pytest
 import math
+
+import pytest
 
 
 class TestCNSR:
@@ -188,7 +189,9 @@ class TestEfficiencyScore:
 
         # step_efficiency = min(1.0, 5/10) = 0.5
         # Eff = 0.8 * (1 - 0.5 + 0.5 * 0.5) = 0.8 * 0.75 = 0.6
-        expected = success_rate * (1 - cost_weight + cost_weight * (optimal_steps / avg_steps))
+        expected = success_rate * (
+            1 - cost_weight + cost_weight * (optimal_steps / avg_steps)
+        )
         assert abs(efficiency - expected) < 1e-10
 
 
@@ -211,7 +214,12 @@ class TestF1Score:
 
         expected_precision = 3 / (3 + 2)  # 0.6
         expected_recall = 3 / (3 + 1)  # 0.75
-        expected_f1 = 2 * expected_precision * expected_recall / (expected_precision + expected_recall)
+        expected_f1 = (
+            2
+            * expected_precision
+            * expected_recall
+            / (expected_precision + expected_recall)
+        )
 
         assert abs(precision - expected_precision) < 1e-10
         assert abs(recall - expected_recall) < 1e-10
@@ -233,7 +241,7 @@ class TestMRR:
         # MRR = (1/1 + 1/2 + 1/3 + 1/1 + 1/5) / 5
         #     = (1 + 0.5 + 0.333... + 1 + 0.2) / 5
         #     = 3.0333... / 5 = 0.6066...
-        expected = (1/1 + 1/2 + 1/3 + 1/1 + 1/5) / 5
+        expected = (1 / 1 + 1 / 2 + 1 / 3 + 1 / 1 + 1 / 5) / 5
         assert abs(mrr - expected) < 1e-10
 
 

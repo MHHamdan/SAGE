@@ -26,26 +26,24 @@ Example:
 """
 
 from .deployment_loop import (
-    DeploymentLoop,
     DeploymentConfig,
+    DeploymentLoop,
+    DeploymentMetrics,
     DeploymentState,
     DeploymentStatus,
-    DeploymentMetrics,
 )
-
-from .feedback import (
-    FeedbackCollector,
-    Feedback,
-    FeedbackType,
-    FeedbackSource,
-    AggregatedFeedback,
-)
-
 from .experience import (
-    ExperienceBuffer,
     Experience,
     ExperienceBatch,
+    ExperienceBuffer,
     PrioritizedExperienceBuffer,
+)
+from .feedback import (
+    AggregatedFeedback,
+    Feedback,
+    FeedbackCollector,
+    FeedbackSource,
+    FeedbackType,
 )
 
 __all__ = [

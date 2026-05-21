@@ -10,33 +10,36 @@ Tests cover:
 - Edge cases and error handling
 """
 
-import pytest
-import numpy as np
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
+import numpy as np
+import pytest
+
 from sage.evaluation.goal_drift import (
-    GoalDriftTracker,
-    GoalSnapshot,
     DriftMeasurement,
     DriftStatistics,
+    GoalDriftTracker,
+    GoalSnapshot,
     GoalSource,
     MultiGoalDriftTracker,
-    compute_goal_similarity,
     compute_drift_score,
+    compute_goal_similarity,
 )
 
-
 # Test fixtures
+
 
 @pytest.fixture
 def mock_embed_fn():
     """Mock embedding function that returns deterministic embeddings."""
+
     def embed(text: str) -> np.ndarray:
         # Create deterministic embedding based on text content
         # This allows us to control similarity for testing
         np.random.seed(hash(text) % (2**32))
         return np.random.randn(384)  # Common embedding dimension
+
     return embed
 
 
@@ -62,6 +65,7 @@ def similar_embed_fn():
             # Random embedding
             np.random.seed(hash(text) % (2**32))
             return np.random.randn(5)
+
     return embed
 
 
@@ -80,6 +84,7 @@ def tracker_with_goal(similar_embed_fn):
 
 
 # Tests for compute_goal_similarity
+
 
 class TestComputeGoalSimilarity:
     """Tests for the goal similarity computation function."""
@@ -136,6 +141,7 @@ class TestComputeGoalSimilarity:
 
 # Tests for compute_drift_score
 
+
 class TestComputeDriftScore:
     """Tests for drift score computation."""
 
@@ -163,6 +169,7 @@ class TestComputeDriftScore:
 
 # Tests for GoalDriftTracker
 
+
 class TestGoalDriftTrackerInitialization:
     """Tests for tracker initialization."""
 
@@ -179,7 +186,7 @@ class TestGoalDriftTrackerInitialization:
             embed_fn=mock_embed_fn,
             drift_threshold=0.5,
             window_size=20,
-            reanchor_threshold=0.7
+            reanchor_threshold=0.7,
         )
         assert tracker.drift_threshold == 0.5
         assert tracker.window_size == 20
@@ -238,8 +245,7 @@ class TestGoalDriftTrackerRecordInferredGoal:
     def test_record_with_confidence(self, tracker_with_goal):
         """Should record confidence level."""
         measurement = tracker_with_goal.record_inferred_goal(
-            "Similar goal",
-            confidence=0.8
+            "Similar goal", confidence=0.8
         )
         assert measurement.confidence == 0.8
 
@@ -251,8 +257,7 @@ class TestGoalDriftTrackerRecordInferredGoal:
     def test_record_with_source(self, tracker_with_goal):
         """Should record source of inference."""
         measurement = tracker_with_goal.record_inferred_goal(
-            "Similar goal",
-            source="explicit_statement"
+            "Similar goal", source="explicit_statement"
         )
         assert measurement.source == GoalSource.EXPLICIT_STATEMENT
 
@@ -291,10 +296,7 @@ class TestGoalDriftTrackerTrendDetection:
 
     def test_trend_stable_with_constant_drift(self, similar_embed_fn):
         """Should return 'stable' when drift is constant."""
-        tracker = GoalDriftTracker(
-            embed_fn=similar_embed_fn,
-            trend_sensitivity=0.1
-        )
+        tracker = GoalDriftTracker(embed_fn=similar_embed_fn, trend_sensitivity=0.1)
         tracker.set_original_goal("identical original")
 
         # Record many similar goals
@@ -306,9 +308,7 @@ class TestGoalDriftTrackerTrendDetection:
     def test_trend_detection_with_increasing_drift(self, mock_embed_fn):
         """Should detect increasing drift trend."""
         tracker = GoalDriftTracker(
-            embed_fn=mock_embed_fn,
-            window_size=5,
-            trend_sensitivity=0.01
+            embed_fn=mock_embed_fn, window_size=5, trend_sensitivity=0.01
         )
         tracker.set_original_goal("original")
 
@@ -320,7 +320,7 @@ class TestGoalDriftTrackerTrendDetection:
                 drift_score=0.1 + i * 0.1,  # 0.1, 0.2, 0.3, 0.4, 0.5
                 original_goal="original",
                 current_goal=f"goal_{i}",
-                similarity=0.9 - i * 0.1
+                similarity=0.9 - i * 0.1,
             )
             tracker._measurements.append(measurement)
 
@@ -359,10 +359,7 @@ class TestGoalDriftTrackerReanchoring:
 
     def test_should_reanchor_high_drift(self, similar_embed_fn):
         """Should recommend re-anchoring with high drift."""
-        tracker = GoalDriftTracker(
-            embed_fn=similar_embed_fn,
-            reanchor_threshold=0.3
-        )
+        tracker = GoalDriftTracker(embed_fn=similar_embed_fn, reanchor_threshold=0.3)
         tracker.set_original_goal("identical original")
         tracker.record_inferred_goal("opposite direction goal")
 
@@ -426,6 +423,7 @@ class TestGoalDriftTrackerEdgeCases:
 
 # Tests for MultiGoalDriftTracker
 
+
 class TestMultiGoalDriftTracker:
     """Tests for multi-goal tracking."""
 
@@ -470,6 +468,7 @@ class TestMultiGoalDriftTracker:
 
 # Tests for GoalSnapshot dataclass
 
+
 class TestGoalSnapshot:
     """Tests for GoalSnapshot dataclass."""
 
@@ -482,7 +481,7 @@ class TestGoalSnapshot:
                 goal_text="Goal",
                 goal_embedding=np.array([1, 2, 3]),
                 source=GoalSource.ORIGINAL,
-                confidence=1.5  # Invalid
+                confidence=1.5,  # Invalid
             )
 
     def test_embedding_converted_to_numpy(self):
@@ -492,12 +491,13 @@ class TestGoalSnapshot:
             timestamp=datetime.now(),
             goal_text="Goal",
             goal_embedding=[1, 2, 3],  # List input
-            source=GoalSource.ORIGINAL
+            source=GoalSource.ORIGINAL,
         )
         assert isinstance(snapshot.goal_embedding, np.ndarray)
 
 
 # Tests for DriftMeasurement dataclass
+
 
 class TestDriftMeasurement:
     """Tests for DriftMeasurement dataclass."""
@@ -511,7 +511,7 @@ class TestDriftMeasurement:
                 drift_score=1.5,  # Invalid
                 original_goal="Original",
                 current_goal="Current",
-                similarity=0.5
+                similarity=0.5,
             )
 
     def test_valid_measurement_creation(self):
@@ -522,7 +522,7 @@ class TestDriftMeasurement:
             drift_score=0.3,
             original_goal="Original",
             current_goal="Current",
-            similarity=0.7
+            similarity=0.7,
         )
         assert measurement.drift_score == 0.3
         assert measurement.similarity == 0.7
@@ -530,15 +530,14 @@ class TestDriftMeasurement:
 
 # Integration tests
 
+
 class TestGoalDriftIntegration:
     """Integration tests for complete workflows."""
 
     def test_complete_drift_tracking_workflow(self, similar_embed_fn):
         """Test complete workflow from goal setting to drift analysis."""
         tracker = GoalDriftTracker(
-            embed_fn=similar_embed_fn,
-            drift_threshold=0.2,
-            window_size=5
+            embed_fn=similar_embed_fn, drift_threshold=0.2, window_size=5
         )
 
         # Set original goal
@@ -547,8 +546,8 @@ class TestGoalDriftIntegration:
         # Record several inferred goals over time
         goals = [
             ("identical current goal", 0.1),  # Very similar
-            ("similar current goal", 0.3),     # Somewhat similar
-            ("different current goal", 0.8),   # Different
+            ("similar current goal", 0.3),  # Somewhat similar
+            ("different current goal", 0.8),  # Different
         ]
 
         for goal_text, _ in goals:

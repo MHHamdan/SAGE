@@ -10,19 +10,20 @@ For Ollama (local models), token costs are $0, but usage is still tracked
 for comparison with API models.
 """
 
-import time
 import logging
-from typing import Optional, Dict, Any, List
-from dataclasses import dataclass, field
-from enum import Enum
-from datetime import datetime
 import threading
+import time
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class CostCategory(Enum):
     """Categories of costs in agentic systems."""
+
     TOKEN_INPUT = "token_input"
     TOKEN_OUTPUT = "token_output"
     TOOL_CALL = "tool_call"
@@ -34,6 +35,7 @@ class CostCategory(Enum):
 @dataclass
 class TokenUsage:
     """Token usage record."""
+
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
@@ -49,6 +51,7 @@ class TokenUsage:
 @dataclass
 class CostRecord:
     """Single cost record."""
+
     category: CostCategory
     value: float
     unit: str
@@ -59,6 +62,7 @@ class CostRecord:
 @dataclass
 class CostSummary:
     """Summary of all costs."""
+
     total_tokens: TokenUsage = field(default_factory=TokenUsage)
     total_tool_calls: int = 0
     total_latency_ms: float = 0.0
@@ -170,17 +174,21 @@ class CostTracker:
             self._tokens.total_tokens += prompt_tokens + completion_tokens
 
             pricing = self._get_pricing()
-            cost = (
-                (prompt_tokens / 1000) * pricing["input"] +
-                (completion_tokens / 1000) * pricing["output"]
-            )
+            cost = (prompt_tokens / 1000) * pricing["input"] + (
+                completion_tokens / 1000
+            ) * pricing["output"]
 
-            self._records.append(CostRecord(
-                category=CostCategory.TOKEN_INPUT,
-                value=prompt_tokens,
-                unit="tokens",
-                metadata={"completion_tokens": completion_tokens, **(metadata or {})},
-            ))
+            self._records.append(
+                CostRecord(
+                    category=CostCategory.TOKEN_INPUT,
+                    value=prompt_tokens,
+                    unit="tokens",
+                    metadata={
+                        "completion_tokens": completion_tokens,
+                        **(metadata or {}),
+                    },
+                )
+            )
 
             self._api_calls += 1
             return cost
@@ -204,16 +212,18 @@ class CostTracker:
             self._tool_calls += 1
             self._latency_ms += latency_ms
 
-            self._records.append(CostRecord(
-                category=CostCategory.TOOL_CALL,
-                value=latency_ms,
-                unit="ms",
-                metadata={
-                    "tool_name": tool_name,
-                    "success": success,
-                    **(metadata or {}),
-                },
-            ))
+            self._records.append(
+                CostRecord(
+                    category=CostCategory.TOOL_CALL,
+                    value=latency_ms,
+                    unit="ms",
+                    metadata={
+                        "tool_name": tool_name,
+                        "success": success,
+                        **(metadata or {}),
+                    },
+                )
+            )
 
     def record_latency(
         self,
@@ -231,12 +241,14 @@ class CostTracker:
         with self._lock:
             self._latency_ms += latency_ms
 
-            self._records.append(CostRecord(
-                category=CostCategory.LATENCY,
-                value=latency_ms,
-                unit="ms",
-                metadata={"operation": operation, **(metadata or {})},
-            ))
+            self._records.append(
+                CostRecord(
+                    category=CostCategory.LATENCY,
+                    value=latency_ms,
+                    unit="ms",
+                    metadata={"operation": operation, **(metadata or {})},
+                )
+            )
 
     def record_human_intervention(
         self,
@@ -252,12 +264,14 @@ class CostTracker:
         with self._lock:
             self._human_interventions += 1
 
-            self._records.append(CostRecord(
-                category=CostCategory.HUMAN_INTERVENTION,
-                value=1,
-                unit="count",
-                metadata={"reason": reason, **(metadata or {})},
-            ))
+            self._records.append(
+                CostRecord(
+                    category=CostCategory.HUMAN_INTERVENTION,
+                    value=1,
+                    unit="count",
+                    metadata={"reason": reason, **(metadata or {})},
+                )
+            )
 
     def get_summary(self) -> CostSummary:
         """Get cost summary.
@@ -267,10 +281,9 @@ class CostTracker:
         """
         with self._lock:
             pricing = self._get_pricing()
-            estimated_cost = (
-                (self._tokens.prompt_tokens / 1000) * pricing["input"] +
-                (self._tokens.completion_tokens / 1000) * pricing["output"]
-            )
+            estimated_cost = (self._tokens.prompt_tokens / 1000) * pricing["input"] + (
+                self._tokens.completion_tokens / 1000
+            ) * pricing["output"]
 
             return CostSummary(
                 total_tokens=TokenUsage(
@@ -389,8 +402,8 @@ def calculate_total_cost(
     pricing = MODEL_PRICING.get(model, MODEL_PRICING["default"])
 
     token_cost = (
-        (token_usage.prompt_tokens / 1000) * pricing["input"] +
-        (token_usage.completion_tokens / 1000) * pricing["output"]
+        (token_usage.prompt_tokens / 1000) * pricing["input"]
+        + (token_usage.completion_tokens / 1000) * pricing["output"]
     ) * weights["token"]
 
     tool_cost = tool_calls * weights["tool"]

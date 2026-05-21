@@ -1,8 +1,8 @@
 """Skill registry for managing agent skills."""
 
 import logging
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
 
 from .skill_base import Skill, SkillPermission
 
@@ -48,7 +48,9 @@ class SkillRegistry:
         if skill.name in self._skills and not replace:
             existing = self._skills[skill.name]
             if existing.version == skill.version:
-                logger.warning(f"Skill '{skill.name}' v{skill.version} already registered")
+                logger.warning(
+                    f"Skill '{skill.name}' v{skill.version} already registered"
+                )
                 return False
 
         self._skills[skill.name] = skill
@@ -176,8 +178,10 @@ class SkillRegistry:
         results = []
 
         for skill in self._skills.values():
-            if (query_lower in skill.name.lower() or
-                query_lower in skill.description.lower()):
+            if (
+                query_lower in skill.name.lower()
+                or query_lower in skill.description.lower()
+            ):
                 results.append(skill)
 
         return results
@@ -214,7 +218,9 @@ class SkillRegistry:
             "active_skills": len([s for s in skills if not s.is_deprecated]),
             "deprecated_skills": len([s for s in skills if s.is_deprecated]),
             "total_tags": len(self._tags_index),
-            "avg_trust_score": sum(s.trust_score for s in skills) / len(skills) if skills else 0,
+            "avg_trust_score": (
+                sum(s.trust_score for s in skills) / len(skills) if skills else 0
+            ),
             "total_invocations": sum(s.stats.total_invocations for s in skills),
         }
 

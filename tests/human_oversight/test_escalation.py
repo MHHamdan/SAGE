@@ -4,21 +4,22 @@ Tests for Escalation Handling.
 Tests for EscalationHandler, EscalationRequest, and related classes.
 """
 
-import pytest
 from datetime import datetime
 
+import pytest
+
+from sage.human_oversight.approval_flow import RiskLevel
 from sage.human_oversight.escalation import (
     EscalationHandler,
-    EscalationRequest,
     EscalationLevel,
     EscalationPolicy,
+    EscalationRequest,
 )
-from sage.human_oversight.approval_flow import RiskLevel
-
 
 # ============================================================================
 # EscalationPolicy Tests
 # ============================================================================
+
 
 class TestEscalationPolicy:
     """Tests for EscalationPolicy dataclass."""
@@ -41,6 +42,7 @@ class TestEscalationPolicy:
 # ============================================================================
 # EscalationRequest Tests
 # ============================================================================
+
 
 class TestEscalationRequest:
     """Tests for EscalationRequest dataclass."""
@@ -78,6 +80,7 @@ class TestEscalationRequest:
 # ============================================================================
 # EscalationHandler Tests
 # ============================================================================
+
 
 class TestEscalationHandler:
     """Tests for EscalationHandler class."""
@@ -201,9 +204,15 @@ class TestEscalationHandler:
 
     def test_get_escalations_by_level(self, handler):
         """Test getting escalations by level."""
-        handler.escalate(request_id="req-001", level=EscalationLevel.TIER_1, reason="T1")
-        handler.escalate(request_id="req-002", level=EscalationLevel.TIER_1, reason="T1")
-        handler.escalate(request_id="req-003", level=EscalationLevel.TIER_2, reason="T2")
+        handler.escalate(
+            request_id="req-001", level=EscalationLevel.TIER_1, reason="T1"
+        )
+        handler.escalate(
+            request_id="req-002", level=EscalationLevel.TIER_1, reason="T1"
+        )
+        handler.escalate(
+            request_id="req-003", level=EscalationLevel.TIER_2, reason="T2"
+        )
 
         tier1 = handler.get_escalations_by_level(EscalationLevel.TIER_1)
         assert len(tier1) == 2
@@ -251,6 +260,7 @@ class TestEscalationHandler:
 # ============================================================================
 # EscalationLevel Tests
 # ============================================================================
+
 
 class TestEscalationLevel:
     """Tests for EscalationLevel enum."""

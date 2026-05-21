@@ -5,32 +5,32 @@ Comprehensive tests for the LongHorizonEvaluator and SimpleLongHorizonEvaluator
 classes that combine rolling metrics, goal drift, and incident tracking.
 """
 
-import pytest
 import asyncio
 import json
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, MagicMock, patch
-from typing import List, Any
+from typing import Any, List
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import numpy as np
+import pytest
 
+from sage.evaluation.incident_tracker import (
+    IncidentSeverity,
+    IncidentType,
+)
 from sage.evaluation.long_horizon import (
-    LongHorizonEvaluator,
-    SimpleLongHorizonEvaluator,
-    LongHorizonReport,
-    TaskExecutionResult,
     CheckpointData,
     EvaluationStatus,
+    LongHorizonEvaluator,
+    LongHorizonReport,
+    SimpleLongHorizonEvaluator,
+    TaskExecutionResult,
 )
-from sage.evaluation.incident_tracker import (
-    IncidentType,
-    IncidentSeverity,
-)
-
 
 # ============================================================================
 # Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def mock_embedding():
@@ -75,7 +75,7 @@ def evaluator(mock_agent, mock_embedding):
         window_size=10,
         drift_threshold=0.3,
         incident_threshold_per_hour=5.0,
-        success_degradation_threshold=0.1
+        success_degradation_threshold=0.1,
     )
 
 
@@ -89,6 +89,7 @@ def simple_evaluator():
 # TaskExecutionResult Tests
 # ============================================================================
 
+
 class TestTaskExecutionResult:
     """Tests for TaskExecutionResult dataclass."""
 
@@ -99,7 +100,7 @@ class TestTaskExecutionResult:
             success=True,
             cost=0.05,
             latency_ms=150.0,
-            output={"data": "test"}
+            output={"data": "test"},
         )
 
         assert result.task_id == "task_1"
@@ -117,7 +118,7 @@ class TestTaskExecutionResult:
             success=False,
             cost=0.01,
             latency_ms=50.0,
-            error="Connection timeout"
+            error="Connection timeout",
         )
 
         assert result.success is False
@@ -128,6 +129,7 @@ class TestTaskExecutionResult:
 # ============================================================================
 # CheckpointData Tests
 # ============================================================================
+
 
 class TestCheckpointData:
     """Tests for CheckpointData dataclass."""
@@ -141,7 +143,7 @@ class TestCheckpointData:
             rolling_success_rate=0.85,
             current_drift=0.1,
             incident_count=2,
-            cnsr=1.2
+            cnsr=1.2,
         )
 
         assert checkpoint.checkpoint_num == 1
@@ -155,6 +157,7 @@ class TestCheckpointData:
 # ============================================================================
 # LongHorizonReport Tests
 # ============================================================================
+
 
 class TestLongHorizonReport:
     """Tests for LongHorizonReport dataclass."""
@@ -185,7 +188,7 @@ class TestLongHorizonReport:
             incidents_by_severity={"LOW": 3, "MEDIUM": 2, "HIGH": 0, "CRITICAL": 0},
             critical_incidents=[],
             recommendations=["Continue monitoring performance"],
-            checkpoints=[]
+            checkpoints=[],
         )
 
     def test_report_creation(self, sample_report):
@@ -228,6 +231,7 @@ class TestLongHorizonReport:
 # ============================================================================
 # LongHorizonEvaluator Tests
 # ============================================================================
+
 
 class TestLongHorizonEvaluator:
     """Tests for LongHorizonEvaluator class."""
@@ -303,17 +307,13 @@ class TestLongHorizonEvaluator:
     async def test_run_evaluation_sync_agent(self, mock_agent, mock_embedding):
         """Test running evaluation with synchronous agent."""
         evaluator = LongHorizonEvaluator(
-            agent=mock_agent,
-            embed_fn=mock_embedding,
-            window_size=5
+            agent=mock_agent, embed_fn=mock_embedding, window_size=5
         )
 
         tasks = [f"task_{i}" for i in range(10)]
 
         report = await evaluator.run_evaluation(
-            tasks=tasks,
-            original_goal="Complete all tasks",
-            checkpoint_interval=5
+            tasks=tasks, original_goal="Complete all tasks", checkpoint_interval=5
         )
 
         assert report.status == EvaluationStatus.COMPLETED
@@ -325,17 +325,13 @@ class TestLongHorizonEvaluator:
     async def test_run_evaluation_async_agent(self, async_mock_agent, mock_embedding):
         """Test running evaluation with async agent."""
         evaluator = LongHorizonEvaluator(
-            agent=async_mock_agent,
-            embed_fn=mock_embedding,
-            window_size=5
+            agent=async_mock_agent, embed_fn=mock_embedding, window_size=5
         )
 
         tasks = [f"task_{i}" for i in range(10)]
 
         report = await evaluator.run_evaluation(
-            tasks=tasks,
-            original_goal="Complete all tasks",
-            checkpoint_interval=5
+            tasks=tasks, original_goal="Complete all tasks", checkpoint_interval=5
         )
 
         assert report.status == EvaluationStatus.COMPLETED
@@ -347,24 +343,23 @@ class TestLongHorizonEvaluator:
         """Test evaluation handles task failures."""
         agent = Mock()
         # Alternate success and failure
-        agent.run = Mock(side_effect=[
-            {"success": True, "cost": 0.01},
-            {"success": False, "cost": 0.01},
-            {"success": True, "cost": 0.01},
-            {"success": False, "cost": 0.01},
-            {"success": True, "cost": 0.01},
-        ])
+        agent.run = Mock(
+            side_effect=[
+                {"success": True, "cost": 0.01},
+                {"success": False, "cost": 0.01},
+                {"success": True, "cost": 0.01},
+                {"success": False, "cost": 0.01},
+                {"success": True, "cost": 0.01},
+            ]
+        )
 
         evaluator = LongHorizonEvaluator(
-            agent=agent,
-            embed_fn=mock_embedding,
-            window_size=5
+            agent=agent, embed_fn=mock_embedding, window_size=5
         )
 
         tasks = [f"task_{i}" for i in range(5)]
         report = await evaluator.run_evaluation(
-            tasks=tasks,
-            original_goal="Complete tasks"
+            tasks=tasks, original_goal="Complete tasks"
         )
 
         assert report.status == EvaluationStatus.COMPLETED
@@ -377,15 +372,12 @@ class TestLongHorizonEvaluator:
         agent.run = Mock(side_effect=Exception("Task error"))
 
         evaluator = LongHorizonEvaluator(
-            agent=agent,
-            embed_fn=mock_embedding,
-            window_size=5
+            agent=agent, embed_fn=mock_embedding, window_size=5
         )
 
         tasks = [f"task_{i}" for i in range(3)]
         report = await evaluator.run_evaluation(
-            tasks=tasks,
-            original_goal="Complete tasks"
+            tasks=tasks, original_goal="Complete tasks"
         )
 
         # Tasks should be recorded as failures with incidents
@@ -397,9 +389,7 @@ class TestLongHorizonEvaluator:
     async def test_run_evaluation_with_callbacks(self, mock_agent, mock_embedding):
         """Test evaluation triggers callbacks."""
         evaluator = LongHorizonEvaluator(
-            agent=mock_agent,
-            embed_fn=mock_embedding,
-            window_size=5
+            agent=mock_agent, embed_fn=mock_embedding, window_size=5
         )
 
         checkpoint_calls = []
@@ -418,7 +408,7 @@ class TestLongHorizonEvaluator:
             original_goal="Complete all tasks",
             checkpoint_interval=5,
             on_checkpoint=on_checkpoint,
-            on_task_complete=on_task_complete
+            on_task_complete=on_task_complete,
         )
 
         assert len(checkpoint_calls) == 2
@@ -428,9 +418,7 @@ class TestLongHorizonEvaluator:
     async def test_run_evaluation_with_goal_inference(self, mock_agent, mock_embedding):
         """Test evaluation with goal inference function."""
         evaluator = LongHorizonEvaluator(
-            agent=mock_agent,
-            embed_fn=mock_embedding,
-            window_size=5
+            agent=mock_agent, embed_fn=mock_embedding, window_size=5
         )
 
         def goal_inference_fn(task, result):
@@ -441,7 +429,7 @@ class TestLongHorizonEvaluator:
         report = await evaluator.run_evaluation(
             tasks=tasks,
             original_goal="Complete all tasks",
-            goal_inference_fn=goal_inference_fn
+            goal_inference_fn=goal_inference_fn,
         )
 
         # Goal drift should be tracked
@@ -451,17 +439,13 @@ class TestLongHorizonEvaluator:
     async def test_checkpoints_captured(self, mock_agent, mock_embedding):
         """Test that checkpoints are captured at correct intervals."""
         evaluator = LongHorizonEvaluator(
-            agent=mock_agent,
-            embed_fn=mock_embedding,
-            window_size=5
+            agent=mock_agent, embed_fn=mock_embedding, window_size=5
         )
 
         tasks = [f"task_{i}" for i in range(30)]
 
         report = await evaluator.run_evaluation(
-            tasks=tasks,
-            original_goal="Complete tasks",
-            checkpoint_interval=10
+            tasks=tasks, original_goal="Complete tasks", checkpoint_interval=10
         )
 
         assert len(report.checkpoints) == 3
@@ -472,10 +456,7 @@ class TestLongHorizonEvaluator:
     def test_generate_recommendations_low_success(self, evaluator):
         """Test recommendations for low success rate."""
         recs = evaluator._generate_recommendations(
-            success_rate=0.5,
-            cnsr=0.8,
-            mean_drift=0.1,
-            incident_rate=1.0
+            success_rate=0.5, cnsr=0.8, mean_drift=0.1, incident_rate=1.0
         )
 
         assert any("Low success rate" in r for r in recs)
@@ -483,10 +464,7 @@ class TestLongHorizonEvaluator:
     def test_generate_recommendations_moderate_success(self, evaluator):
         """Test recommendations for moderate success rate."""
         recs = evaluator._generate_recommendations(
-            success_rate=0.75,
-            cnsr=1.5,
-            mean_drift=0.1,
-            incident_rate=1.0
+            success_rate=0.75, cnsr=1.5, mean_drift=0.1, incident_rate=1.0
         )
 
         assert any("Moderate success rate" in r for r in recs)
@@ -494,10 +472,7 @@ class TestLongHorizonEvaluator:
     def test_generate_recommendations_low_cnsr(self, evaluator):
         """Test recommendations for low CNSR."""
         recs = evaluator._generate_recommendations(
-            success_rate=0.85,
-            cnsr=0.5,
-            mean_drift=0.1,
-            incident_rate=1.0
+            success_rate=0.85, cnsr=0.5, mean_drift=0.1, incident_rate=1.0
         )
 
         assert any("cost efficiency" in r for r in recs)
@@ -505,10 +480,7 @@ class TestLongHorizonEvaluator:
     def test_generate_recommendations_high_drift(self, evaluator):
         """Test recommendations for high goal drift."""
         recs = evaluator._generate_recommendations(
-            success_rate=0.9,
-            cnsr=1.5,
-            mean_drift=0.5,
-            incident_rate=1.0
+            success_rate=0.9, cnsr=1.5, mean_drift=0.5, incident_rate=1.0
         )
 
         assert any("goal drift" in r.lower() for r in recs)
@@ -516,10 +488,7 @@ class TestLongHorizonEvaluator:
     def test_generate_recommendations_high_incident_rate(self, evaluator):
         """Test recommendations for high incident rate."""
         recs = evaluator._generate_recommendations(
-            success_rate=0.9,
-            cnsr=1.5,
-            mean_drift=0.1,
-            incident_rate=10.0
+            success_rate=0.9, cnsr=1.5, mean_drift=0.1, incident_rate=10.0
         )
 
         assert any("incident rate" in r.lower() for r in recs)
@@ -527,10 +496,7 @@ class TestLongHorizonEvaluator:
     def test_generate_recommendations_no_issues(self, evaluator):
         """Test recommendations when no issues detected."""
         recs = evaluator._generate_recommendations(
-            success_rate=0.95,
-            cnsr=2.0,
-            mean_drift=0.05,
-            incident_rate=1.0
+            success_rate=0.95, cnsr=2.0, mean_drift=0.05, incident_rate=1.0
         )
 
         assert any("No critical issues" in r for r in recs)
@@ -560,7 +526,7 @@ class TestLongHorizonEvaluator:
             incidents_by_severity={},
             critical_incidents=[],
             recommendations=["Continue monitoring"],
-            checkpoints=[]
+            checkpoints=[],
         )
 
         json_export = evaluator.export_report(report, format="json")
@@ -592,7 +558,7 @@ class TestLongHorizonEvaluator:
             incidents_by_severity={"LOW": 0, "MEDIUM": 0},
             critical_incidents=[],
             recommendations=["Continue monitoring"],
-            checkpoints=[]
+            checkpoints=[],
         )
 
         md_export = evaluator.export_report(report, format="markdown")
@@ -628,7 +594,7 @@ class TestLongHorizonEvaluator:
             incidents_by_severity={},
             critical_incidents=[],
             recommendations=[],
-            checkpoints=[]
+            checkpoints=[],
         )
 
         with pytest.raises(ValueError, match="Unsupported format"):
@@ -644,7 +610,7 @@ class TestLongHorizonEvaluator:
                 rolling_success_rate=0.8,
                 current_drift=0.1,
                 incident_count=2,
-                cnsr=1.2
+                cnsr=1.2,
             ),
             CheckpointData(
                 checkpoint_num=2,
@@ -653,8 +619,8 @@ class TestLongHorizonEvaluator:
                 rolling_success_rate=0.85,
                 current_drift=0.12,
                 incident_count=3,
-                cnsr=1.3
-            )
+                cnsr=1.3,
+            ),
         ]
 
         report = LongHorizonReport(
@@ -680,7 +646,7 @@ class TestLongHorizonEvaluator:
             incidents_by_severity={"LOW": 2, "MEDIUM": 1},
             critical_incidents=[],
             recommendations=["Continue monitoring"],
-            checkpoints=checkpoints
+            checkpoints=checkpoints,
         )
 
         md = evaluator._format_markdown_report(report)
@@ -692,6 +658,7 @@ class TestLongHorizonEvaluator:
 # SimpleLongHorizonEvaluator Tests
 # ============================================================================
 
+
 class TestSimpleLongHorizonEvaluator:
     """Tests for SimpleLongHorizonEvaluator class."""
 
@@ -701,11 +668,7 @@ class TestSimpleLongHorizonEvaluator:
 
     def test_record_result_success(self, simple_evaluator):
         """Test recording successful results."""
-        simple_evaluator.record_result(
-            success=True,
-            cost=0.01,
-            latency_ms=100.0
-        )
+        simple_evaluator.record_result(success=True, cost=0.01, latency_ms=100.0)
 
         assert simple_evaluator._task_count == 1
         summary = simple_evaluator.get_summary()
@@ -714,11 +677,7 @@ class TestSimpleLongHorizonEvaluator:
 
     def test_record_result_failure(self, simple_evaluator):
         """Test recording failed results."""
-        simple_evaluator.record_result(
-            success=False,
-            cost=0.01,
-            latency_ms=100.0
-        )
+        simple_evaluator.record_result(success=False, cost=0.01, latency_ms=100.0)
 
         summary = simple_evaluator.get_summary()
         assert summary["overall_success_rate"] == 0.0
@@ -731,7 +690,7 @@ class TestSimpleLongHorizonEvaluator:
             latency_ms=100.0,
             incident_type=IncidentType.TOOL_FAILURE,
             incident_severity=IncidentSeverity.MEDIUM,
-            incident_description="Tool execution failed"
+            incident_description="Tool execution failed",
         )
 
         summary = simple_evaluator.get_summary()
@@ -741,11 +700,7 @@ class TestSimpleLongHorizonEvaluator:
         """Test recording multiple results."""
         # Record 8 successes and 2 failures
         for i in range(10):
-            simple_evaluator.record_result(
-                success=i < 8,
-                cost=0.01,
-                latency_ms=100.0
-            )
+            simple_evaluator.record_result(success=i < 8, cost=0.01, latency_ms=100.0)
 
         summary = simple_evaluator.get_summary()
         assert summary["total_tasks"] == 10
@@ -756,10 +711,7 @@ class TestSimpleLongHorizonEvaluator:
         """Test CNSR calculation in summary."""
         # Record results
         for _ in range(10):
-            simple_evaluator.record_result(
-                success=True,
-                cost=0.01
-            )
+            simple_evaluator.record_result(success=True, cost=0.01)
 
         summary = simple_evaluator.get_summary()
         # CNSR = success_rate / mean_cost = 1.0 / 0.01 = 100.0
@@ -770,21 +722,22 @@ class TestSimpleLongHorizonEvaluator:
         # Create degrading pattern - high success early, low success later
         for i in range(20):
             simple_evaluator.record_result(
-                success=i < 15,  # First 15 succeed, last 5 fail
-                cost=0.01
+                success=i < 15, cost=0.01  # First 15 succeed, last 5 fail
             )
 
         summary = simple_evaluator.get_summary()
         # Should detect degradation
-        assert "trend" in summary.get("success_trend", "").lower() or summary.get("is_degrading") is True
+        assert (
+            "trend" in summary.get("success_trend", "").lower()
+            or summary.get("is_degrading") is True
+        )
 
     def test_rolling_success_rate(self, simple_evaluator):
         """Test rolling success rate calculation."""
         # Fill more than window size
         for i in range(15):
             simple_evaluator.record_result(
-                success=i >= 10,  # Last 5 successful
-                cost=0.01
+                success=i >= 10, cost=0.01  # Last 5 successful
             )
 
         summary = simple_evaluator.get_summary()
@@ -796,6 +749,7 @@ class TestSimpleLongHorizonEvaluator:
 # ============================================================================
 # Integration Tests
 # ============================================================================
+
 
 class TestLongHorizonIntegration:
     """Integration tests for long-horizon evaluation."""
@@ -815,15 +769,13 @@ class TestLongHorizonIntegration:
         agent.run = Mock(side_effect=results)
 
         evaluator = LongHorizonEvaluator(
-            agent=agent,
-            embed_fn=mock_embedding,
-            window_size=20
+            agent=agent, embed_fn=mock_embedding, window_size=20
         )
 
         report = await evaluator.run_evaluation(
             tasks=[f"task_{i}" for i in range(100)],
             original_goal="Complete data processing",
-            checkpoint_interval=25
+            checkpoint_interval=25,
         )
 
         # Verify report completeness
@@ -849,21 +801,17 @@ class TestLongHorizonIntegration:
         agent.run = Mock(side_effect=results)
 
         evaluator = LongHorizonEvaluator(
-            agent=agent,
-            embed_fn=mock_embedding,
-            window_size=20
+            agent=agent, embed_fn=mock_embedding, window_size=20
         )
 
         report = await evaluator.run_evaluation(
-            tasks=[f"task_{i}" for i in range(100)],
-            original_goal="Complete tasks"
+            tasks=[f"task_{i}" for i in range(100)], original_goal="Complete tasks"
         )
 
         # Should detect degradation or have relevant recommendations
         assert report.status == EvaluationStatus.COMPLETED
-        has_degradation_notice = (
-            report.success_trend == "degrading" or
-            any("degradation" in r.lower() for r in report.recommendations)
+        has_degradation_notice = report.success_trend == "degrading" or any(
+            "degradation" in r.lower() for r in report.recommendations
         )
         # Either trend detected or recommendations mention it
         assert has_degradation_notice or report.success_trend in ["stable", "degrading"]
@@ -872,6 +820,7 @@ class TestLongHorizonIntegration:
 # ============================================================================
 # EvaluationStatus Tests
 # ============================================================================
+
 
 class TestEvaluationStatus:
     """Tests for EvaluationStatus enum."""

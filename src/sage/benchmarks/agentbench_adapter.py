@@ -25,23 +25,24 @@ Example:
 
 from __future__ import annotations
 
-import logging
-import json
 import hashlib
-from enum import Enum
+import json
+import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from enum import Enum
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
-from .base_adapter import BenchmarkAdapter, BenchmarkTask, BenchmarkResult
+from .base_adapter import BenchmarkAdapter, BenchmarkResult, BenchmarkTask
 
 logger = logging.getLogger(__name__)
 
 
 class AgentBenchSubset(Enum):
     """AgentBench task subsets."""
+
     OS = "os"
     DB = "db"
     KG = "kg"
@@ -62,6 +63,7 @@ class AgentBenchTask(BenchmarkTask):
         difficulty: Task difficulty (1-5)
         max_steps: Maximum allowed steps
     """
+
     subset: AgentBenchSubset = AgentBenchSubset.OS
     environment: Dict[str, Any] = field(default_factory=dict)
     init_state: Dict[str, Any] = field(default_factory=dict)
@@ -71,14 +73,16 @@ class AgentBenchTask(BenchmarkTask):
 
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
-        base.update({
-            "subset": self.subset.value,
-            "environment": self.environment,
-            "init_state": self.init_state,
-            "goal": self.goal,
-            "difficulty": self.difficulty,
-            "max_steps": self.max_steps
-        })
+        base.update(
+            {
+                "subset": self.subset.value,
+                "environment": self.environment,
+                "init_state": self.init_state,
+                "goal": self.goal,
+                "difficulty": self.difficulty,
+                "max_steps": self.max_steps,
+            }
+        )
         return base
 
 
@@ -93,6 +97,7 @@ class AgentBenchResult(BenchmarkResult):
         goal_achieved: Whether goal was achieved
         partial_credit: Partial credit score
     """
+
     steps_taken: int = 0
     commands_executed: List[str] = field(default_factory=list)
     final_state: Dict[str, Any] = field(default_factory=dict)
@@ -101,13 +106,15 @@ class AgentBenchResult(BenchmarkResult):
 
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
-        base.update({
-            "steps_taken": self.steps_taken,
-            "commands_executed": self.commands_executed,
-            "final_state": self.final_state,
-            "goal_achieved": self.goal_achieved,
-            "partial_credit": self.partial_credit
-        })
+        base.update(
+            {
+                "steps_taken": self.steps_taken,
+                "commands_executed": self.commands_executed,
+                "final_state": self.final_state,
+                "goal_achieved": self.goal_achieved,
+                "partial_credit": self.partial_credit,
+            }
+        )
         return base
 
 
@@ -117,65 +124,57 @@ SAMPLE_OS_TASKS = [
         "id": "os_001",
         "query": "Create a directory called 'project' and inside it create a file 'readme.txt' with the content 'Hello World'",
         "goal": "Directory 'project' exists with file 'readme.txt' containing 'Hello World'",
-        "expected_state": {
-            "files": {"project/readme.txt": "Hello World"}
-        },
-        "difficulty": 1
+        "expected_state": {"files": {"project/readme.txt": "Hello World"}},
+        "difficulty": 1,
     },
     {
         "id": "os_002",
         "query": "Find all Python files in the current directory and its subdirectories, then count the total number of lines",
         "goal": "Return the total line count of all .py files",
         "expected_output": "line_count",
-        "difficulty": 2
+        "difficulty": 2,
     },
     {
         "id": "os_003",
         "query": "Create a backup of all .txt files by copying them to a 'backup' directory with a .bak extension",
         "goal": "Backup directory contains .bak copies of all .txt files",
-        "expected_state": {
-            "files_pattern": "backup/*.bak"
-        },
-        "difficulty": 2
+        "expected_state": {"files_pattern": "backup/*.bak"},
+        "difficulty": 2,
     },
     {
         "id": "os_004",
         "query": "Find the process using the most memory and display its name and memory usage",
         "goal": "Display process name and memory information",
         "expected_output": "process_info",
-        "difficulty": 3
+        "difficulty": 3,
     },
     {
         "id": "os_005",
         "query": "Create a shell script that monitors disk usage and alerts if any partition exceeds 80%",
         "goal": "Script exists and is executable",
-        "expected_state": {
-            "files": {"disk_monitor.sh": "executable"}
-        },
-        "difficulty": 3
+        "expected_state": {"files": {"disk_monitor.sh": "executable"}},
+        "difficulty": 3,
     },
     {
         "id": "os_006",
         "query": "Configure a cron job to run a backup script every day at 2 AM",
         "goal": "Cron job is configured correctly",
         "expected_output": "cron_configured",
-        "difficulty": 4
+        "difficulty": 4,
     },
     {
         "id": "os_007",
         "query": "Set up a local git repository, create an initial commit, and configure a pre-commit hook that runs tests",
         "goal": "Git repo initialized with pre-commit hook",
-        "expected_state": {
-            "files": {".git/hooks/pre-commit": "executable"}
-        },
-        "difficulty": 4
+        "expected_state": {"files": {".git/hooks/pre-commit": "executable"}},
+        "difficulty": 4,
     },
     {
         "id": "os_008",
         "query": "Diagnose why a web server is not responding on port 80 and fix the issue",
         "goal": "Web server is responding on port 80",
         "expected_output": "server_running",
-        "difficulty": 5
+        "difficulty": 5,
     },
 ]
 
@@ -206,7 +205,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
         self,
         data_path: Optional[str] = None,
         seed: int = 42,
-        use_sample_data: bool = True
+        use_sample_data: bool = True,
     ):
         """Initialize AgentBench adapter.
 
@@ -232,7 +231,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
         subset: str = "os",
         n: Optional[int] = None,
         difficulty: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> List[AgentBenchTask]:
         """Load AgentBench tasks.
 
@@ -292,17 +291,13 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
                 init_state=item.get("init_state", {}),
                 goal=item.get("goal", ""),
                 difficulty=item.get("difficulty", 1),
-                max_steps=item.get("max_steps", 30)
+                max_steps=item.get("max_steps", 30),
             )
             tasks.append(task)
 
         return tasks
 
-    def _generate_sample_tasks(
-        self,
-        subset: str,
-        n: int
-    ) -> List[AgentBenchTask]:
+    def _generate_sample_tasks(self, subset: str, n: int) -> List[AgentBenchTask]:
         """Generate sample tasks for demonstration."""
         sample_data = SAMPLE_OS_TASKS if subset == "os" else SAMPLE_OS_TASKS
 
@@ -313,10 +308,14 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
                 query=item["query"],
                 expected_output=item.get("expected_output"),
                 metadata={"source": "sample"},
-                subset=AgentBenchSubset(subset) if subset in [e.value for e in AgentBenchSubset] else AgentBenchSubset.OS,
+                subset=(
+                    AgentBenchSubset(subset)
+                    if subset in [e.value for e in AgentBenchSubset]
+                    else AgentBenchSubset.OS
+                ),
                 goal=item.get("goal", ""),
                 difficulty=item.get("difficulty", 1),
-                max_steps=30
+                max_steps=30,
             )
             tasks.append(task)
 
@@ -329,7 +328,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
                 metadata={"source": "generated"},
                 subset=AgentBenchSubset.OS,
                 difficulty=self._rng.integers(1, 5),
-                max_steps=30
+                max_steps=30,
             )
             tasks.append(task)
 
@@ -339,7 +338,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
         self,
         task: AgentBenchTask,
         output: str,
-        execution_trace: Optional[List[Dict]] = None
+        execution_trace: Optional[List[Dict]] = None,
     ) -> AgentBenchResult:
         """Evaluate agent output for a task.
 
@@ -374,7 +373,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
             steps_taken=len(commands),
             commands_executed=commands,
             goal_achieved=goal_achieved,
-            partial_credit=score if not goal_achieved else 0.0
+            partial_credit=score if not goal_achieved else 0.0,
         )
 
     def _extract_commands(self, output: str) -> List[str]:
@@ -383,26 +382,27 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
 
         # Look for code blocks
         import re
-        code_blocks = re.findall(r'```(?:bash|sh|shell)?\n(.*?)```', output, re.DOTALL)
+
+        code_blocks = re.findall(r"```(?:bash|sh|shell)?\n(.*?)```", output, re.DOTALL)
         for block in code_blocks:
-            for line in block.strip().split('\n'):
+            for line in block.strip().split("\n"):
                 line = line.strip()
-                if line and not line.startswith('#'):
+                if line and not line.startswith("#"):
                     commands.append(line)
 
         # Look for inline commands
-        inline = re.findall(r'`([^`]+)`', output)
+        inline = re.findall(r"`([^`]+)`", output)
         for cmd in inline:
-            if any(kw in cmd for kw in ['cd', 'ls', 'cat', 'echo', 'mkdir', 'cp', 'mv', 'rm']):
+            if any(
+                kw in cmd
+                for kw in ["cd", "ls", "cat", "echo", "mkdir", "cp", "mv", "rm"]
+            ):
                 commands.append(cmd)
 
         return commands
 
     def _check_goal_achievement(
-        self,
-        task: AgentBenchTask,
-        output: str,
-        commands: List[str]
+        self, task: AgentBenchTask, output: str, commands: List[str]
     ) -> bool:
         """Check if goal was achieved."""
         # Simplified goal checking
@@ -411,10 +411,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
                 return task.expected_output.lower() in output.lower()
             elif isinstance(task.expected_output, dict):
                 # Check expected state
-                return all(
-                    key in output.lower()
-                    for key in task.expected_output.keys()
-                )
+                return all(key in output.lower() for key in task.expected_output.keys())
 
         # Check goal keywords
         if task.goal:
@@ -425,10 +422,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
         return len(commands) > 0
 
     def _calculate_partial_credit(
-        self,
-        task: AgentBenchTask,
-        output: str,
-        commands: List[str]
+        self, task: AgentBenchTask, output: str, commands: List[str]
     ) -> float:
         """Calculate partial credit for incomplete solutions."""
         credit = 0.0
@@ -438,10 +432,9 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
             credit += 0.2
 
         # Credit for relevant commands
-        relevant_keywords = ['mkdir', 'touch', 'echo', 'cat', 'find', 'grep']
+        relevant_keywords = ["mkdir", "touch", "echo", "cat", "find", "grep"]
         relevant_count = sum(
-            1 for cmd in commands
-            if any(kw in cmd for kw in relevant_keywords)
+            1 for cmd in commands if any(kw in cmd for kw in relevant_keywords)
         )
         credit += min(0.3, relevant_count * 0.1)
 
@@ -456,8 +449,7 @@ class AgentBenchAdapter(BenchmarkAdapter[AgentBenchTask, AgentBenchResult]):
 
 
 def download_agentbench_data(
-    output_dir: str = "data/agentbench",
-    subset: str = "os"
+    output_dir: str = "data/agentbench", subset: str = "os"
 ) -> str:
     """Download AgentBench data.
 

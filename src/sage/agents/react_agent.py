@@ -1,16 +1,15 @@
 """ReAct (Reasoning and Acting) agent implementation."""
 
-from typing import Optional, List, Callable, Any, Literal
 import logging
+from typing import Any, Callable, List, Literal, Optional
 
-from langgraph.prebuilt import ToolNode
-from langgraph.graph import StateGraph, MessagesState, START, END
 from langchain_core.messages import HumanMessage
+from langgraph.graph import END, START, MessagesState, StateGraph
+from langgraph.prebuilt import ToolNode
 
 from sage.core.base_agent import BaseAgent
-from sage.core.llm_client import LLMClient
 from sage.core.exceptions import AgentError
-
+from sage.core.llm_client import LLMClient
 
 logger = logging.getLogger(__name__)
 
@@ -90,13 +89,16 @@ class ReActAgent(BaseAgent):
             # Add system instructions if provided
             if self.instructions:
                 from langchain_core.messages import SystemMessage
+
                 system_msg = SystemMessage(content=self.instructions)
                 messages = [system_msg] + list(messages)
 
             response = llm_with_tools.invoke(messages)
 
             if self.verbose:
-                logger.debug(f"[{self.name}] Model response: {response.content[:100]}...")
+                logger.debug(
+                    f"[{self.name}] Model response: {response.content[:100]}..."
+                )
 
             return {"messages": [response]}
 

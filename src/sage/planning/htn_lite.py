@@ -10,14 +10,20 @@ formal precondition/effect reasoning.
 """
 
 import logging
-import time
 import re
-from typing import Optional, List, Dict, Any, Callable
+import time
+from typing import Any, Callable, Dict, List, Optional
 
 from .planner_base import BasePlanner
 from .schemas import (
-    Plan, PlanStep, PlanningContext, PlanningResult,
-    PlanStatus, StepStatus, create_plan, create_step,
+    Plan,
+    PlanningContext,
+    PlanningResult,
+    PlanStatus,
+    PlanStep,
+    StepStatus,
+    create_plan,
+    create_step,
 )
 
 logger = logging.getLogger(__name__)
@@ -78,7 +84,9 @@ class TaskTemplate:
             for key, value in st.items():
                 if isinstance(value, str):
                     for group_name, group_value in groups.items():
-                        st[key] = st[key].replace(f"{{{group_name}}}", group_value or "")
+                        st[key] = st[key].replace(
+                            f"{{{group_name}}}", group_value or ""
+                        )
             result.append(st)
         return result
 
@@ -89,9 +97,21 @@ DEFAULT_TEMPLATES = [
         name="search_and_summarize",
         pattern=r"(?:find|search|look up).*(?:about|for|on)\s+(?P<topic>.+?)(?:\s+and\s+(?:summarize|summarise))?",
         subtasks=[
-            {"action": "search", "description": "Search for information about {topic}", "params": {"query": "{topic}"}},
-            {"action": "read", "description": "Read and extract relevant information", "params": {}},
-            {"action": "summarize", "description": "Summarize the findings about {topic}", "params": {}},
+            {
+                "action": "search",
+                "description": "Search for information about {topic}",
+                "params": {"query": "{topic}"},
+            },
+            {
+                "action": "read",
+                "description": "Read and extract relevant information",
+                "params": {},
+            },
+            {
+                "action": "summarize",
+                "description": "Summarize the findings about {topic}",
+                "params": {},
+            },
         ],
         description="Search for a topic and summarize results",
     ),
@@ -99,9 +119,17 @@ DEFAULT_TEMPLATES = [
         name="analyze_data",
         pattern=r"(?:analyze|analyse|examine)\s+(?P<data>.+)",
         subtasks=[
-            {"action": "load", "description": "Load the data: {data}", "params": {"source": "{data}"}},
+            {
+                "action": "load",
+                "description": "Load the data: {data}",
+                "params": {"source": "{data}"},
+            },
             {"action": "analyze", "description": "Perform analysis", "params": {}},
-            {"action": "report", "description": "Generate analysis report", "params": {}},
+            {
+                "action": "report",
+                "description": "Generate analysis report",
+                "params": {},
+            },
         ],
         description="Load, analyze, and report on data",
     ),
@@ -109,9 +137,21 @@ DEFAULT_TEMPLATES = [
         name="create_document",
         pattern=r"(?:create|write|generate)\s+(?:a\s+)?(?P<doctype>report|summary|document|email)\s+(?:about|on|for)\s+(?P<topic>.+)",
         subtasks=[
-            {"action": "research", "description": "Gather information about {topic}", "params": {"topic": "{topic}"}},
-            {"action": "outline", "description": "Create outline for {doctype}", "params": {}},
-            {"action": "write", "description": "Write the {doctype}", "params": {"type": "{doctype}"}},
+            {
+                "action": "research",
+                "description": "Gather information about {topic}",
+                "params": {"topic": "{topic}"},
+            },
+            {
+                "action": "outline",
+                "description": "Create outline for {doctype}",
+                "params": {},
+            },
+            {
+                "action": "write",
+                "description": "Write the {doctype}",
+                "params": {"type": "{doctype}"},
+            },
             {"action": "review", "description": "Review and finalize", "params": {}},
         ],
         description="Research and create a document",
@@ -120,9 +160,21 @@ DEFAULT_TEMPLATES = [
         name="code_task",
         pattern=r"(?:implement|code|build|develop)\s+(?P<feature>.+)",
         subtasks=[
-            {"action": "understand", "description": "Understand requirements for {feature}", "params": {}},
-            {"action": "design", "description": "Design the implementation", "params": {}},
-            {"action": "implement", "description": "Implement {feature}", "params": {"feature": "{feature}"}},
+            {
+                "action": "understand",
+                "description": "Understand requirements for {feature}",
+                "params": {},
+            },
+            {
+                "action": "design",
+                "description": "Design the implementation",
+                "params": {},
+            },
+            {
+                "action": "implement",
+                "description": "Implement {feature}",
+                "params": {"feature": "{feature}"},
+            },
             {"action": "test", "description": "Test the implementation", "params": {}},
         ],
         description="Software development workflow",
@@ -131,9 +183,17 @@ DEFAULT_TEMPLATES = [
         name="deploy_task",
         pattern=r"(?:deploy|release|ship)\s+(?P<artifact>.+?)(?:\s+to\s+(?P<environment>.+))?",
         subtasks=[
-            {"action": "verify", "description": "Verify {artifact} is ready", "params": {}},
+            {
+                "action": "verify",
+                "description": "Verify {artifact} is ready",
+                "params": {},
+            },
             {"action": "backup", "description": "Create backup/snapshot", "params": {}},
-            {"action": "deploy", "description": "Deploy {artifact} to {environment}", "params": {"target": "{environment}"}},
+            {
+                "action": "deploy",
+                "description": "Deploy {artifact} to {environment}",
+                "params": {"target": "{environment}"},
+            },
             {"action": "validate", "description": "Validate deployment", "params": {}},
         ],
         description="Deployment workflow",
@@ -280,10 +340,12 @@ class HTNLitePlanner(BasePlanner):
             PlanningResult with new plan
         """
         # Add failure context
-        context.history.append({
-            "action": "htn_failure",
-            "result": failure_reason,
-        })
+        context.history.append(
+            {
+                "action": "htn_failure",
+                "result": failure_reason,
+            }
+        )
 
         # Try alternative templates or LLM fallback
         result = self.plan(context)

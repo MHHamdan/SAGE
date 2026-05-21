@@ -4,19 +4,21 @@ Provides a lightweight Python DSL for defining security and
 execution policies. Optionally supports OPA/Rego integration.
 """
 
-import re
-import yaml
 import logging
-from typing import Optional, List, Dict, Any, Callable, Union
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Union
+
+import yaml
 
 logger = logging.getLogger(__name__)
 
 
 class PolicyDecision(Enum):
     """Decision from policy evaluation."""
+
     ALLOW = "allow"
     DENY = "deny"
     REQUIRE_APPROVAL = "require_approval"
@@ -25,6 +27,7 @@ class PolicyDecision(Enum):
 @dataclass
 class PolicyResult:
     """Result of policy evaluation."""
+
     decision: PolicyDecision
     rule_name: Optional[str] = None
     reason: Optional[str] = None
@@ -49,6 +52,7 @@ class PolicyRule:
 
     Rules are evaluated in order. First matching rule determines the decision.
     """
+
     name: str
     description: str = ""
     condition: Optional[Callable[[Dict[str, Any]], bool]] = None
@@ -138,12 +142,14 @@ class Policy:
         """
         self._blocklist.extend(patterns)
         for pattern in patterns:
-            self.add_rule(PolicyRule(
-                name=f"blocklist_{pattern}",
-                condition_pattern=re.escape(pattern),
-                decision=PolicyDecision.DENY,
-                priority=100,  # High priority
-            ))
+            self.add_rule(
+                PolicyRule(
+                    name=f"blocklist_{pattern}",
+                    condition_pattern=re.escape(pattern),
+                    decision=PolicyDecision.DENY,
+                    priority=100,  # High priority
+                )
+            )
 
     def add_allowlist(self, patterns: List[str]):
         """Add patterns to allowlist.
@@ -153,12 +159,14 @@ class Policy:
         """
         self._allowlist.extend(patterns)
         for pattern in patterns:
-            self.add_rule(PolicyRule(
-                name=f"allowlist_{pattern}",
-                condition_pattern=re.escape(pattern),
-                decision=PolicyDecision.ALLOW,
-                priority=90,  # High priority but below blocklist
-            ))
+            self.add_rule(
+                PolicyRule(
+                    name=f"allowlist_{pattern}",
+                    condition_pattern=re.escape(pattern),
+                    decision=PolicyDecision.ALLOW,
+                    priority=90,  # High priority but below blocklist
+                )
+            )
 
     def evaluate(self, context: Dict[str, Any]) -> PolicyResult:
         """Evaluate the policy for a given context.
@@ -324,40 +332,48 @@ def create_default_policy() -> Policy:
     policy = Policy(name="default_security")
 
     # Block dangerous operations
-    policy.add_blocklist([
-        "rm -rf",
-        "sudo",
-        "chmod 777",
-        "eval(",
-        "exec(",
-        "DROP TABLE",
-        "DELETE FROM",
-        "format c:",
-    ])
+    policy.add_blocklist(
+        [
+            "rm -rf",
+            "sudo",
+            "chmod 777",
+            "eval(",
+            "exec(",
+            "DROP TABLE",
+            "DELETE FROM",
+            "format c:",
+        ]
+    )
 
     # Require approval for risky operations
-    policy.add_rule(PolicyRule(
-        name="production_deployment",
-        condition_pattern=r"deploy.*prod|production",
-        decision=PolicyDecision.REQUIRE_APPROVAL,
-        priority=80,
-        description="Production deployments require approval",
-    ))
+    policy.add_rule(
+        PolicyRule(
+            name="production_deployment",
+            condition_pattern=r"deploy.*prod|production",
+            decision=PolicyDecision.REQUIRE_APPROVAL,
+            priority=80,
+            description="Production deployments require approval",
+        )
+    )
 
-    policy.add_rule(PolicyRule(
-        name="data_deletion",
-        condition_pattern=r"delete|truncate|drop",
-        decision=PolicyDecision.REQUIRE_APPROVAL,
-        priority=70,
-        description="Data deletion requires approval",
-    ))
+    policy.add_rule(
+        PolicyRule(
+            name="data_deletion",
+            condition_pattern=r"delete|truncate|drop",
+            decision=PolicyDecision.REQUIRE_APPROVAL,
+            priority=70,
+            description="Data deletion requires approval",
+        )
+    )
 
-    policy.add_rule(PolicyRule(
-        name="high_risk",
-        condition=lambda ctx: ctx.get("risk_score", 0) >= 0.7,
-        decision=PolicyDecision.REQUIRE_APPROVAL,
-        priority=60,
-        description="High-risk actions require approval",
-    ))
+    policy.add_rule(
+        PolicyRule(
+            name="high_risk",
+            condition=lambda ctx: ctx.get("risk_score", 0) >= 0.7,
+            decision=PolicyDecision.REQUIRE_APPROVAL,
+            priority=60,
+            description="High-risk actions require approval",
+        )
+    )
 
     return policy

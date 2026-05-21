@@ -1,8 +1,7 @@
 """Tool registry for managing and organizing agent tools."""
 
-from typing import List, Dict, Any, Callable, Optional
 import logging
-
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

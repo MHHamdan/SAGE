@@ -4,24 +4,26 @@ Prevents replay attacks through nonce and timestamp validation.
 """
 
 import logging
-import time
 import secrets
 import threading
-from typing import Optional, Dict, Set
-from dataclasses import dataclass, field
+import time
 from collections import OrderedDict
+from dataclasses import dataclass, field
+from typing import Dict, Optional, Set
 
 logger = logging.getLogger(__name__)
 
 
 class ReplayAttackDetected(Exception):
     """Exception raised when a replay attack is detected."""
+
     pass
 
 
 @dataclass
 class MessageMetadata:
     """Metadata for replay protection."""
+
     message_id: str
     nonce: str
     timestamp: float
@@ -29,7 +31,9 @@ class MessageMetadata:
     sequence_number: Optional[int] = None
 
     @classmethod
-    def generate(cls, sender_id: str, sequence_number: Optional[int] = None) -> "MessageMetadata":
+    def generate(
+        cls, sender_id: str, sequence_number: Optional[int] = None
+    ) -> "MessageMetadata":
         """Generate new message metadata.
 
         Args:
@@ -112,10 +116,7 @@ class NonceManager:
     def _cleanup(self):
         """Remove expired nonces."""
         cutoff = time.time() - self.max_age_seconds
-        expired = [
-            nonce for nonce, ts in self._nonces.items()
-            if ts < cutoff
-        ]
+        expired = [nonce for nonce, ts in self._nonces.items() if ts < cutoff]
 
         for nonce in expired:
             del self._nonces[nonce]

@@ -5,17 +5,18 @@ before and after execution.
 """
 
 import logging
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
-from ..planning.schemas import Plan, PlanStep, Condition, ConditionType
+from ..planning.schemas import Condition, ConditionType, Plan, PlanStep
 
 logger = logging.getLogger(__name__)
 
 
 class ConstraintStatus(Enum):
     """Status of a constraint check."""
+
     SATISFIED = "satisfied"
     VIOLATED = "violated"
     UNKNOWN = "unknown"
@@ -25,6 +26,7 @@ class ConstraintStatus(Enum):
 @dataclass
 class ConstraintResult:
     """Result of checking a constraint."""
+
     condition: Condition
     status: ConstraintStatus
     message: str = ""
@@ -42,6 +44,7 @@ class ConstraintResult:
 @dataclass
 class CheckResult:
     """Result of checking all constraints for a step."""
+
     step_id: str
     step_name: str
     precondition_results: List[ConstraintResult] = field(default_factory=list)
@@ -138,7 +141,11 @@ class ConstraintChecker:
                 is_satisfied = check_fn(condition.parameters, state)
                 return ConstraintResult(
                     condition=condition,
-                    status=ConstraintStatus.SATISFIED if is_satisfied else ConstraintStatus.VIOLATED,
+                    status=(
+                        ConstraintStatus.SATISFIED
+                        if is_satisfied
+                        else ConstraintStatus.VIOLATED
+                    ),
                     message=f"Check '{condition.check_fn}' {'passed' if is_satisfied else 'failed'}",
                 )
             except Exception as e:

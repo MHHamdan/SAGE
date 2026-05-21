@@ -10,21 +10,22 @@ Tests cover:
 - Edge cases
 """
 
-import pytest
-import numpy as np
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
+import numpy as np
+import pytest
+
 from sage.evaluation.rolling_metrics import (
-    RollingWindowTracker,
-    TimeBasedRollingTracker,
-    TaskResult,
-    WindowMetrics,
     PerformanceTrend,
+    RollingWindowTracker,
+    TaskResult,
+    TimeBasedRollingTracker,
+    WindowMetrics,
 )
 
-
 # Test fixtures
+
 
 @pytest.fixture
 def tracker():
@@ -39,13 +40,15 @@ def populated_tracker():
 
     now = datetime.now()
     for i in range(20):
-        tracker.record(TaskResult(
-            task_id=f"task_{i}",
-            timestamp=now + timedelta(minutes=i),
-            success=(i % 3 != 0),  # 2/3 success rate
-            cost=0.1 + (i * 0.01),
-            latency_ms=100 + (i * 10)
-        ))
+        tracker.record(
+            TaskResult(
+                task_id=f"task_{i}",
+                timestamp=now + timedelta(minutes=i),
+                success=(i % 3 != 0),  # 2/3 success rate
+                cost=0.1 + (i * 0.01),
+                latency_ms=100 + (i * 10),
+            )
+        )
 
     return tracker
 
@@ -55,7 +58,7 @@ def make_task_result(
     success: bool = True,
     cost: float = 0.1,
     latency_ms: float = 100.0,
-    timestamp: datetime = None
+    timestamp: datetime = None,
 ) -> TaskResult:
     """Helper to create task results."""
     return TaskResult(
@@ -63,11 +66,12 @@ def make_task_result(
         timestamp=timestamp or datetime.now(),
         success=success,
         cost=cost,
-        latency_ms=latency_ms
+        latency_ms=latency_ms,
     )
 
 
 # Tests for TaskResult dataclass
+
 
 class TestTaskResult:
     """Tests for TaskResult dataclass."""
@@ -76,11 +80,7 @@ class TestTaskResult:
         """Should create task result with all fields."""
         now = datetime.now()
         result = TaskResult(
-            task_id="test-123",
-            timestamp=now,
-            success=True,
-            cost=0.05,
-            latency_ms=150.5
+            task_id="test-123", timestamp=now, success=True, cost=0.05, latency_ms=150.5
         )
 
         assert result.task_id == "test-123"
@@ -97,7 +97,7 @@ class TestTaskResult:
             success=True,
             cost=0.1,
             latency_ms=100.0,
-            metadata={"model": "gpt-4", "tokens": 500}
+            metadata={"model": "gpt-4", "tokens": 500},
         )
 
         assert result.metadata["model"] == "gpt-4"
@@ -110,7 +110,7 @@ class TestTaskResult:
             timestamp=datetime.now(),
             success=True,
             cost=0.1,
-            latency_ms=100.0
+            latency_ms=100.0,
         )
 
         data = result.to_dict()
@@ -120,6 +120,7 @@ class TestTaskResult:
 
 
 # Tests for WindowMetrics dataclass
+
 
 class TestWindowMetrics:
     """Tests for WindowMetrics dataclass."""
@@ -139,7 +140,7 @@ class TestWindowMetrics:
             total_cost=0.5,
             mean_latency_ms=100.0,
             cost_variance=0.001,
-            latency_variance=50.0
+            latency_variance=50.0,
         )
 
         assert metrics.success_rate == 0.8
@@ -159,7 +160,7 @@ class TestWindowMetrics:
             total_cost=0.5,
             mean_latency_ms=100.0,
             cost_variance=0.001,
-            latency_variance=50.0
+            latency_variance=50.0,
         )
 
         # 0.5 total / 8 successes = 0.0625
@@ -179,13 +180,14 @@ class TestWindowMetrics:
             total_cost=0.5,
             mean_latency_ms=100.0,
             cost_variance=0.001,
-            latency_variance=50.0
+            latency_variance=50.0,
         )
 
-        assert metrics.cost_per_success == float('inf')
+        assert metrics.cost_per_success == float("inf")
 
 
 # Tests for RollingWindowTracker initialization
+
 
 class TestRollingWindowTrackerInitialization:
     """Tests for tracker initialization."""
@@ -199,9 +201,7 @@ class TestRollingWindowTrackerInitialization:
     def test_custom_initialization(self):
         """Should accept custom parameters."""
         tracker = RollingWindowTracker(
-            window_size=100,
-            overlap=50,
-            max_history_windows=200
+            window_size=100, overlap=50, max_history_windows=200
         )
 
         assert tracker.window_size == 100
@@ -223,6 +223,7 @@ class TestRollingWindowTrackerInitialization:
 
 
 # Tests for recording results
+
 
 class TestRollingWindowTrackerRecording:
     """Tests for recording task results."""
@@ -270,6 +271,7 @@ class TestRollingWindowTrackerRecording:
 
 # Tests for current window metrics
 
+
 class TestCurrentWindowMetrics:
     """Tests for getting current window metrics."""
 
@@ -290,10 +292,7 @@ class TestCurrentWindowMetrics:
         """Should compute correct success rate."""
         # Add 6 successes and 4 failures
         for i in range(10):
-            tracker.record(make_task_result(
-                task_id=f"task_{i}",
-                success=(i < 6)
-            ))
+            tracker.record(make_task_result(task_id=f"task_{i}", success=(i < 6)))
 
         metrics = tracker.get_current_window()
         assert metrics.success_rate == pytest.approx(0.6, abs=0.01)
@@ -302,6 +301,7 @@ class TestCurrentWindowMetrics:
 
 
 # Tests for rolling success rate
+
 
 class TestRollingSuccessRate:
     """Tests for rolling success rate."""
@@ -338,6 +338,7 @@ class TestRollingSuccessRate:
 
 # Tests for rolling values
 
+
 class TestRollingValues:
     """Tests for getting rolling values."""
 
@@ -355,6 +356,7 @@ class TestRollingValues:
 
 
 # Tests for trend detection
+
 
 class TestTrendDetection:
     """Tests for trend detection."""
@@ -377,23 +379,27 @@ class TestTrendDetection:
         # First batch: all failures
         now = datetime.now()
         for i in range(5):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now + timedelta(minutes=i),
-                success=False,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now + timedelta(minutes=i),
+                    success=False,
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         # Second batch: all successes
         for i in range(5, 15):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now + timedelta(minutes=i),
-                success=True,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now + timedelta(minutes=i),
+                    success=True,
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         trend = tracker.get_success_trend()
         assert trend == "improving"
@@ -405,29 +411,34 @@ class TestTrendDetection:
         now = datetime.now()
         # First batch: all successes
         for i in range(5):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now + timedelta(minutes=i),
-                success=True,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now + timedelta(minutes=i),
+                    success=True,
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         # Second batch: all failures
         for i in range(5, 15):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now + timedelta(minutes=i),
-                success=False,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now + timedelta(minutes=i),
+                    success=False,
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         trend = tracker.get_success_trend()
         assert trend == "degrading"
 
 
 # Tests for performance degradation detection
+
 
 class TestPerformanceDegradationDetection:
     """Tests for degradation detection."""
@@ -436,11 +447,7 @@ class TestPerformanceDegradationDetection:
         """Should not detect degradation with stable performance."""
         # Add results with stable performance
         for i in range(20):
-            tracker.record(make_task_result(
-                success=True,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(make_task_result(success=True, cost=0.1, latency_ms=100))
 
         assert not tracker.detect_performance_degradation()
 
@@ -451,28 +458,33 @@ class TestPerformanceDegradationDetection:
         now = datetime.now()
         # Start with high success
         for i in range(10):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now + timedelta(minutes=i),
-                success=True,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now + timedelta(minutes=i),
+                    success=True,
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         # Then failures
         for i in range(10, 20):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now + timedelta(minutes=i),
-                success=False,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now + timedelta(minutes=i),
+                    success=False,
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         assert tracker.detect_performance_degradation()
 
 
 # Tests for trend analysis
+
 
 class TestTrendAnalysis:
     """Tests for comprehensive trend analysis."""
@@ -497,6 +509,7 @@ class TestTrendAnalysis:
 
 # Tests for cost trajectory
 
+
 class TestCostTrajectory:
     """Tests for cost trajectory."""
 
@@ -513,6 +526,7 @@ class TestCostTrajectory:
 
 # Tests for window history
 
+
 class TestWindowHistory:
     """Tests for window history."""
 
@@ -528,6 +542,7 @@ class TestWindowHistory:
 
 
 # Tests for summary statistics
+
 
 class TestSummaryStatistics:
     """Tests for summary statistics."""
@@ -552,6 +567,7 @@ class TestSummaryStatistics:
 
 # Tests for reset
 
+
 class TestTrackerReset:
     """Tests for resetting tracker."""
 
@@ -567,6 +583,7 @@ class TestTrackerReset:
 
 
 # Tests for to_dict export
+
 
 class TestTrackerExport:
     """Tests for export functionality."""
@@ -591,15 +608,13 @@ class TestTrackerExport:
 
 # Tests for TimeBasedRollingTracker
 
+
 class TestTimeBasedRollingTracker:
     """Tests for time-based tracker."""
 
     def test_initialization(self):
         """Should initialize with time parameters."""
-        tracker = TimeBasedRollingTracker(
-            window_minutes=60,
-            overlap_minutes=30
-        )
+        tracker = TimeBasedRollingTracker(window_minutes=60, overlap_minutes=30)
 
         assert tracker.window_duration == timedelta(minutes=60)
         assert tracker.overlap_duration == timedelta(minutes=30)
@@ -610,13 +625,15 @@ class TestTimeBasedRollingTracker:
 
         now = datetime.now()
         for i in range(5):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now - timedelta(minutes=i * 5),
-                success=True,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now - timedelta(minutes=i * 5),
+                    success=True,
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         metrics = tracker.get_current_window()
         assert metrics is not None
@@ -629,22 +646,26 @@ class TestTimeBasedRollingTracker:
         now = datetime.now()
 
         # Result within window
-        tracker.record(TaskResult(
-            task_id="recent",
-            timestamp=now - timedelta(minutes=10),
-            success=True,
-            cost=0.1,
-            latency_ms=100
-        ))
+        tracker.record(
+            TaskResult(
+                task_id="recent",
+                timestamp=now - timedelta(minutes=10),
+                success=True,
+                cost=0.1,
+                latency_ms=100,
+            )
+        )
 
         # Result outside window
-        tracker.record(TaskResult(
-            task_id="old",
-            timestamp=now - timedelta(minutes=60),
-            success=False,
-            cost=0.1,
-            latency_ms=100
-        ))
+        tracker.record(
+            TaskResult(
+                task_id="old",
+                timestamp=now - timedelta(minutes=60),
+                success=False,
+                cost=0.1,
+                latency_ms=100,
+            )
+        )
 
         metrics = tracker.get_current_window()
         assert metrics.task_count == 1  # Only recent result
@@ -657,19 +678,22 @@ class TestTimeBasedRollingTracker:
         now = datetime.now()
         # Add results at different times
         for i in range(10):
-            tracker.record(TaskResult(
-                task_id=f"task_{i}",
-                timestamp=now - timedelta(minutes=i * 5),
-                success=(i % 2 == 0),
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(
+                TaskResult(
+                    task_id=f"task_{i}",
+                    timestamp=now - timedelta(minutes=i * 5),
+                    success=(i % 2 == 0),
+                    cost=0.1,
+                    latency_ms=100,
+                )
+            )
 
         buckets = tracker.get_success_rate_over_time(bucket_minutes=15)
         assert len(buckets) > 0
 
 
 # Edge case tests
+
 
 class TestEdgeCases:
     """Tests for edge cases."""
@@ -685,11 +709,7 @@ class TestEdgeCases:
     def test_all_same_values(self, tracker):
         """Should handle all identical values."""
         for i in range(20):
-            tracker.record(make_task_result(
-                success=True,
-                cost=0.1,
-                latency_ms=100
-            ))
+            tracker.record(make_task_result(success=True, cost=0.1, latency_ms=100))
 
         metrics = tracker.get_current_window()
         assert metrics.cost_variance < 0.001
@@ -698,10 +718,12 @@ class TestEdgeCases:
     def test_high_variance_data(self, tracker):
         """Should handle high variance data."""
         for i in range(20):
-            tracker.record(make_task_result(
-                cost=0.1 * (2 ** i),  # Exponentially increasing
-                latency_ms=100 * (i + 1)
-            ))
+            tracker.record(
+                make_task_result(
+                    cost=0.1 * (2**i),  # Exponentially increasing
+                    latency_ms=100 * (i + 1),
+                )
+            )
 
         metrics = tracker.get_current_window()
         assert metrics.cost_variance > 0

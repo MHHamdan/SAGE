@@ -4,18 +4,19 @@ Provides isolation and resource limits for tool execution.
 """
 
 import logging
-import time
 import subprocess
-from typing import Optional, List, Dict, Any, Callable
+import threading
+import time
 from dataclasses import dataclass, field
 from enum import Enum
-import threading
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class SandboxMode(Enum):
     """Sandbox execution mode."""
+
     NONE = "none"  # No sandboxing
     BASIC = "basic"  # Basic resource limits
     STRICT = "strict"  # Strict isolation
@@ -24,6 +25,7 @@ class SandboxMode(Enum):
 @dataclass
 class ResourceLimits:
     """Resource limits for sandbox execution."""
+
     max_memory_mb: int = 512
     max_cpu_seconds: float = 30.0
     max_file_size_mb: int = 10
@@ -34,6 +36,7 @@ class ResourceLimits:
 @dataclass
 class SandboxResult:
     """Result of sandboxed execution."""
+
     success: bool
     result: Any = None
     error: Optional[str] = None
@@ -240,6 +243,7 @@ def sandboxed(
         ... def risky_operation():
         ...     pass
     """
+
     def decorator(func: Callable) -> SandboxedTool:
         limits = ResourceLimits(timeout_seconds=timeout)
         sandbox = Sandbox(mode=mode, limits=limits)

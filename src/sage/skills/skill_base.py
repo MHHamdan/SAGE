@@ -5,16 +5,17 @@ a coherent set of actions with associated metadata.
 """
 
 import logging
-from typing import Optional, List, Dict, Any, Callable, Set
 from dataclasses import dataclass, field
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
 
 class SkillPermission(Enum):
     """Permissions that a skill may require."""
+
     READ = "read"
     WRITE = "write"
     EXECUTE = "execute"
@@ -26,6 +27,7 @@ class SkillPermission(Enum):
 @dataclass
 class SkillMetadata:
     """Metadata associated with a skill."""
+
     author: str = "unknown"
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     updated_at: Optional[str] = None
@@ -38,6 +40,7 @@ class SkillMetadata:
 @dataclass
 class SkillStats:
     """Runtime statistics for a skill."""
+
     total_invocations: int = 0
     successful_invocations: int = 0
     failed_invocations: int = 0
@@ -87,6 +90,7 @@ class Skill:
         ... )
         >>> skill.execute(query="AI research papers")
     """
+
     name: str
     description: str
     version: str = "1.0.0"
@@ -132,6 +136,7 @@ class Skill:
             logger.warning(f"Using deprecated skill: {self.name}")
 
         import time
+
         start_time = time.time()
 
         try:
@@ -254,6 +259,7 @@ def skill_decorator(
         ...     '''Search the web for information.'''
         ...     return f"Results for {query}"
     """
+
     def decorator(func: Callable) -> Skill:
         return create_skill(
             name=name or func.__name__,
@@ -262,4 +268,5 @@ def skill_decorator(
             permissions=permissions or [],
             version=version,
         )
+
     return decorator

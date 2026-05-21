@@ -1,15 +1,14 @@
 """Base agent class providing foundational agent capabilities."""
 
-from abc import ABC, abstractmethod
-from typing import Optional, List, Dict, Any, Callable
-from dataclasses import dataclass, field
 import logging
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
-from sage.core.llm_client import LLMClient
 from sage.core.exceptions import AgentError
-
+from sage.core.llm_client import LLMClient
 
 logger = logging.getLogger(__name__)
 

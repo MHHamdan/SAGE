@@ -4,25 +4,26 @@ Tests for Human Approval Flow.
 Comprehensive tests for ApprovalHandler, ApprovalRequest, and related classes.
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock
+from unittest.mock import AsyncMock, Mock
+
+import pytest
 
 from sage.human_oversight.approval_flow import (
     ApprovalHandler,
     ApprovalRequest,
     ApprovalResult,
     ApprovalStatus,
-    RiskLevel,
     ApprovalTimeoutError,
     BatchApprovalHandler,
+    RiskLevel,
 )
-
 
 # ============================================================================
 # ApprovalRequest Tests
 # ============================================================================
+
 
 class TestApprovalRequest:
     """Tests for ApprovalRequest dataclass."""
@@ -131,6 +132,7 @@ class TestApprovalRequest:
 # ApprovalResult Tests
 # ============================================================================
 
+
 class TestApprovalResult:
     """Tests for ApprovalResult dataclass."""
 
@@ -165,6 +167,7 @@ class TestApprovalResult:
 # ============================================================================
 # ApprovalHandler Tests
 # ============================================================================
+
 
 class TestApprovalHandler:
     """Tests for ApprovalHandler class."""
@@ -214,7 +217,7 @@ class TestApprovalHandler:
             risk_timeouts={
                 RiskLevel.CRITICAL: 60.0,
                 RiskLevel.HIGH: 120.0,
-            }
+            },
         )
 
         critical_req = handler.create_request(
@@ -428,6 +431,7 @@ class TestApprovalHandler:
 # BatchApprovalHandler Tests
 # ============================================================================
 
+
 class TestBatchApprovalHandler:
     """Tests for BatchApprovalHandler class."""
 
@@ -514,6 +518,7 @@ class TestBatchApprovalHandler:
 # RiskLevel Tests
 # ============================================================================
 
+
 class TestRiskLevel:
     """Tests for RiskLevel enum."""
 
@@ -528,6 +533,7 @@ class TestRiskLevel:
 # ============================================================================
 # ApprovalStatus Tests
 # ============================================================================
+
 
 class TestApprovalStatus:
     """Tests for ApprovalStatus enum."""

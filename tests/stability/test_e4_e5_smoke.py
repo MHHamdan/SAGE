@@ -25,6 +25,7 @@ sys.path.insert(0, str(ROOT))
 
 # ── E4 smoke test ──────────────────────────────────────────────────────────────
 
+
 class TestE4Smoke:
     @pytest.fixture(scope="class")
     def e4_results(self, tmp_path_factory):
@@ -51,6 +52,7 @@ class TestE4Smoke:
             e4.RESULTS_DIR = orig_dir
             # Restore subdirs for other tests
             import experiments.e4_closed_loop as e4_fresh
+
             e4_fresh.RESULTS_DIR = orig_dir
 
         return condition_results, tmp_dir
@@ -58,14 +60,23 @@ class TestE4Smoke:
     def test_four_conditions_returned(self, e4_results):
         cond_results, _ = e4_results
         assert set(cond_results.keys()) == {
-            "NoControl", "FixedSchedule", "ThresholdController", "PredictiveController"
+            "NoControl",
+            "FixedSchedule",
+            "ThresholdController",
+            "PredictiveController",
         }
 
     def test_completion_rates_in_range(self, e4_results):
         cond_results, _ = e4_results
         for cond, res in cond_results.items():
-            assert 0.0 <= res["completion_mean"] <= 1.0, f"{cond} completion out of range"
-            assert res["completion_ci_lo"] <= res["completion_mean"] <= res["completion_ci_hi"]
+            assert (
+                0.0 <= res["completion_mean"] <= 1.0
+            ), f"{cond} completion out of range"
+            assert (
+                res["completion_ci_lo"]
+                <= res["completion_mean"]
+                <= res["completion_ci_hi"]
+            )
 
     def test_summary_csv_created(self, e4_results):
         _, tmp_dir = e4_results
@@ -75,8 +86,17 @@ class TestE4Smoke:
             reader = csv.DictReader(f)
             rows = list(reader)
         assert len(rows) > 0
-        expected_cols = {"task_id", "controller", "seed", "success", "total_cost",
-                          "turns_used", "intervention_count", "final_drift", "cnsr"}
+        expected_cols = {
+            "task_id",
+            "controller",
+            "seed",
+            "success",
+            "total_cost",
+            "turns_used",
+            "intervention_count",
+            "final_drift",
+            "cnsr",
+        }
         assert expected_cols.issubset(set(rows[0].keys()))
 
     def test_manifest_created(self, e4_results):
@@ -108,6 +128,7 @@ class TestE4Smoke:
         assert jsonl_files, "No traces to validate"
         first_file = sorted(jsonl_files)[0]
         from sage.stability.traces import TraceEvent
+
         with first_file.open() as f:
             for i, line in enumerate(f):
                 if i >= 3:
@@ -129,6 +150,7 @@ class TestE4Smoke:
 
 
 # ── E5 smoke test ──────────────────────────────────────────────────────────────
+
 
 class TestE5Smoke:
     @pytest.fixture(scope="class")
@@ -158,7 +180,13 @@ class TestE5Smoke:
 
     def test_all_predictor_variants_present(self, e5_results):
         results, _ = e5_results
-        expected = {"drift_only", "oscillation_only", "fidelity_only", "combined", "mlp"}
+        expected = {
+            "drift_only",
+            "oscillation_only",
+            "fidelity_only",
+            "combined",
+            "mlp",
+        }
         assert expected.issubset(set(results.keys()))
 
     def test_all_lead_times_present(self, e5_results):
@@ -176,11 +204,13 @@ class TestE5Smoke:
 
     def test_no_leakage_in_cv(self, e5_results):
         """Verify that no task_id appears in both train and test across folds."""
+        from sklearn.model_selection import StratifiedGroupKFold
+
         import experiments.e5_predictive_validation as e5
         from sage.stability.predictor import (
-            build_training_data, assert_no_leakage,
+            assert_no_leakage,
+            build_training_data,
         )
-        from sklearn.model_selection import StratifiedGroupKFold
 
         cfg = dict(e5.E5_CONFIG)
         cfg["n_violation_tasks"] = 15
@@ -235,6 +265,6 @@ class TestE5Smoke:
         combined_auc = results["combined"].get(k, {}).get("auc", 0.5)
         best_single = max(single_aucs)
         # Allow 0.05 tolerance for small-sample variance in smoke test
-        assert combined_auc >= best_single - 0.05, (
-            f"Combined AUC {combined_auc:.3f} much worse than best single {best_single:.3f}"
-        )
+        assert (
+            combined_auc >= best_single - 0.05
+        ), f"Combined AUC {combined_auc:.3f} much worse than best single {best_single:.3f}"

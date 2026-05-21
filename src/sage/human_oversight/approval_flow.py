@@ -30,22 +30,22 @@ Example:
     ...     print("Deploying model...")
 """
 
+import asyncio
+import json
+import logging
+import uuid
 from dataclasses import dataclass, field
-from typing import (
-    Optional,
-    Callable,
-    Awaitable,
-    Dict,
-    Any,
-    List,
-    Union,
-)
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
-import asyncio
-import uuid
-import json
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Union,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +57,7 @@ class RiskLevel(Enum):
     Higher risk operations may have shorter timeouts (auto-reject)
     or require multiple approvers.
     """
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -65,6 +66,7 @@ class RiskLevel(Enum):
 
 class ApprovalStatus(Enum):
     """Status of an approval request."""
+
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
@@ -83,9 +85,7 @@ class ApprovalTimeoutError(Exception):
     def __init__(self, request_id: str, timeout: float):
         self.request_id = request_id
         self.timeout = timeout
-        super().__init__(
-            f"Approval request {request_id} timed out after {timeout}s"
-        )
+        super().__init__(f"Approval request {request_id} timed out after {timeout}s")
 
 
 @dataclass
@@ -107,6 +107,7 @@ class ApprovalRequest:
         decision_at: When decision was made
         decision_reason: Reason for the decision
     """
+
     request_id: str
     action: str
     context: Dict[str, Any]
@@ -170,6 +171,7 @@ class ApprovalResult:
         decided_at: When decision was made
         conditions: Any conditions attached to approval
     """
+
     request_id: str
     approved: bool
     status: ApprovalStatus
@@ -487,7 +489,9 @@ class ApprovalHandler:
 
         # Update request
         decided_at = datetime.now()
-        request.status = ApprovalStatus.APPROVED if approved else ApprovalStatus.REJECTED
+        request.status = (
+            ApprovalStatus.APPROVED if approved else ApprovalStatus.REJECTED
+        )
         request.approver = approver
         request.decision_at = decided_at
         request.decision_reason = reason
@@ -507,10 +511,7 @@ class ApprovalHandler:
         self._events[request_id].set()
 
         # Audit log
-        self._log_audit(
-            "request_approved" if approved else "request_rejected",
-            request
-        )
+        self._log_audit("request_approved" if approved else "request_rejected", request)
 
         logger.info(
             f"Approval request {request_id} "
@@ -549,27 +550,17 @@ class ApprovalHandler:
 
     def get_pending_requests(self) -> List[ApprovalRequest]:
         """Get all pending requests."""
-        return [
-            req for req in self._requests.values()
-            if req.is_pending()
-        ]
+        return [req for req in self._requests.values() if req.is_pending()]
 
     def get_requests_by_action(self, action: str) -> List[ApprovalRequest]:
         """Get all requests for a specific action."""
-        return [
-            req for req in self._requests.values()
-            if req.action == action
-        ]
+        return [req for req in self._requests.values() if req.action == action]
 
     def get_requests_by_risk_level(
-        self,
-        risk_level: RiskLevel
+        self, risk_level: RiskLevel
     ) -> List[ApprovalRequest]:
         """Get all requests with a specific risk level."""
-        return [
-            req for req in self._requests.values()
-            if req.risk_level == risk_level
-        ]
+        return [req for req in self._requests.values() if req.risk_level == risk_level]
 
     def get_audit_log(self) -> List[Dict[str, Any]]:
         """Get the audit log."""
@@ -673,7 +664,8 @@ class ApprovalHandler:
             "pending_count": len(self.get_pending_requests()),
             "avg_decision_time_seconds": (
                 sum(avg_decision_time) / len(avg_decision_time)
-                if avg_decision_time else 0.0
+                if avg_decision_time
+                else 0.0
             ),
             "approval_rate": (
                 by_status.get("approved", 0) / total if total > 0 else 0.0

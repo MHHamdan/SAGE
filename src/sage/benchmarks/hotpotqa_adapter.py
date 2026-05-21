@@ -24,31 +24,33 @@ Example:
 
 from __future__ import annotations
 
-import logging
 import json
+import logging
 import re
 import string
-from enum import Enum
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Set
-from pathlib import Path
 from collections import Counter
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
-from .base_adapter import BenchmarkAdapter, BenchmarkTask, BenchmarkResult
+from .base_adapter import BenchmarkAdapter, BenchmarkResult, BenchmarkTask
 
 logger = logging.getLogger(__name__)
 
 
 class HotpotQAType(Enum):
     """HotpotQA question types."""
+
     BRIDGE = "bridge"
     COMPARISON = "comparison"
 
 
 class HotpotQADifficulty(Enum):
     """HotpotQA difficulty levels."""
+
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
@@ -66,23 +68,30 @@ class HotpotQATask(BenchmarkTask):
         question_type: Bridge or comparison
         difficulty: Question difficulty
     """
+
     question: str = ""
-    context: List[Tuple[str, List[str]]] = field(default_factory=list)  # [(title, [sentences])]
-    supporting_facts: List[Tuple[str, int]] = field(default_factory=list)  # [(title, sent_idx)]
+    context: List[Tuple[str, List[str]]] = field(
+        default_factory=list
+    )  # [(title, [sentences])]
+    supporting_facts: List[Tuple[str, int]] = field(
+        default_factory=list
+    )  # [(title, sent_idx)]
     answer: str = ""
     question_type: HotpotQAType = HotpotQAType.BRIDGE
     difficulty: HotpotQADifficulty = HotpotQADifficulty.MEDIUM
 
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
-        base.update({
-            "question": self.question,
-            "context": self.context,
-            "supporting_facts": self.supporting_facts,
-            "answer": self.answer,
-            "question_type": self.question_type.value,
-            "difficulty": self.difficulty.value
-        })
+        base.update(
+            {
+                "question": self.question,
+                "context": self.context,
+                "supporting_facts": self.supporting_facts,
+                "answer": self.answer,
+                "question_type": self.question_type.value,
+                "difficulty": self.difficulty.value,
+            }
+        )
         return base
 
     def get_context_text(self) -> str:
@@ -116,6 +125,7 @@ class HotpotQAResult(BenchmarkResult):
         supporting_f1: F1 for supporting facts
         reasoning_steps: Number of reasoning steps identified
     """
+
     f1_score: float = 0.0
     exact_match: bool = False
     supporting_precision: float = 0.0
@@ -125,14 +135,16 @@ class HotpotQAResult(BenchmarkResult):
 
     def to_dict(self) -> Dict[str, Any]:
         base = super().to_dict()
-        base.update({
-            "f1_score": self.f1_score,
-            "exact_match": self.exact_match,
-            "supporting_precision": self.supporting_precision,
-            "supporting_recall": self.supporting_recall,
-            "supporting_f1": self.supporting_f1,
-            "reasoning_steps": self.reasoning_steps
-        })
+        base.update(
+            {
+                "f1_score": self.f1_score,
+                "exact_match": self.exact_match,
+                "supporting_precision": self.supporting_precision,
+                "supporting_recall": self.supporting_recall,
+                "supporting_f1": self.supporting_f1,
+                "reasoning_steps": self.reasoning_steps,
+            }
+        )
         return base
 
 
@@ -144,17 +156,23 @@ SAMPLE_HOTPOTQA_TASKS = [
         "answer": "yes",
         "type": "comparison",
         "context": [
-            ("Scott Derrickson", [
-                "Scott Derrickson (born July 16, 1966) is an American director.",
-                "He is best known for his horror films."
-            ]),
-            ("Ed Wood", [
-                "Edward Davis Wood Jr. was an American filmmaker.",
-                "He is known for his low-budget B movies."
-            ])
+            (
+                "Scott Derrickson",
+                [
+                    "Scott Derrickson (born July 16, 1966) is an American director.",
+                    "He is best known for his horror films.",
+                ],
+            ),
+            (
+                "Ed Wood",
+                [
+                    "Edward Davis Wood Jr. was an American filmmaker.",
+                    "He is known for his low-budget B movies.",
+                ],
+            ),
         ],
         "supporting_facts": [("Scott Derrickson", 0), ("Ed Wood", 0)],
-        "difficulty": "medium"
+        "difficulty": "medium",
     },
     {
         "id": "5a8b5a1c5542995d1e6f13a8",
@@ -162,21 +180,30 @@ SAMPLE_HOTPOTQA_TASKS = [
         "answer": "Scott Derrickson",
         "type": "bridge",
         "context": [
-            ("Doctor Strange", [
-                "Doctor Strange is a 2016 American superhero film.",
-                "It was directed by Scott Derrickson."
-            ]),
-            ("Sinister", [
-                "Sinister is a 2012 American horror film.",
-                "The film was directed by Scott Derrickson."
-            ]),
-            ("Scott Derrickson", [
-                "Scott Derrickson is an American director.",
-                "He directed Doctor Strange and Sinister."
-            ])
+            (
+                "Doctor Strange",
+                [
+                    "Doctor Strange is a 2016 American superhero film.",
+                    "It was directed by Scott Derrickson.",
+                ],
+            ),
+            (
+                "Sinister",
+                [
+                    "Sinister is a 2012 American horror film.",
+                    "The film was directed by Scott Derrickson.",
+                ],
+            ),
+            (
+                "Scott Derrickson",
+                [
+                    "Scott Derrickson is an American director.",
+                    "He directed Doctor Strange and Sinister.",
+                ],
+            ),
         ],
         "supporting_facts": [("Doctor Strange", 1), ("Sinister", 1)],
-        "difficulty": "medium"
+        "difficulty": "medium",
     },
     {
         "id": "5a8b5c3a5542995d1e6f13c2",
@@ -184,18 +211,24 @@ SAMPLE_HOTPOTQA_TASKS = [
         "answer": "Forrest Gump",
         "type": "comparison",
         "context": [
-            ("The Shawshank Redemption", [
-                "The Shawshank Redemption is a 1994 drama film.",
-                "It received seven Academy Award nominations."
-            ]),
-            ("Forrest Gump", [
-                "Forrest Gump is a 1994 American comedy-drama.",
-                "The film received thirteen Academy Award nominations.",
-                "It won six awards including Best Picture."
-            ])
+            (
+                "The Shawshank Redemption",
+                [
+                    "The Shawshank Redemption is a 1994 drama film.",
+                    "It received seven Academy Award nominations.",
+                ],
+            ),
+            (
+                "Forrest Gump",
+                [
+                    "Forrest Gump is a 1994 American comedy-drama.",
+                    "The film received thirteen Academy Award nominations.",
+                    "It won six awards including Best Picture.",
+                ],
+            ),
         ],
         "supporting_facts": [("The Shawshank Redemption", 1), ("Forrest Gump", 1)],
-        "difficulty": "easy"
+        "difficulty": "easy",
     },
     {
         "id": "5a8b5d7f5542995d1e6f13e5",
@@ -203,17 +236,23 @@ SAMPLE_HOTPOTQA_TASKS = [
         "answer": "Edwin Catmull and Alvy Ray Smith",
         "type": "bridge",
         "context": [
-            ("Toy Story", [
-                "Toy Story is a 1995 computer-animated film.",
-                "It was produced by Pixar Animation Studios."
-            ]),
-            ("Pixar", [
-                "Pixar Animation Studios is an American animation studio.",
-                "It was founded by Edwin Catmull and Alvy Ray Smith in 1986."
-            ])
+            (
+                "Toy Story",
+                [
+                    "Toy Story is a 1995 computer-animated film.",
+                    "It was produced by Pixar Animation Studios.",
+                ],
+            ),
+            (
+                "Pixar",
+                [
+                    "Pixar Animation Studios is an American animation studio.",
+                    "It was founded by Edwin Catmull and Alvy Ray Smith in 1986.",
+                ],
+            ),
         ],
         "supporting_facts": [("Toy Story", 1), ("Pixar", 1)],
-        "difficulty": "hard"
+        "difficulty": "hard",
     },
     {
         "id": "5a8b5e9a5542995d1e6f1401",
@@ -221,18 +260,24 @@ SAMPLE_HOTPOTQA_TASKS = [
         "answer": "yes",
         "type": "comparison",
         "context": [
-            ("Eiffel Tower", [
-                "The Eiffel Tower is a wrought-iron lattice tower.",
-                "It stands 330 meters tall including antennas."
-            ]),
-            ("Statue of Liberty", [
-                "The Statue of Liberty is a copper statue.",
-                "The statue is 93 meters tall from ground to torch tip."
-            ])
+            (
+                "Eiffel Tower",
+                [
+                    "The Eiffel Tower is a wrought-iron lattice tower.",
+                    "It stands 330 meters tall including antennas.",
+                ],
+            ),
+            (
+                "Statue of Liberty",
+                [
+                    "The Statue of Liberty is a copper statue.",
+                    "The statue is 93 meters tall from ground to torch tip.",
+                ],
+            ),
         ],
         "supporting_facts": [("Eiffel Tower", 1), ("Statue of Liberty", 1)],
-        "difficulty": "easy"
-    }
+        "difficulty": "easy",
+    },
 ]
 
 
@@ -259,7 +304,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         self,
         data_path: Optional[str] = None,
         seed: int = 42,
-        use_sample_data: bool = True
+        use_sample_data: bool = True,
     ):
         """Initialize HotpotQA adapter.
 
@@ -285,7 +330,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         n: Optional[int] = None,
         difficulty: Optional[str] = None,
         question_type: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> List[HotpotQATask]:
         """Load HotpotQA tasks.
 
@@ -346,10 +391,12 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
                 query=item["question"],
                 question=item["question"],
                 context=[(c[0], c[1]) for c in item.get("context", [])],
-                supporting_facts=[(s[0], s[1]) for s in item.get("supporting_facts", [])],
+                supporting_facts=[
+                    (s[0], s[1]) for s in item.get("supporting_facts", [])
+                ],
                 answer=item.get("answer", ""),
                 question_type=HotpotQAType(item.get("type", "bridge")),
-                difficulty=HotpotQADifficulty(item.get("level", "medium"))
+                difficulty=HotpotQADifficulty(item.get("level", "medium")),
             )
             tasks.append(task)
 
@@ -369,7 +416,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
                 answer=item["answer"],
                 question_type=HotpotQAType(item["type"]),
                 difficulty=HotpotQADifficulty(item["difficulty"]),
-                metadata={"source": "sample"}
+                metadata={"source": "sample"},
             )
             tasks.append(task)
 
@@ -387,7 +434,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
                 answer=f"sample_answer_{idx}",
                 question_type=qtype,
                 difficulty=difficulty,
-                metadata={"source": "generated"}
+                metadata={"source": "generated"},
             )
             tasks.append(task)
 
@@ -397,7 +444,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         self,
         task: HotpotQATask,
         answer: str,
-        supporting_facts: Optional[List[Tuple[str, int]]] = None
+        supporting_facts: Optional[List[Tuple[str, int]]] = None,
     ) -> HotpotQAResult:
         """Evaluate agent answer.
 
@@ -438,7 +485,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
             supporting_precision=sp_precision,
             supporting_recall=sp_recall,
             supporting_f1=sp_f1,
-            reasoning_steps=reasoning_steps
+            reasoning_steps=reasoning_steps,
         )
 
     def _normalize_answer(self, text: str) -> str:
@@ -447,15 +494,15 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         text = text.lower()
 
         # Remove punctuation
-        text = ''.join(c for c in text if c not in string.punctuation)
+        text = "".join(c for c in text if c not in string.punctuation)
 
         # Remove articles
-        articles = {'a', 'an', 'the'}
+        articles = {"a", "an", "the"}
         words = text.split()
         words = [w for w in words if w not in articles]
 
         # Remove extra whitespace
-        text = ' '.join(words)
+        text = " ".join(words)
 
         return text.strip()
 
@@ -463,11 +510,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         """Get tokens from normalized text."""
         return self._normalize_answer(text).split()
 
-    def _compute_f1(
-        self,
-        gold: str,
-        pred: str
-    ) -> Tuple[float, float, float]:
+    def _compute_f1(self, gold: str, pred: str) -> Tuple[float, float, float]:
         """Compute F1 score between gold and predicted answers.
 
         Returns:
@@ -499,9 +542,7 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         return self._normalize_answer(gold) == self._normalize_answer(pred)
 
     def _compute_supporting_facts_metrics(
-        self,
-        gold_facts: List[Tuple[str, int]],
-        pred_facts: List[Tuple[str, int]]
+        self, gold_facts: List[Tuple[str, int]], pred_facts: List[Tuple[str, int]]
     ) -> Tuple[float, float, float]:
         """Compute supporting facts precision, recall, F1.
 
@@ -533,9 +574,16 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         """
         # Count reasoning indicators
         indicators = [
-            r'\bfirst\b', r'\bthen\b', r'\bnext\b', r'\bfinally\b',
-            r'\bbecause\b', r'\btherefore\b', r'\bso\b', r'\bthus\b',
-            r'\bstep \d+', r'\d\)'
+            r"\bfirst\b",
+            r"\bthen\b",
+            r"\bnext\b",
+            r"\bfinally\b",
+            r"\bbecause\b",
+            r"\btherefore\b",
+            r"\bso\b",
+            r"\bthus\b",
+            r"\bstep \d+",
+            r"\d\)",
         ]
 
         count = 0
@@ -558,19 +606,21 @@ class HotpotQAAdapter(BenchmarkAdapter[HotpotQATask, HotpotQAResult]):
         mean_f1 = sum(r.f1_score for r in results) / len(results)
         mean_sp_f1 = sum(r.supporting_f1 for r in results) / len(results)
 
-        base_stats.update({
-            "exact_match_rate": em_count / len(results),
-            "mean_f1": mean_f1,
-            "mean_supporting_f1": mean_sp_f1,
-            "mean_reasoning_steps": sum(r.reasoning_steps for r in results) / len(results)
-        })
+        base_stats.update(
+            {
+                "exact_match_rate": em_count / len(results),
+                "mean_f1": mean_f1,
+                "mean_supporting_f1": mean_sp_f1,
+                "mean_reasoning_steps": sum(r.reasoning_steps for r in results)
+                / len(results),
+            }
+        )
 
         return base_stats
 
 
 def download_hotpotqa_data(
-    output_dir: str = "data/hotpotqa",
-    split: str = "dev"
+    output_dir: str = "data/hotpotqa", split: str = "dev"
 ) -> str:
     """Download HotpotQA data.
 

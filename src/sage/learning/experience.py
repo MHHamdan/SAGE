@@ -22,13 +22,13 @@ Example:
     ...     train_on_experience(exp)
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Union
-from datetime import datetime
-from collections import deque
-import random
-import logging
 import json
+import logging
+import random
+from collections import deque
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,7 @@ class Experience:
         metadata: Additional metadata
         priority: Priority for sampling (higher = more likely)
     """
+
     experience_id: str = ""
     timestamp: datetime = field(default_factory=datetime.now)
     state: Dict[str, Any] = field(default_factory=dict)
@@ -86,6 +87,7 @@ class ExperienceBatch:
         batch_id: Unique batch identifier
         sampled_at: When batch was sampled
     """
+
     experiences: List[Experience]
     batch_id: str = ""
     sampled_at: datetime = field(default_factory=datetime.now)
@@ -229,9 +231,7 @@ class ExperienceBuffer:
         return ExperienceBatch(experiences=sampled)
 
     def sample_recent(
-        self,
-        batch_size: int,
-        recency_bias: float = 0.5
+        self, batch_size: int, recency_bias: float = 0.5
     ) -> ExperienceBatch:
         """Sample with bias toward recent experiences.
 
@@ -247,10 +247,7 @@ class ExperienceBuffer:
 
         # Create weights favoring recent experiences
         n = len(self._buffer)
-        weights = [
-            (1 - recency_bias) + recency_bias * (i / n)
-            for i in range(n)
-        ]
+        weights = [(1 - recency_bias) + recency_bias * (i / n) for i in range(n)]
 
         sampled = random.choices(list(self._buffer), weights=weights, k=batch_size)
         return ExperienceBatch(experiences=sampled)
@@ -267,9 +264,7 @@ class ExperienceBuffer:
         return list(self._buffer)[-n:]
 
     def get_high_reward(
-        self,
-        n: int,
-        min_reward: Optional[float] = None
+        self, n: int, min_reward: Optional[float] = None
     ) -> List[Experience]:
         """Get experiences with highest rewards.
 
@@ -380,9 +375,7 @@ class PrioritizedExperienceBuffer:
         self._max_priority = 1.0
 
     def add(
-        self,
-        experience: Experience,
-        priority: Optional[float] = None
+        self, experience: Experience, priority: Optional[float] = None
     ) -> Experience:
         """Add experience with priority.
 
@@ -404,14 +397,13 @@ class PrioritizedExperienceBuffer:
         # Remove oldest if at capacity
         if len(self._buffer) >= self.max_size:
             oldest_id = min(
-                self._buffer.keys(),
-                key=lambda k: self._buffer[k].timestamp
+                self._buffer.keys(), key=lambda k: self._buffer[k].timestamp
             )
             del self._buffer[oldest_id]
             del self._priorities[oldest_id]
 
         self._buffer[experience.experience_id] = experience
-        self._priorities[experience.experience_id] = priority ** self.alpha
+        self._priorities[experience.experience_id] = priority**self.alpha
 
         return experience
 
@@ -429,10 +421,7 @@ class PrioritizedExperienceBuffer:
 
         # Calculate sampling probabilities
         total_priority = sum(self._priorities.values())
-        probs = {
-            k: p / total_priority
-            for k, p in self._priorities.items()
-        }
+        probs = {k: p / total_priority for k, p in self._priorities.items()}
 
         # Sample
         ids = list(self._buffer.keys())
@@ -454,7 +443,7 @@ class PrioritizedExperienceBuffer:
         """
         for exp_id, priority in priority_updates.items():
             if exp_id in self._priorities:
-                self._priorities[exp_id] = priority ** self.alpha
+                self._priorities[exp_id] = priority**self.alpha
                 self._max_priority = max(self._max_priority, priority)
 
     def get_experience(self, experience_id: str) -> Optional[Experience]:

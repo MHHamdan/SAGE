@@ -3,24 +3,26 @@
 Agent Cards provide identity and capability declarations for agents.
 """
 
-import logging
 import hashlib
 import json
-from typing import Optional, List, Dict, Any
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class AgentCardError(Exception):
     """Exception for agent card errors."""
+
     pass
 
 
 @dataclass
 class AgentCapability:
     """A capability declared by an agent."""
+
     name: str
     version: str = "1.0.0"
     description: str = ""
@@ -49,6 +51,7 @@ class AgentCard:
         >>> if validator.validate(card):
         ...     print("Card is valid")
     """
+
     agent_id: str
     name: str
     version: str = "1.0.0"
@@ -226,9 +229,7 @@ class AgentCardValidator:
         if self.allowed_capabilities is not None:
             for cap in card.capabilities:
                 if cap.name not in self.allowed_capabilities:
-                    raise AgentCardError(
-                        f"Capability '{cap.name}' not in allowlist"
-                    )
+                    raise AgentCardError(f"Capability '{cap.name}' not in allowlist")
 
         # Check signature if required
         if self.require_signature:
@@ -352,6 +353,7 @@ class AgentCardRegistry:
             List of matching agent cards
         """
         return [
-            card for card in self._cards.values()
+            card
+            for card in self._cards.values()
             if card.has_capability(capability_name) and not card.is_expired()
         ]

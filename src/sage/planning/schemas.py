@@ -4,15 +4,16 @@ Defines the core data structures for plans, steps, conditions,
 and plan validation.
 """
 
-from typing import Optional, List, Dict, Any, Union
-from dataclasses import dataclass, field
-from enum import Enum
-from datetime import datetime
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
 
 class StepStatus(Enum):
     """Status of a plan step."""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -23,6 +24,7 @@ class StepStatus(Enum):
 
 class PlanStatus(Enum):
     """Status of an entire plan."""
+
     DRAFT = "draft"
     VALIDATED = "validated"
     EXECUTING = "executing"
@@ -33,6 +35,7 @@ class PlanStatus(Enum):
 
 class ConditionType(Enum):
     """Types of conditions for steps."""
+
     PRECONDITION = "precondition"
     POSTCONDITION = "postcondition"
     INVARIANT = "invariant"
@@ -44,6 +47,7 @@ class Condition:
 
     Used for preconditions, postconditions, and invariants.
     """
+
     name: str
     description: str
     condition_type: ConditionType
@@ -71,6 +75,7 @@ class PlanStep:
 
     Represents an atomic action to be taken by the agent.
     """
+
     step_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     name: str = ""
     description: str = ""
@@ -124,6 +129,7 @@ class Plan:
 
     Represents the agent's strategy for accomplishing a task.
     """
+
     plan_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     name: str = ""
     goal: str = ""
@@ -228,7 +234,9 @@ class Plan:
             errors.append("Plan has no steps")
 
         if len(self.steps) > self.max_steps_allowed:
-            errors.append(f"Plan exceeds max steps ({len(self.steps)} > {self.max_steps_allowed})")
+            errors.append(
+                f"Plan exceeds max steps ({len(self.steps)} > {self.max_steps_allowed})"
+            )
 
         # Check for dependency cycles
         step_ids = {s.step_id for s in self.steps}
@@ -248,6 +256,7 @@ class Plan:
 @dataclass
 class PlanningContext:
     """Context for planning operations."""
+
     task: str
     available_tools: List[str] = field(default_factory=list)
     constraints: List[str] = field(default_factory=list)
@@ -260,6 +269,7 @@ class PlanningContext:
 @dataclass
 class PlanningResult:
     """Result from a planning operation."""
+
     plan: Optional[Plan] = None
     success: bool = False
     error: Optional[str] = None

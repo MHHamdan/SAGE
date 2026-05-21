@@ -30,13 +30,13 @@ Example:
     >>> print(f"Rolling success rate: {metrics.success_rate:.2%}")
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional, Deque, Tuple, Dict, Any
-from collections import deque
-from datetime import datetime, timedelta
 import logging
-import uuid
 import math
+import uuid
+from collections import deque
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -55,6 +55,7 @@ class TaskResult:
         latency_ms: Execution time in milliseconds
         metadata: Additional task-specific data
     """
+
     task_id: str
     timestamp: datetime
     success: bool
@@ -70,7 +71,7 @@ class TaskResult:
             "success": self.success,
             "cost": self.cost,
             "latency_ms": self.latency_ms,
-            "metadata": self.metadata or {}
+            "metadata": self.metadata or {},
         }
 
 
@@ -92,6 +93,7 @@ class WindowMetrics:
         cost_variance: Variance of costs
         latency_variance: Variance of latencies
     """
+
     window_id: str
     window_start: datetime
     window_end: datetime
@@ -119,14 +121,14 @@ class WindowMetrics:
             "total_cost": self.total_cost,
             "mean_latency_ms": self.mean_latency_ms,
             "cost_variance": self.cost_variance,
-            "latency_variance": self.latency_variance
+            "latency_variance": self.latency_variance,
         }
 
     @property
     def cost_per_success(self) -> float:
         """Cost per successful task."""
         if self.success_count == 0:
-            return float('inf')
+            return float("inf")
         return self.total_cost / self.success_count
 
 
@@ -144,6 +146,7 @@ class PerformanceTrend:
         is_degrading: Whether overall performance is degrading
         degradation_metrics: Which metrics are degrading
     """
+
     success_trend: str  # "stable", "improving", "degrading"
     cost_trend: str  # "stable", "increasing", "decreasing"
     latency_trend: str  # "stable", "increasing", "decreasing"
@@ -192,10 +195,7 @@ class RollingWindowTracker:
     """
 
     def __init__(
-        self,
-        window_size: int = 50,
-        overlap: int = 25,
-        max_history_windows: int = 100
+        self, window_size: int = 50, overlap: int = 25, max_history_windows: int = 100
     ):
         """Initialize the rolling window tracker.
 
@@ -232,19 +232,19 @@ class RollingWindowTracker:
 
         # Check if we've completed a window
         step = self.window_size - self.overlap
-        if len(self._results) >= self.window_size and \
-           (len(self._results) - self.window_size) % step == 0:
+        if (
+            len(self._results) >= self.window_size
+            and (len(self._results) - self.window_size) % step == 0
+        ):
             # Compute metrics for the current window
             metrics = self._compute_window_metrics()
             self._window_history.append(metrics)
 
             # Trim history if needed
             if len(self._window_history) > self.max_history_windows:
-                self._window_history = self._window_history[-self.max_history_windows:]
+                self._window_history = self._window_history[-self.max_history_windows :]
 
-            logger.debug(
-                f"Window completed: success_rate={metrics.success_rate:.2%}"
-            )
+            logger.debug(f"Window completed: success_rate={metrics.success_rate:.2%}")
             return metrics
 
         return None
@@ -274,10 +274,7 @@ class RollingWindowTracker:
             return 0.0
         return current.success_rate
 
-    def get_rolling_values(
-        self,
-        metric: str = "success_rate"
-    ) -> List[float]:
+    def get_rolling_values(self, metric: str = "success_rate") -> List[float]:
         """Get list of rolling values for a metric.
 
         Args:
@@ -298,8 +295,10 @@ class RollingWindowTracker:
 
         # Add current window if it's different from last recorded
         current = self.get_current_window()
-        if current and (not self._window_history or
-                       current.window_id != self._window_history[-1].window_id):
+        if current and (
+            not self._window_history
+            or current.window_id != self._window_history[-1].window_id
+        ):
             values.append(getattr(current, metric))
 
         return values
@@ -354,7 +353,7 @@ class RollingWindowTracker:
         self,
         success_threshold: float = 0.1,
         cost_threshold: float = 0.2,
-        latency_threshold: float = 0.2
+        latency_threshold: float = 0.2,
     ) -> bool:
         """Detect if performance is degrading beyond threshold.
 
@@ -425,7 +424,9 @@ class RollingWindowTracker:
         if latency_trend == "increasing":
             degradation_metrics.append("latency")
 
-        is_degrading = len(degradation_metrics) > 0 and "success_rate" in degradation_metrics
+        is_degrading = (
+            len(degradation_metrics) > 0 and "success_rate" in degradation_metrics
+        )
 
         return PerformanceTrend(
             success_trend=success_trend,
@@ -435,7 +436,7 @@ class RollingWindowTracker:
             cost_slope=cost_slope,
             latency_slope=latency_slope,
             is_degrading=is_degrading,
-            degradation_metrics=degradation_metrics
+            degradation_metrics=degradation_metrics,
         )
 
     def get_window_history(self) -> List[WindowMetrics]:
@@ -466,7 +467,7 @@ class RollingWindowTracker:
                 "overall_success_rate": 0.0,
                 "total_cost": 0.0,
                 "mean_cost": 0.0,
-                "mean_latency_ms": 0.0
+                "mean_latency_ms": 0.0,
             }
 
         successes = sum(1 for r in self._results if r.success)
@@ -481,13 +482,13 @@ class RollingWindowTracker:
             "total_cost": total_cost,
             "mean_cost": total_cost / len(self._results),
             "mean_latency_ms": total_latency / len(self._results),
-            "windows_completed": len(self._window_history)
+            "windows_completed": len(self._window_history),
         }
 
     def _compute_window_metrics(self) -> WindowMetrics:
         """Compute metrics for the current window."""
         # Get the most recent window_size results
-        window_results = list(self._results)[-self.window_size:]
+        window_results = list(self._results)[-self.window_size :]
 
         if not window_results:
             now = datetime.now()
@@ -503,7 +504,7 @@ class RollingWindowTracker:
                 total_cost=0.0,
                 mean_latency_ms=0.0,
                 cost_variance=0.0,
-                latency_variance=0.0
+                latency_variance=0.0,
             )
 
         # Calculate metrics
@@ -519,8 +520,16 @@ class RollingWindowTracker:
         mean_latency = sum(latencies) / len(latencies)
 
         # Compute variances
-        cost_variance = sum((c - mean_cost) ** 2 for c in costs) / len(costs) if len(costs) > 1 else 0.0
-        latency_variance = sum((l - mean_latency) ** 2 for l in latencies) / len(latencies) if len(latencies) > 1 else 0.0
+        cost_variance = (
+            sum((c - mean_cost) ** 2 for c in costs) / len(costs)
+            if len(costs) > 1
+            else 0.0
+        )
+        latency_variance = (
+            sum((l - mean_latency) ** 2 for l in latencies) / len(latencies)
+            if len(latencies) > 1
+            else 0.0
+        )
 
         return WindowMetrics(
             window_id=str(uuid.uuid4()),
@@ -534,7 +543,7 @@ class RollingWindowTracker:
             total_cost=total_cost,
             mean_latency_ms=mean_latency,
             cost_variance=cost_variance,
-            latency_variance=latency_variance
+            latency_variance=latency_variance,
         )
 
     def _compute_slope(self, values: List[float]) -> float:
@@ -566,8 +575,9 @@ class RollingWindowTracker:
 
         # Least squares slope
         n = len(x)
-        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / \
-                (n * np.sum(x ** 2) - np.sum(x) ** 2)
+        slope = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / (
+            n * np.sum(x**2) - np.sum(x) ** 2
+        )
 
         return float(slope)
 
@@ -586,8 +596,12 @@ class RollingWindowTracker:
             "total_tasks": self._total_tasks,
             "current_buffer_size": len(self._results),
             "windows_completed": len(self._window_history),
-            "current_window": self.get_current_window().to_dict() if self.get_current_window() else None,
-            "summary": self.get_summary_statistics()
+            "current_window": (
+                self.get_current_window().to_dict()
+                if self.get_current_window()
+                else None
+            ),
+            "summary": self.get_summary_statistics(),
         }
 
 
@@ -603,11 +617,7 @@ class TimeBasedRollingTracker:
         >>> metrics = tracker.get_current_window()
     """
 
-    def __init__(
-        self,
-        window_minutes: int = 60,
-        overlap_minutes: int = 30
-    ):
+    def __init__(self, window_minutes: int = 60, overlap_minutes: int = 30):
         """Initialize time-based tracker.
 
         Args:
@@ -631,10 +641,7 @@ class TimeBasedRollingTracker:
 
         now = datetime.now()
         window_start = now - self.window_duration
-        window_results = [
-            r for r in self._results
-            if r.timestamp >= window_start
-        ]
+        window_results = [r for r in self._results if r.timestamp >= window_start]
 
         if not window_results:
             return None
@@ -648,8 +655,16 @@ class TimeBasedRollingTracker:
         mean_cost = total_cost / len(costs)
         mean_latency = sum(latencies) / len(latencies)
 
-        cost_variance = sum((c - mean_cost) ** 2 for c in costs) / len(costs) if len(costs) > 1 else 0.0
-        latency_variance = sum((l - mean_latency) ** 2 for l in latencies) / len(latencies) if len(latencies) > 1 else 0.0
+        cost_variance = (
+            sum((c - mean_cost) ** 2 for c in costs) / len(costs)
+            if len(costs) > 1
+            else 0.0
+        )
+        latency_variance = (
+            sum((l - mean_latency) ** 2 for l in latencies) / len(latencies)
+            if len(latencies) > 1
+            else 0.0
+        )
 
         return WindowMetrics(
             window_id=str(uuid.uuid4()),
@@ -663,12 +678,11 @@ class TimeBasedRollingTracker:
             total_cost=total_cost,
             mean_latency_ms=mean_latency,
             cost_variance=cost_variance,
-            latency_variance=latency_variance
+            latency_variance=latency_variance,
         )
 
     def get_success_rate_over_time(
-        self,
-        bucket_minutes: int = 15
+        self, bucket_minutes: int = 15
     ) -> List[Tuple[datetime, float]]:
         """Get success rates bucketed by time.
 
@@ -691,12 +705,13 @@ class TimeBasedRollingTracker:
         while current_start <= max_time:
             current_end = current_start + bucket_duration
             bucket_results = [
-                r for r in self._results
-                if current_start <= r.timestamp < current_end
+                r for r in self._results if current_start <= r.timestamp < current_end
             ]
 
             if bucket_results:
-                success_rate = sum(1 for r in bucket_results if r.success) / len(bucket_results)
+                success_rate = sum(1 for r in bucket_results if r.success) / len(
+                    bucket_results
+                )
                 buckets.append((current_start, success_rate))
 
             current_start = current_end

@@ -1,20 +1,20 @@
 """Evaluation harness for reproducible agent benchmarking."""
 
+import json
 import logging
 import time
-import json
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 from .benchmarks import (
     Benchmark,
-    BenchmarkTask,
     BenchmarkResult,
+    BenchmarkTask,
     TaskDifficulty,
 )
-from .metrics import MetricsCollector, AggregatedMetrics
+from .metrics import AggregatedMetrics, MetricsCollector
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +35,7 @@ class EvaluationConfig:
         difficulty_filter: Filter tasks by difficulty
         task_limit: Maximum tasks per benchmark
     """
+
     seed: int = 42
     num_runs: int = 1
     max_parallel: int = 1
@@ -70,6 +71,7 @@ class EvaluationConfig:
     def from_yaml(cls, path: str) -> "EvaluationConfig":
         """Load from YAML file."""
         import yaml
+
         with open(path) as f:
             data = yaml.safe_load(f)
         return cls.from_dict(data.get("evaluation", data))
@@ -87,6 +89,7 @@ class EvaluationResult:
         end_time: Evaluation end time
         metadata: Additional metadata
     """
+
     config: EvaluationConfig
     benchmark_results: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     aggregate_metrics: Dict[str, Any] = field(default_factory=dict)
@@ -191,7 +194,10 @@ class EvaluationHarness:
 
         # Save if configured
         if self.config.save_results:
-            output_path = Path(self.config.output_dir) / f"eval_{result.start_time.replace(':', '-')}.json"
+            output_path = (
+                Path(self.config.output_dir)
+                / f"eval_{result.start_time.replace(':', '-')}.json"
+            )
             result.save(str(output_path))
             logger.info(f"Results saved to: {output_path}")
 
@@ -273,7 +279,9 @@ class EvaluationHarness:
                 task_id=task.task_id,
                 success=success,
                 output=output,
-                steps_taken=getattr(output, 'steps', 0) if hasattr(output, 'steps') else 0,
+                steps_taken=(
+                    getattr(output, "steps", 0) if hasattr(output, "steps") else 0
+                ),
                 duration_seconds=duration,
                 cost_usd=self._estimate_cost(duration),
             )
@@ -391,7 +399,7 @@ class EvaluationHarness:
             "mean_cost_usd": mean_cost,
             "total_duration_seconds": total_duration,
             "mean_duration_seconds": total_duration / total_tasks if total_tasks else 0,
-            "cnsr": success_rate / mean_cost if mean_cost > 0 else float('inf'),
+            "cnsr": success_rate / mean_cost if mean_cost > 0 else float("inf"),
         }
 
     def _set_seed(self, seed: int):
@@ -401,16 +409,19 @@ class EvaluationHarness:
             seed: Random seed
         """
         import random
+
         random.seed(seed)
 
         try:
             import numpy as np
+
             np.random.seed(seed)
         except ImportError:
             pass
 
         try:
             import torch
+
             torch.manual_seed(seed)
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(seed)

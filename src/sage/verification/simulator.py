@@ -6,8 +6,8 @@ useful for validation and cost estimation.
 
 import logging
 import time
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
 
 from ..planning.schemas import Plan, PlanStep, StepStatus
 
@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class StepSimulation:
     """Result of simulating a single step."""
+
     step_id: str
     step_name: str
     action: str
@@ -44,6 +45,7 @@ class StepSimulation:
 @dataclass
 class SimulationResult:
     """Result of simulating an entire plan."""
+
     plan_id: str
     plan_goal: str
     step_simulations: List[StepSimulation] = field(default_factory=list)

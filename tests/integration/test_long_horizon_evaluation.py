@@ -13,13 +13,13 @@ These tests verify that all components work together correctly
 in realistic scenarios.
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+from unittest.mock import AsyncMock, Mock
 
 import numpy as np
+import pytest
 
 # Evaluation components
 from sage.evaluation.goal_drift import (
@@ -27,18 +27,18 @@ from sage.evaluation.goal_drift import (
     MultiGoalDriftTracker,
 )
 from sage.evaluation.incident_tracker import (
+    IncidentSeverity,
     IncidentTracker,
     IncidentType,
-    IncidentSeverity,
+)
+from sage.evaluation.long_horizon import (
+    EvaluationStatus,
+    LongHorizonEvaluator,
+    SimpleLongHorizonEvaluator,
 )
 from sage.evaluation.rolling_metrics import (
     RollingWindowTracker,
     TaskResult,
-)
-from sage.evaluation.long_horizon import (
-    LongHorizonEvaluator,
-    SimpleLongHorizonEvaluator,
-    EvaluationStatus,
 )
 
 # Human oversight components
@@ -47,34 +47,34 @@ from sage.human_oversight.approval_flow import (
     ApprovalRequest,
     RiskLevel,
 )
+from sage.human_oversight.audit import (
+    AuditEventType,
+    AuditLogger,
+)
 from sage.human_oversight.escalation import (
     EscalationHandler,
     EscalationLevel,
 )
-from sage.human_oversight.audit import (
-    AuditLogger,
-    AuditEventType,
-)
 
 # Learning components
 from sage.learning.deployment_loop import (
-    DeploymentLoop,
-    DeploymentConfig,
     ABTestDeployment,
+    DeploymentConfig,
+    DeploymentLoop,
+)
+from sage.learning.experience import (
+    Experience,
+    ExperienceBuffer,
 )
 from sage.learning.feedback import (
     FeedbackCollector,
     FeedbackType,
 )
-from sage.learning.experience import (
-    ExperienceBuffer,
-    Experience,
-)
-
 
 # ============================================================================
 # Test Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def mock_embedding_fn():
@@ -141,14 +141,13 @@ def mock_degrading_agent():
 # Long-Horizon Evaluation Integration Tests
 # ============================================================================
 
+
 class TestLongHorizonEvaluationIntegration:
     """Integration tests for the complete evaluation pipeline."""
 
     @pytest.mark.asyncio
     async def test_full_evaluation_with_all_components(
-        self,
-        mock_successful_agent,
-        mock_embedding_fn
+        self, mock_successful_agent, mock_embedding_fn
     ):
         """Test complete evaluation with all tracking components."""
         evaluator = LongHorizonEvaluator(
@@ -181,9 +180,7 @@ class TestLongHorizonEvaluationIntegration:
 
     @pytest.mark.asyncio
     async def test_evaluation_detects_degradation(
-        self,
-        mock_degrading_agent,
-        mock_embedding_fn
+        self, mock_degrading_agent, mock_embedding_fn
     ):
         """Test that evaluation detects performance degradation."""
         evaluator = LongHorizonEvaluator(
@@ -235,6 +232,7 @@ class TestLongHorizonEvaluationIntegration:
 # ============================================================================
 # Human Oversight Integration Tests
 # ============================================================================
+
 
 class TestHumanOversightIntegration:
     """Integration tests for human oversight components."""
@@ -346,6 +344,7 @@ class TestHumanOversightIntegration:
 # Learning System Integration Tests
 # ============================================================================
 
+
 class TestLearningSystemIntegration:
     """Integration tests for learning components."""
 
@@ -439,14 +438,13 @@ class TestLearningSystemIntegration:
 # End-to-End Integration Tests
 # ============================================================================
 
+
 class TestEndToEndIntegration:
     """End-to-end integration tests combining all systems."""
 
     @pytest.mark.asyncio
     async def test_complete_agent_deployment_scenario(
-        self,
-        mock_successful_agent,
-        mock_embedding_fn
+        self, mock_successful_agent, mock_embedding_fn
     ):
         """Test a complete agent deployment scenario."""
         # Setup all components
@@ -528,10 +526,7 @@ class TestEndToEndIntegration:
         assert "deployment-001" in audit_export
 
     @pytest.mark.asyncio
-    async def test_incident_tracking_during_evaluation(
-        self,
-        mock_embedding_fn
-    ):
+    async def test_incident_tracking_during_evaluation(self, mock_embedding_fn):
         """Test incident tracking during long-horizon evaluation."""
         # Create an agent that triggers incidents
         agent = Mock()
@@ -566,6 +561,7 @@ class TestEndToEndIntegration:
 # ============================================================================
 # Performance Tests
 # ============================================================================
+
 
 class TestPerformance:
     """Performance-related integration tests."""

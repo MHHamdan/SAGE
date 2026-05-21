@@ -39,14 +39,14 @@ Example:
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import time
-import hashlib
-from enum import Enum, auto
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Callable, Tuple, Set
 from collections import deque
+from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
@@ -57,18 +57,21 @@ logger = logging.getLogger(__name__)
 # STABILITY DEFINITIONS (Section III-F-5)
 # =============================================================================
 
+
 class ViolationType(Enum):
     """Types of stability condition violations."""
-    GOAL_DIVERGENCE = auto()        # Definition 1 violated
-    OSCILLATION = auto()            # Definition 2 violated
-    MONOTONICITY_FAILURE = auto()   # Theorem 1 condition (ii) violated
-    OBSERVATION_FIDELITY = auto()   # Theorem 1 condition (i) violated
-    CONTEXT_NOISE = auto()          # Theorem 1 condition (iii) violated
-    DEADLOCK = auto()               # Agent stuck in absorbing state
+
+    GOAL_DIVERGENCE = auto()  # Definition 1 violated
+    OSCILLATION = auto()  # Definition 2 violated
+    MONOTONICITY_FAILURE = auto()  # Theorem 1 condition (ii) violated
+    OBSERVATION_FIDELITY = auto()  # Theorem 1 condition (i) violated
+    CONTEXT_NOISE = auto()  # Theorem 1 condition (iii) violated
+    DEADLOCK = auto()  # Agent stuck in absorbing state
 
 
 class StabilitySeverity(Enum):
     """Severity levels for stability violations."""
+
     INFO = 0
     WARNING = 1
     CRITICAL = 2
@@ -90,6 +93,7 @@ class ConvergenceStatus:
         estimated_steps_remaining: Estimated steps to convergence
         trend: Direction of convergence trend
     """
+
     converging: bool
     current_similarity: float
     target_similarity: float
@@ -102,7 +106,7 @@ class ConvergenceStatus:
             "current_similarity": self.current_similarity,
             "target_similarity": self.target_similarity,
             "estimated_steps_remaining": self.estimated_steps_remaining,
-            "trend": self.trend
+            "trend": self.trend,
         }
 
 
@@ -122,6 +126,7 @@ class OscillationStatus:
         bound: Maximum allowed overlap
         repeated_actions: List of repeated action hashes
     """
+
     oscillating: bool
     cycle_detected: bool
     overlap_ratio: float
@@ -136,7 +141,7 @@ class OscillationStatus:
             "overlap_ratio": self.overlap_ratio,
             "window_size": self.window_size,
             "bound": self.bound,
-            "repeated_action_count": len(self.repeated_actions)
+            "repeated_action_count": len(self.repeated_actions),
         }
 
 
@@ -154,6 +159,7 @@ class MonotonicityStatus:
         consecutive_negative: Number of consecutive negative progress steps
         window_size: Size of analysis window
     """
+
     monotonic: bool
     mean_progress: float
     required_progress: float
@@ -166,7 +172,7 @@ class MonotonicityStatus:
             "mean_progress": self.mean_progress,
             "required_progress": self.required_progress,
             "consecutive_negative": self.consecutive_negative,
-            "window_size": self.window_size
+            "window_size": self.window_size,
         }
 
 
@@ -184,6 +190,7 @@ class FidelityStatus:
         error_rate: Rate of validation failures
         bound: Maximum allowed error (delta_o)
     """
+
     fidelity_satisfied: bool
     schema_valid: bool
     validation_errors: List[str]
@@ -196,7 +203,7 @@ class FidelityStatus:
             "schema_valid": self.schema_valid,
             "error_count": len(self.validation_errors),
             "error_rate": self.error_rate,
-            "bound": self.bound
+            "bound": self.bound,
         }
 
 
@@ -213,6 +220,7 @@ class StabilityViolation:
         context: Additional context data
         recommended_action: Suggested remediation
     """
+
     violation_type: ViolationType
     severity: StabilitySeverity
     timestamp: float
@@ -229,7 +237,7 @@ class StabilityViolation:
             "step": self.step,
             "description": self.description,
             "context": self.context,
-            "recommended_action": self.recommended_action
+            "recommended_action": self.recommended_action,
         }
 
 
@@ -248,6 +256,7 @@ class StabilityStatus:
         violations: List of violations detected
         goal_similarity: Current goal similarity
     """
+
     step: int
     timestamp: float
     convergence: ConvergenceStatus
@@ -268,7 +277,7 @@ class StabilityStatus:
             "oscillation": self.oscillation.to_dict(),
             "monotonicity": self.monotonicity.to_dict(),
             "fidelity": self.fidelity.to_dict(),
-            "violations": [v.to_dict() for v in self.violations]
+            "violations": [v.to_dict() for v in self.violations],
         }
 
 
@@ -285,6 +294,7 @@ class StabilityReport:
         oscillation_incidents: Number of oscillation incidents
         recommendations: List of recommendations
     """
+
     total_steps: int
     total_violations: int
     violations_by_type: Dict[str, int]
@@ -302,13 +312,14 @@ class StabilityReport:
             "mean_goal_similarity": self.mean_goal_similarity,
             "monotonicity_satisfaction_rate": self.monotonicity_satisfaction_rate,
             "oscillation_incidents": self.oscillation_incidents,
-            "recommendations": self.recommendations
+            "recommendations": self.recommendations,
         }
 
 
 # =============================================================================
 # STABILITY MONITOR CLASS
 # =============================================================================
+
 
 class StabilityMonitor:
     """
@@ -355,7 +366,7 @@ class StabilityMonitor:
         monotonicity_window: int = 10,
         progress_threshold: float = 0.001,
         fidelity_bound: float = 0.1,
-        embedding_fn: Optional[Callable[[str], np.ndarray]] = None
+        embedding_fn: Optional[Callable[[str], np.ndarray]] = None,
     ):
         """Initialize stability monitor.
 
@@ -399,7 +410,7 @@ class StabilityMonitor:
         state_embedding: np.ndarray,
         action: str,
         observation: Optional[Dict[str, Any]] = None,
-        expected_schema: Optional[Dict[str, Any]] = None
+        expected_schema: Optional[Dict[str, Any]] = None,
     ) -> StabilityStatus:
         """Update tracking and check for violations.
 
@@ -434,48 +445,60 @@ class StabilityMonitor:
         violations: List[StabilityViolation] = []
 
         if not convergence.converging and convergence.trend == "degrading":
-            violations.append(StabilityViolation(
-                violation_type=ViolationType.GOAL_DIVERGENCE,
-                severity=StabilitySeverity.WARNING,
-                timestamp=timestamp,
-                step=self._step,
-                description=f"Goal divergence detected: similarity={similarity:.3f}",
-                context={"similarity": similarity, "trend": convergence.trend},
-                recommended_action="Consider re-anchoring goal or adjusting strategy"
-            ))
+            violations.append(
+                StabilityViolation(
+                    violation_type=ViolationType.GOAL_DIVERGENCE,
+                    severity=StabilitySeverity.WARNING,
+                    timestamp=timestamp,
+                    step=self._step,
+                    description=f"Goal divergence detected: similarity={similarity:.3f}",
+                    context={"similarity": similarity, "trend": convergence.trend},
+                    recommended_action="Consider re-anchoring goal or adjusting strategy",
+                )
+            )
 
         if oscillation.oscillating:
-            violations.append(StabilityViolation(
-                violation_type=ViolationType.OSCILLATION,
-                severity=StabilitySeverity.CRITICAL if oscillation.cycle_detected else StabilitySeverity.WARNING,
-                timestamp=timestamp,
-                step=self._step,
-                description=f"Action oscillation detected: overlap={oscillation.overlap_ratio:.1%}",
-                context=oscillation.to_dict(),
-                recommended_action="Break cycle by introducing exploration or external guidance"
-            ))
+            violations.append(
+                StabilityViolation(
+                    violation_type=ViolationType.OSCILLATION,
+                    severity=(
+                        StabilitySeverity.CRITICAL
+                        if oscillation.cycle_detected
+                        else StabilitySeverity.WARNING
+                    ),
+                    timestamp=timestamp,
+                    step=self._step,
+                    description=f"Action oscillation detected: overlap={oscillation.overlap_ratio:.1%}",
+                    context=oscillation.to_dict(),
+                    recommended_action="Break cycle by introducing exploration or external guidance",
+                )
+            )
 
         if not monotonicity.monotonic:
-            violations.append(StabilityViolation(
-                violation_type=ViolationType.MONOTONICITY_FAILURE,
-                severity=StabilitySeverity.WARNING,
-                timestamp=timestamp,
-                step=self._step,
-                description=f"Monotonicity violated: mean_progress={monotonicity.mean_progress:.4f}",
-                context=monotonicity.to_dict(),
-                recommended_action="Trigger intervention or replanning"
-            ))
+            violations.append(
+                StabilityViolation(
+                    violation_type=ViolationType.MONOTONICITY_FAILURE,
+                    severity=StabilitySeverity.WARNING,
+                    timestamp=timestamp,
+                    step=self._step,
+                    description=f"Monotonicity violated: mean_progress={monotonicity.mean_progress:.4f}",
+                    context=monotonicity.to_dict(),
+                    recommended_action="Trigger intervention or replanning",
+                )
+            )
 
         if not fidelity.fidelity_satisfied:
-            violations.append(StabilityViolation(
-                violation_type=ViolationType.OBSERVATION_FIDELITY,
-                severity=StabilitySeverity.WARNING,
-                timestamp=timestamp,
-                step=self._step,
-                description=f"Observation fidelity violated: error_rate={fidelity.error_rate:.1%}",
-                context=fidelity.to_dict(),
-                recommended_action="Validate tool outputs and implement parsing verification"
-            ))
+            violations.append(
+                StabilityViolation(
+                    violation_type=ViolationType.OBSERVATION_FIDELITY,
+                    severity=StabilitySeverity.WARNING,
+                    timestamp=timestamp,
+                    step=self._step,
+                    description=f"Observation fidelity violated: error_rate={fidelity.error_rate:.1%}",
+                    context=fidelity.to_dict(),
+                    recommended_action="Validate tool outputs and implement parsing verification",
+                )
+            )
 
         self._violations.extend(violations)
 
@@ -488,7 +511,7 @@ class StabilityMonitor:
             fidelity=fidelity,
             has_violation=len(violations) > 0,
             violations=violations,
-            goal_similarity=similarity
+            goal_similarity=similarity,
         )
 
         self._status_history.append(status)
@@ -506,7 +529,7 @@ class StabilityMonitor:
                 current_similarity=0.0,
                 target_similarity=self.similarity_threshold,
                 estimated_steps_remaining=None,
-                trend="stable"
+                trend="stable",
             )
 
         current_similarity = self._similarity_history[-1]
@@ -537,14 +560,16 @@ class StabilityMonitor:
                 if progress_rate > 0:
                     estimated_steps = int(gap / progress_rate)
 
-        converging = current_similarity >= self.similarity_threshold or trend == "improving"
+        converging = (
+            current_similarity >= self.similarity_threshold or trend == "improving"
+        )
 
         return ConvergenceStatus(
             converging=converging,
             current_similarity=current_similarity,
             target_similarity=self.similarity_threshold,
             estimated_steps_remaining=estimated_steps,
-            trend=trend
+            trend=trend,
         )
 
     def check_oscillation(self) -> OscillationStatus:
@@ -560,7 +585,7 @@ class StabilityMonitor:
                 overlap_ratio=0.0,
                 window_size=self.oscillation_window,
                 bound=self.oscillation_bound,
-                repeated_actions=[]
+                repeated_actions=[],
             )
 
         actions = list(self._action_history)
@@ -580,7 +605,7 @@ class StabilityMonitor:
         cycle_detected = False
         if len(actions) >= self.oscillation_window * 2:
             for cycle_len in range(2, self.oscillation_window // 2 + 1):
-                recent = actions[-cycle_len * 2:]
+                recent = actions[-cycle_len * 2 :]
                 first_half = recent[:cycle_len]
                 second_half = recent[cycle_len:]
                 if first_half == second_half:
@@ -595,7 +620,7 @@ class StabilityMonitor:
             overlap_ratio=overlap_ratio,
             window_size=self.oscillation_window,
             bound=self.oscillation_bound,
-            repeated_actions=list(overlap)
+            repeated_actions=list(overlap),
         )
 
     def check_monotonicity(self, window: Optional[int] = None) -> MonotonicityStatus:
@@ -615,15 +640,14 @@ class StabilityMonitor:
                 mean_progress=0.0,
                 required_progress=self.progress_threshold,
                 consecutive_negative=0,
-                window_size=window
+                window_size=window,
             )
 
         similarities = list(self._similarity_history)[-window:]
 
         # Compute progress deltas
         deltas = [
-            similarities[i + 1] - similarities[i]
-            for i in range(len(similarities) - 1)
+            similarities[i + 1] - similarities[i] for i in range(len(similarities) - 1)
         ]
 
         if not deltas:
@@ -632,7 +656,7 @@ class StabilityMonitor:
                 mean_progress=0.0,
                 required_progress=self.progress_threshold,
                 consecutive_negative=0,
-                window_size=window
+                window_size=window,
             )
 
         mean_progress = sum(deltas) / len(deltas)
@@ -652,13 +676,13 @@ class StabilityMonitor:
             mean_progress=mean_progress,
             required_progress=self.progress_threshold,
             consecutive_negative=consecutive_negative,
-            window_size=window
+            window_size=window,
         )
 
     def check_observation_fidelity(
         self,
         observation: Optional[Dict[str, Any]],
-        expected_schema: Optional[Dict[str, Any]] = None
+        expected_schema: Optional[Dict[str, Any]] = None,
     ) -> FidelityStatus:
         """Validate observation against expected schema (Theorem 1, condition i).
 
@@ -677,14 +701,16 @@ class StabilityMonitor:
                 schema_valid=True,
                 validation_errors=[],
                 error_rate=0.0,
-                bound=self.fidelity_bound
+                bound=self.fidelity_bound,
             )
 
         validation_errors: List[str] = []
 
         # Schema validation
         if expected_schema:
-            schema_valid = self._validate_schema(observation, expected_schema, validation_errors)
+            schema_valid = self._validate_schema(
+                observation, expected_schema, validation_errors
+            )
         else:
             schema_valid = True
 
@@ -701,14 +727,11 @@ class StabilityMonitor:
             schema_valid=schema_valid,
             validation_errors=validation_errors,
             error_rate=error_rate,
-            bound=self.fidelity_bound
+            bound=self.fidelity_bound,
         )
 
     def _validate_schema(
-        self,
-        observation: Dict[str, Any],
-        schema: Dict[str, Any],
-        errors: List[str]
+        self, observation: Dict[str, Any], schema: Dict[str, Any], errors: List[str]
     ) -> bool:
         """Validate observation against schema.
 
@@ -737,19 +760,31 @@ class StabilityMonitor:
                 if expected_type:
                     actual = observation[field]
                     if expected_type == "string" and not isinstance(actual, str):
-                        errors.append(f"Field {field} should be string, got {type(actual).__name__}")
+                        errors.append(
+                            f"Field {field} should be string, got {type(actual).__name__}"
+                        )
                         valid = False
-                    elif expected_type == "number" and not isinstance(actual, (int, float)):
-                        errors.append(f"Field {field} should be number, got {type(actual).__name__}")
+                    elif expected_type == "number" and not isinstance(
+                        actual, (int, float)
+                    ):
+                        errors.append(
+                            f"Field {field} should be number, got {type(actual).__name__}"
+                        )
                         valid = False
                     elif expected_type == "boolean" and not isinstance(actual, bool):
-                        errors.append(f"Field {field} should be boolean, got {type(actual).__name__}")
+                        errors.append(
+                            f"Field {field} should be boolean, got {type(actual).__name__}"
+                        )
                         valid = False
                     elif expected_type == "object" and not isinstance(actual, dict):
-                        errors.append(f"Field {field} should be object, got {type(actual).__name__}")
+                        errors.append(
+                            f"Field {field} should be object, got {type(actual).__name__}"
+                        )
                         valid = False
                     elif expected_type == "array" and not isinstance(actual, list):
-                        errors.append(f"Field {field} should be array, got {type(actual).__name__}")
+                        errors.append(
+                            f"Field {field} should be array, got {type(actual).__name__}"
+                        )
                         valid = False
 
         return valid
@@ -769,7 +804,8 @@ class StabilityMonitor:
         # Calculate mean similarity
         mean_similarity = (
             sum(self._similarity_history) / len(self._similarity_history)
-            if self._similarity_history else 0.0
+            if self._similarity_history
+            else 0.0
         )
 
         # Calculate monotonicity satisfaction rate
@@ -797,12 +833,11 @@ class StabilityMonitor:
             monotonicity_satisfaction_rate=monotonicity_rate,
             oscillation_incidents=oscillation_incidents,
             recommendations=recommendations,
-            status_history=self._status_history
+            status_history=self._status_history,
         )
 
     def _generate_recommendations(
-        self,
-        violations_by_type: Dict[str, int]
+        self, violations_by_type: Dict[str, int]
     ) -> List[str]:
         """Generate recommendations based on violations.
 
@@ -840,9 +875,7 @@ class StabilityMonitor:
         return recommendations
 
     def _compute_similarity(
-        self,
-        embedding1: np.ndarray,
-        embedding2: np.ndarray
+        self, embedding1: np.ndarray, embedding2: np.ndarray
     ) -> float:
         """Compute cosine similarity between embeddings.
 
@@ -889,6 +922,7 @@ class StabilityMonitor:
 # COROLLARY 1 IMPLEMENTATION: LIMIT CYCLE DETECTION
 # =============================================================================
 
+
 class LimitCycleDetector:
     """
     Detects limit cycles as described in Corollary 1.
@@ -919,7 +953,7 @@ class LimitCycleDetector:
         cycle_threshold: float = 0.8,
         window_size: int = 20,
         min_cycle_length: int = 2,
-        max_cycle_length: int = 10
+        max_cycle_length: int = 10,
     ):
         """Initialize limit cycle detector.
 
@@ -941,10 +975,7 @@ class LimitCycleDetector:
         self._state_history: List[np.ndarray] = []
         self._cycle_candidates: Dict[int, int] = {}  # cycle_length -> count
 
-    def check_state(
-        self,
-        state_embedding: np.ndarray
-    ) -> Tuple[bool, Dict[str, Any]]:
+    def check_state(self, state_embedding: np.ndarray) -> Tuple[bool, Dict[str, Any]]:
         """Check if current state is part of a limit cycle.
 
         Args:
@@ -964,7 +995,7 @@ class LimitCycleDetector:
             if len(self._state_history) >= cycle_len * 2:
                 # Compare current window to previous window
                 current_window = self._state_history[-cycle_len:]
-                previous_window = self._state_history[-cycle_len * 2:-cycle_len]
+                previous_window = self._state_history[-cycle_len * 2 : -cycle_len]
 
                 # Check similarity of corresponding states
                 similarities = []
@@ -976,26 +1007,28 @@ class LimitCycleDetector:
 
                 if avg_similarity > self.similarity_threshold:
                     # Potential cycle detected
-                    self._cycle_candidates[cycle_len] = self._cycle_candidates.get(cycle_len, 0) + 1
+                    self._cycle_candidates[cycle_len] = (
+                        self._cycle_candidates.get(cycle_len, 0) + 1
+                    )
 
                     # Calculate cycle probability
                     total_checks = len(self._state_history) - cycle_len * 2 + 1
-                    cycle_probability = self._cycle_candidates.get(cycle_len, 0) / max(total_checks, 1)
+                    cycle_probability = self._cycle_candidates.get(cycle_len, 0) / max(
+                        total_checks, 1
+                    )
 
                     if cycle_probability > self.cycle_threshold:
                         return True, {
                             "cycle_length": cycle_len,
                             "cycle_probability": cycle_probability,
                             "avg_similarity": avg_similarity,
-                            "message": f"Limit cycle detected with length {cycle_len}"
+                            "message": f"Limit cycle detected with length {cycle_len}",
                         }
 
         return False, {"message": "No limit cycle detected"}
 
     def _compute_similarity(
-        self,
-        embedding1: np.ndarray,
-        embedding2: np.ndarray
+        self, embedding1: np.ndarray, embedding2: np.ndarray
     ) -> float:
         """Compute cosine similarity between embeddings."""
         norm1 = np.linalg.norm(embedding1)
@@ -1016,10 +1049,9 @@ class LimitCycleDetector:
 # CONVENIENCE FUNCTIONS
 # =============================================================================
 
+
 def create_stability_monitor(
-    goal_text: str,
-    embedding_fn: Callable[[str], np.ndarray],
-    **kwargs
+    goal_text: str, embedding_fn: Callable[[str], np.ndarray], **kwargs
 ) -> StabilityMonitor:
     """Create a stability monitor from goal text.
 
@@ -1033,9 +1065,7 @@ def create_stability_monitor(
     """
     goal_embedding = embedding_fn(goal_text)
     return StabilityMonitor(
-        goal_embedding=goal_embedding,
-        embedding_fn=embedding_fn,
-        **kwargs
+        goal_embedding=goal_embedding, embedding_fn=embedding_fn, **kwargs
     )
 
 
@@ -1043,7 +1073,7 @@ def check_stability_conditions(
     goal_embedding: np.ndarray,
     state_embeddings: List[np.ndarray],
     actions: List[str],
-    observations: Optional[List[Dict[str, Any]]] = None
+    observations: Optional[List[Dict[str, Any]]] = None,
 ) -> StabilityReport:
     """Run stability analysis on a completed execution trace.
 
@@ -1061,10 +1091,6 @@ def check_stability_conditions(
     observations = observations or [None] * len(actions)
 
     for state, action, obs in zip(state_embeddings, actions, observations):
-        monitor.track_state(
-            state_embedding=state,
-            action=action,
-            observation=obs
-        )
+        monitor.track_state(state_embedding=state, action=action, observation=obs)
 
     return monitor.get_stability_report()

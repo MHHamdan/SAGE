@@ -1,23 +1,24 @@
 """Tests for CNSR Benchmark module."""
 
-import pytest
-import numpy as np
 from unittest.mock import Mock
 
+import numpy as np
+import pytest
+
 from sage.evaluation.cnsr_benchmark import (
-    CNSRBenchmark,
-    BenchmarkConfig,
-    AgentEvaluationResult,
-    CNSRResults,
-    ParetoAnalysis,
-    DivergenceReport,
-    SensitivityReport,
-    RankingMethod,
     MODEL_COST_RATES,
+    AgentEvaluationResult,
+    BenchmarkConfig,
+    CNSRBenchmark,
+    CNSRResults,
+    DivergenceReport,
+    ParetoAnalysis,
+    RankingMethod,
+    SensitivityReport,
     create_cnsr_benchmark,
     quick_cnsr_comparison,
 )
-from sage.evaluation.metrics import TaskResult, TaskCostBreakdown
+from sage.evaluation.metrics import TaskCostBreakdown, TaskResult
 
 
 class TestCNSRBenchmark:
@@ -50,9 +51,7 @@ class TestCNSRBenchmark:
 
         # Run evaluation
         results = benchmark.run_evaluation(
-            agents=[agent1, agent2],
-            benchmark_name="test",
-            n_samples=10
+            agents=[agent1, agent2], benchmark_name="test", n_samples=10
         )
 
         assert isinstance(results, CNSRResults)
@@ -76,7 +75,7 @@ class TestCNSRBenchmark:
                     p75_cost=1.2,
                     cost_variance=0.1,
                     cnsr=0.8,
-                    total_duration=10.0
+                    total_duration=10.0,
                 ),
                 AgentEvaluationResult(
                     agent_name="Agent2",
@@ -88,11 +87,11 @@ class TestCNSRBenchmark:
                     p75_cost=2.5,
                     cost_variance=0.2,
                     cnsr=0.3,
-                    total_duration=10.0
+                    total_duration=10.0,
                 ),
             ],
             benchmark_configs=[BenchmarkConfig("test", n_samples=10)],
-            seed=42
+            seed=42,
         )
 
         pareto = benchmark.compute_pareto_frontier(results)
@@ -118,7 +117,7 @@ class TestCNSRBenchmark:
                     p75_cost=6.0,
                     cost_variance=0.5,
                     cnsr=0.18,  # Low CNSR despite high SR
-                    total_duration=10.0
+                    total_duration=10.0,
                 ),
                 AgentEvaluationResult(
                     agent_name="LowSR-LowCost",
@@ -130,17 +129,15 @@ class TestCNSRBenchmark:
                     p75_cost=0.15,
                     cost_variance=0.01,
                     cnsr=5.0,  # High CNSR despite low SR
-                    total_duration=10.0
+                    total_duration=10.0,
                 ),
             ],
             benchmark_configs=[BenchmarkConfig("test", n_samples=10)],
-            seed=42
+            seed=42,
         )
 
         divergence = benchmark.ranking_divergence(
-            results,
-            method1=RankingMethod.SUCCESS_RATE,
-            method2=RankingMethod.CNSR
+            results, method1=RankingMethod.SUCCESS_RATE, method2=RankingMethod.CNSR
         )
 
         assert isinstance(divergence, DivergenceReport)
@@ -155,10 +152,7 @@ class TestCNSRBenchmark:
             TaskResult(
                 task_id=f"task_{i}",
                 success=i % 3 != 0,
-                cost=TaskCostBreakdown(
-                    inference_cost=0.1 * (i + 1),
-                    tool_cost=0.01
-                )
+                cost=TaskCostBreakdown(inference_cost=0.1 * (i + 1), tool_cost=0.01),
             )
             for i in range(20)
         ]
@@ -169,11 +163,11 @@ class TestCNSRBenchmark:
                     agent_name="Agent1",
                     benchmark_name="test",
                     task_results=task_results,
-                    total_duration=10.0
+                    total_duration=10.0,
                 ),
             ],
             benchmark_configs=[BenchmarkConfig("test", n_samples=20)],
-            seed=42
+            seed=42,
         )
 
         sensitivity = benchmark.sensitivity_analysis(results)
@@ -189,10 +183,7 @@ class TestCNSRBenchmark:
         mock_agent.name = "TestAgent"
         mock_agent.run = Mock(return_value="response")
 
-        results = benchmark.run_evaluation(
-            agents=[mock_agent],
-            n_samples=5
-        )
+        results = benchmark.run_evaluation(agents=[mock_agent], n_samples=5)
 
         report = benchmark.generate_validation_report(results)
 
@@ -208,19 +199,13 @@ class TestAgentEvaluationResult:
         """Test creation from task results."""
         task_results = [
             TaskResult(
-                task_id="1",
-                success=True,
-                cost=TaskCostBreakdown(inference_cost=0.1)
+                task_id="1", success=True, cost=TaskCostBreakdown(inference_cost=0.1)
             ),
             TaskResult(
-                task_id="2",
-                success=True,
-                cost=TaskCostBreakdown(inference_cost=0.2)
+                task_id="2", success=True, cost=TaskCostBreakdown(inference_cost=0.2)
             ),
             TaskResult(
-                task_id="3",
-                success=False,
-                cost=TaskCostBreakdown(inference_cost=0.15)
+                task_id="3", success=False, cost=TaskCostBreakdown(inference_cost=0.15)
             ),
         ]
 
@@ -228,10 +213,10 @@ class TestAgentEvaluationResult:
             agent_name="Test",
             benchmark_name="test",
             task_results=task_results,
-            total_duration=10.0
+            total_duration=10.0,
         )
 
-        assert result.success_rate == pytest.approx(2/3)
+        assert result.success_rate == pytest.approx(2 / 3)
         assert result.mean_cost == pytest.approx(0.15)
 
     def test_empty_results(self):
@@ -240,7 +225,7 @@ class TestAgentEvaluationResult:
             agent_name="Test",
             benchmark_name="test",
             task_results=[],
-            total_duration=0.0
+            total_duration=0.0,
         )
 
         assert result.success_rate == 0.0
@@ -258,7 +243,7 @@ class TestAgentEvaluationResult:
             p75_cost=1.2,
             cost_variance=0.1,
             cnsr=0.8,
-            total_duration=10.0
+            total_duration=10.0,
         )
 
         d = result.to_dict()
@@ -304,11 +289,7 @@ class TestBenchmarkConfig:
 
     def test_custom_config(self):
         """Test custom configuration."""
-        config = BenchmarkConfig(
-            name="custom",
-            n_samples=50,
-            timeout_seconds=60.0
-        )
+        config = BenchmarkConfig(name="custom", n_samples=50, timeout_seconds=60.0)
         assert config.n_samples == 50
         assert config.timeout_seconds == 60.0
 
@@ -327,7 +308,7 @@ class TestModelCostRates:
         required_fields = [
             "token_input_per_1k",
             "token_output_per_1k",
-            "tool_call_cost"
+            "tool_call_cost",
         ]
 
         for model, rates in MODEL_COST_RATES.items():

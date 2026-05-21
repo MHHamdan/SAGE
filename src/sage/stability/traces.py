@@ -14,8 +14,8 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
-
 # ── Pydantic models ────────────────────────────────────────────────────────────
+
 
 class MonitorSignalsModel(BaseModel):
     drift_score: float = Field(ge=0.0, le=1.0)
@@ -55,6 +55,7 @@ class ManifestModel(BaseModel):
 
 
 # ── I/O helpers ────────────────────────────────────────────────────────────────
+
 
 class TraceWriter:
     """Append-mode JSONL writer for TraceEvent objects."""
@@ -121,16 +122,22 @@ def write_manifest(
 def _get_git_sha() -> str:
     try:
         import subprocess
-        return subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL
-        ).decode().strip()
+
+        return (
+            subprocess.check_output(
+                ["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL
+            )
+            .decode()
+            .strip()
+        )
     except Exception:
         return "unknown"
 
 
 def _get_env_hash() -> str:
     import numpy as np
-    import sklearn
     import scipy
+    import sklearn
+
     s = f"numpy={np.__version__},sklearn={sklearn.__version__},scipy={scipy.__version__}"
     return hashlib.sha256(s.encode()).hexdigest()[:12]

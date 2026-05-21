@@ -20,7 +20,7 @@ from typing import Optional
 import numpy as np
 from sklearn.calibration import calibration_curve
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score, average_precision_score, brier_score_loss
+from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
@@ -43,6 +43,7 @@ FEATURE_NAMES = [
 
 # ── Feature extraction ─────────────────────────────────────────────────────────
 
+
 def extract_features(
     signals: MonitorSignals,
     history: list[MonitorSignals],
@@ -61,23 +62,28 @@ def extract_features(
         delta_fid = 0.0
         max_drift = signals.drift_score
 
-    return np.array([
-        signals.drift_score,
-        signals.oscillation_score,
-        signals.fidelity_score,
-        signals.convergence_progress,
-        delta_drift,
-        delta_osc,
-        delta_fid,
-        max_drift,
-    ], dtype=np.float64)
+    return np.array(
+        [
+            signals.drift_score,
+            signals.oscillation_score,
+            signals.fidelity_score,
+            signals.convergence_progress,
+            delta_drift,
+            delta_osc,
+            delta_fid,
+            max_drift,
+        ],
+        dtype=np.float64,
+    )
 
 
 # ── Training data construction ─────────────────────────────────────────────────
 
+
 @dataclass
 class TraceRecord:
     """Per-turn record for predictor training."""
+
     task_id: str
     turn: int
     features: np.ndarray
@@ -132,6 +138,7 @@ def assert_no_leakage(
 
 
 # ── Predictor class ────────────────────────────────────────────────────────────
+
 
 class FailurePredictor:
     """k-step-ahead failure predictor (logistic regression by default).
@@ -192,7 +199,9 @@ class FailurePredictor:
         self._fitted = True
         logger.info(
             "FailurePredictor fitted: k=%d, n_samples=%d, pos_rate=%.2f%%",
-            self.k, len(y), 100 * y.mean(),
+            self.k,
+            len(y),
+            100 * y.mean(),
         )
         return self
 
@@ -278,8 +287,10 @@ class FailurePredictor:
         def _bootstrap_mean_ci(vals: list[float]) -> tuple[float, float, float]:
             arr = np.array(vals)
             mn = float(arr.mean())
-            boots = [rng.choice(arr, size=len(arr), replace=True).mean()
-                     for _ in range(n_bootstrap)]
+            boots = [
+                rng.choice(arr, size=len(arr), replace=True).mean()
+                for _ in range(n_bootstrap)
+            ]
             lo, hi = float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
             return mn, lo, hi
 

@@ -4,15 +4,16 @@ Implements least-privilege access control for tool execution.
 """
 
 import logging
-from typing import Optional, List, Dict, Any, Set
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
 
 class Permission(Enum):
     """Available permissions."""
+
     READ = auto()
     WRITE = auto()
     EXECUTE = auto()
@@ -26,6 +27,7 @@ class Permission(Enum):
 @dataclass
 class PermissionScope:
     """Scope for a permission."""
+
     permission: Permission
     resource_pattern: str = "*"  # Pattern for resources this applies to
     allow: bool = True
@@ -34,6 +36,7 @@ class PermissionScope:
 @dataclass
 class PermissionSet:
     """Set of permissions for an entity."""
+
     name: str
     permissions: Set[Permission] = field(default_factory=set)
     scopes: List[PermissionScope] = field(default_factory=list)
@@ -152,5 +155,10 @@ class PermissionManager:
 # Predefined permission sets
 READONLY_PERMISSIONS = {Permission.READ}
 STANDARD_PERMISSIONS = {Permission.READ, Permission.WRITE}
-FULL_PERMISSIONS = {Permission.READ, Permission.WRITE, Permission.EXECUTE, Permission.DELETE}
+FULL_PERMISSIONS = {
+    Permission.READ,
+    Permission.WRITE,
+    Permission.EXECUTE,
+    Permission.DELETE,
+}
 NETWORK_PERMISSIONS = {Permission.READ, Permission.NETWORK}

@@ -14,7 +14,7 @@ from sage.evaluation.pathology_benchmarks import (
     ALL_PATHOLOGY_TASKS,
     TASKS_BY_PATHOLOGY,
     PathologyBenchmarkTask,
-    get_benchmark_statistics
+    get_benchmark_statistics,
 )
 
 
@@ -25,7 +25,9 @@ class TestPathologyCoverage:
         """Every pathology should have at least one benchmark task."""
         for pathology in FailurePathology:
             tasks = TASKS_BY_PATHOLOGY.get(pathology, [])
-            assert len(tasks) >= 1, f"Pathology {pathology.value} has no benchmark tasks"
+            assert (
+                len(tasks) >= 1
+            ), f"Pathology {pathology.value} has no benchmark tasks"
 
     def test_minimum_tasks_per_pathology(self):
         """Each pathology should have at least 2 tasks for robustness."""
@@ -43,11 +45,15 @@ class TestPathologyCoverage:
 
         for pathology in single_agent_pathologies:
             tasks = TASKS_BY_PATHOLOGY.get(pathology, [])
-            assert len(tasks) >= 2, f"Pathology {pathology.value} needs at least 2 tasks, has {len(tasks)}"
+            assert (
+                len(tasks) >= 2
+            ), f"Pathology {pathology.value} needs at least 2 tasks, has {len(tasks)}"
 
     def test_total_task_count(self):
         """Should have at least 20 total tasks."""
-        assert len(ALL_PATHOLOGY_TASKS) >= 20, f"Expected 20+ tasks, got {len(ALL_PATHOLOGY_TASKS)}"
+        assert (
+            len(ALL_PATHOLOGY_TASKS) >= 20
+        ), f"Expected 20+ tasks, got {len(ALL_PATHOLOGY_TASKS)}"
 
 
 class TestTaskDeterminism:
@@ -82,7 +88,7 @@ class TestTaskStructure:
             "description",
             "setup",
             "expected_behavior",
-            "pathology_trigger"
+            "pathology_trigger",
         ]
 
         for task in ALL_PATHOLOGY_TASKS:
@@ -97,8 +103,9 @@ class TestTaskStructure:
         valid_difficulties = {"easy", "medium", "hard"}
 
         for task in ALL_PATHOLOGY_TASKS:
-            assert task.difficulty in valid_difficulties, \
-                f"Task {task.task_id} has invalid difficulty: {task.difficulty}"
+            assert (
+                task.difficulty in valid_difficulties
+            ), f"Task {task.task_id} has invalid difficulty: {task.difficulty}"
 
     def test_difficulty_distribution(self):
         """Should have mix of difficulties."""
@@ -148,23 +155,25 @@ class TestPaperAlignment:
         """
         # Table IX: Hallucinated Affordance -> Schema validation tests
         ha_tasks = TASKS_BY_PATHOLOGY[FailurePathology.HALLUCINATED_AFFORDANCE]
-        assert any("schema" in task.description.lower() or
-                  "schema" in task.pathology_trigger.lower()
-                  for task in ha_tasks), \
-            "Hallucinated affordance tasks should test schema validation"
+        assert any(
+            "schema" in task.description.lower()
+            or "schema" in task.pathology_trigger.lower()
+            for task in ha_tasks
+        ), "Hallucinated affordance tasks should test schema validation"
 
         # Table IX: Cascading Tool Failure -> Fault injection testing
         ctf_tasks = TASKS_BY_PATHOLOGY[FailurePathology.CASCADING_TOOL_FAILURE]
-        assert any("error" in task.setup.get("injected_failure", {}).get("error", "").lower() or
-                  "failure" in task.name.lower()
-                  for task in ctf_tasks), \
-            "Cascading failure tasks should include fault injection"
+        assert any(
+            "error" in task.setup.get("injected_failure", {}).get("error", "").lower()
+            or "failure" in task.name.lower()
+            for task in ctf_tasks
+        ), "Cascading failure tasks should include fault injection"
 
         # Table IX: Goal Drift -> Goal drift score tracking
         gd_tasks = TASKS_BY_PATHOLOGY[FailurePathology.GOAL_DRIFT]
-        assert any("goal" in task.setup.get("original_goal", "").lower()
-                  for task in gd_tasks), \
-            "Goal drift tasks should have explicit original goals"
+        assert any(
+            "goal" in task.setup.get("original_goal", "").lower() for task in gd_tasks
+        ), "Goal drift tasks should have explicit original goals"
 
 
 class TestBenchmarkStatistics:

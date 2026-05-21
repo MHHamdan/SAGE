@@ -15,12 +15,12 @@ and mitigations.
 
 from __future__ import annotations
 
-import time
 import hashlib
 import logging
-from enum import Enum
+import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Callable, Set
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Set
 
 import numpy as np
 
@@ -57,6 +57,7 @@ class FailurePathology(Enum):
 
 class PathologySeverity(Enum):
     """Severity levels for detected pathologies."""
+
     INFO = 0
     LOW = 1
     MEDIUM = 2
@@ -102,8 +103,8 @@ class PathologyIncident:
             "confidence": self.confidence,
             "mitigation": {
                 "applied": self.mitigation_applied,
-                "successful": self.mitigation_successful
-            }
+                "successful": self.mitigation_successful,
+            },
         }
 
 
@@ -130,53 +131,53 @@ MITIGATION_STRATEGIES: Dict[FailurePathology, List[str]] = {
     FailurePathology.HALLUCINATED_AFFORDANCE: [
         "Strict allowlisting",
         "Capability verification",
-        "Schema validation"
+        "Schema validation",
     ],
     FailurePathology.STATE_MISESTIMATION: [
         "Explicit state verification",
         "Freshness checks",
-        "Multi-source validation"
+        "Multi-source validation",
     ],
     FailurePathology.CASCADING_TOOL_FAILURE: [
         "Error boundaries",
         "Circuit breakers",
-        "Rollback mechanisms"
+        "Rollback mechanisms",
     ],
     FailurePathology.ACTION_OBSERVATION_MISMATCH: [
         "Postcondition verification",
         "Result validation",
-        "Retry with verification"
+        "Retry with verification",
     ],
     FailurePathology.MEMORY_POISONING: [
         "Provenance tracking",
         "TTL limits",
-        "Integrity verification"
+        "Integrity verification",
     ],
     FailurePathology.FEEDBACK_AMPLIFICATION: [
         "External grounding",
         "Dampening mechanisms",
-        "Error correlation detection"
+        "Error correlation detection",
     ],
     FailurePathology.GOAL_DRIFT: [
         "Periodic goal re-anchoring",
         "Drift score monitoring",
-        "Goal checkpoints"
+        "Goal checkpoints",
     ],
     FailurePathology.PLANNING_MYOPIA: [
         "Explicit planning horizons",
         "Long-term consequence modeling",
-        "Multi-step lookahead"
+        "Multi-step lookahead",
     ],
     FailurePathology.EMERGENT_COLLUSION: [
         "Diverse agent objectives",
         "Independent oversight",
-        "Outcome analysis"
+        "Outcome analysis",
     ],
     FailurePathology.CONSENSUS_DEADLOCK: [
         "Timeout mechanisms",
         "Escalation to arbiter",
-        "Majority voting fallback"
-    ]
+        "Majority voting fallback",
+    ],
 }
 
 
@@ -202,7 +203,7 @@ class FailureDetector:
         self,
         tool_registry: Any = None,
         memory_store: Any = None,
-        embedding_fn: Optional[Callable[[str], np.ndarray]] = None
+        embedding_fn: Optional[Callable[[str], np.ndarray]] = None,
     ):
         """
         Initialize failure detector.
@@ -231,9 +232,7 @@ class FailureDetector:
     # ==========================================
 
     def detect_hallucinated_affordance(
-        self,
-        action: Any,
-        available_tools: Optional[Set[str]] = None
+        self, action: Any, available_tools: Optional[Set[str]] = None
     ) -> Optional[PathologyIncident]:
         """
         Detect phantom tools, fabricated APIs, imagined permissions.
@@ -246,9 +245,9 @@ class FailureDetector:
         """
         # Get available tools from registry or parameter
         if available_tools is None and self.tool_registry:
-            if hasattr(self.tool_registry, 'get_available_tools'):
+            if hasattr(self.tool_registry, "get_available_tools"):
                 available_tools = set(self.tool_registry.get_available_tools())
-            elif hasattr(self.tool_registry, 'list_tools'):
+            elif hasattr(self.tool_registry, "list_tools"):
                 available_tools = set(self.tool_registry.list_tools())
             else:
                 available_tools = set()
@@ -257,10 +256,10 @@ class FailureDetector:
 
         # Extract tool name from action
         tool_name = None
-        if hasattr(action, 'tool') or hasattr(action, 'target'):
-            tool_name = getattr(action, 'tool', None) or getattr(action, 'target', None)
+        if hasattr(action, "tool") or hasattr(action, "target"):
+            tool_name = getattr(action, "tool", None) or getattr(action, "target", None)
         elif isinstance(action, dict):
-            tool_name = action.get('tool') or action.get('target') or action.get('name')
+            tool_name = action.get("tool") or action.get("target") or action.get("name")
 
         if tool_name and tool_name not in available_tools:
             incident = PathologyIncident(
@@ -271,10 +270,10 @@ class FailureDetector:
                 context={
                     "requested_tool": tool_name,
                     "available_tools": list(available_tools)[:10],
-                    "action": str(action)[:500]
+                    "action": str(action)[:500],
                 },
                 detection_method="tool_existence_check",
-                confidence=1.0
+                confidence=1.0,
             )
             self.incidents.append(incident)
             return incident
@@ -282,19 +281,19 @@ class FailureDetector:
         # Check parameter schema if tool exists
         if tool_name and self.tool_registry:
             tool = None
-            if hasattr(self.tool_registry, 'get_tool'):
+            if hasattr(self.tool_registry, "get_tool"):
                 tool = self.tool_registry.get_tool(tool_name)
-            elif hasattr(self.tool_registry, 'get'):
+            elif hasattr(self.tool_registry, "get"):
                 tool = self.tool_registry.get(tool_name)
 
             if tool:
                 params = None
-                if hasattr(action, 'parameters'):
+                if hasattr(action, "parameters"):
                     params = action.parameters
                 elif isinstance(action, dict):
-                    params = action.get('parameters', action.get('args', {}))
+                    params = action.get("parameters", action.get("args", {}))
 
-                if params and hasattr(tool, 'validate_parameters'):
+                if params and hasattr(tool, "validate_parameters"):
                     if not tool.validate_parameters(params):
                         incident = PathologyIncident(
                             pathology=FailurePathology.HALLUCINATED_AFFORDANCE,
@@ -304,10 +303,12 @@ class FailureDetector:
                             context={
                                 "tool": tool_name,
                                 "parameters": str(params)[:500],
-                                "expected_schema": str(getattr(tool, 'schema', {}))[:500]
+                                "expected_schema": str(getattr(tool, "schema", {}))[
+                                    :500
+                                ],
                             },
                             detection_method="schema_validation",
-                            confidence=1.0
+                            confidence=1.0,
                         )
                         self.incidents.append(incident)
                         return incident
@@ -318,7 +319,7 @@ class FailureDetector:
         self,
         agent_beliefs: Dict[str, Any],
         ground_truth: Dict[str, Any],
-        tolerance: float = 0.0
+        tolerance: float = 0.0,
     ) -> Optional[PathologyIncident]:
         """
         Detect incorrect beliefs about environment state.
@@ -338,21 +339,27 @@ class FailureDetector:
                 truth_value = ground_truth[key]
 
                 # Handle numeric comparison with tolerance
-                if isinstance(agent_value, (int, float)) and isinstance(truth_value, (int, float)):
+                if isinstance(agent_value, (int, float)) and isinstance(
+                    truth_value, (int, float)
+                ):
                     if abs(agent_value - truth_value) > tolerance:
-                        discrepancies.append({
-                            "key": key,
-                            "agent_belief": agent_value,
-                            "ground_truth": truth_value,
-                            "type": "numeric_mismatch"
-                        })
+                        discrepancies.append(
+                            {
+                                "key": key,
+                                "agent_belief": agent_value,
+                                "ground_truth": truth_value,
+                                "type": "numeric_mismatch",
+                            }
+                        )
                 elif agent_value != truth_value:
-                    discrepancies.append({
-                        "key": key,
-                        "agent_belief": str(agent_value)[:100],
-                        "ground_truth": str(truth_value)[:100],
-                        "type": "value_mismatch"
-                    })
+                    discrepancies.append(
+                        {
+                            "key": key,
+                            "agent_belief": str(agent_value)[:100],
+                            "ground_truth": str(truth_value)[:100],
+                            "type": "value_mismatch",
+                        }
+                    )
 
         if discrepancies:
             # Severity based on number of discrepancies
@@ -370,7 +377,7 @@ class FailureDetector:
                 description=f"Agent has {len(discrepancies)} incorrect beliefs about state",
                 context={"discrepancies": discrepancies},
                 detection_method="belief_ground_truth_comparison",
-                confidence=0.9
+                confidence=0.9,
             )
             self.incidents.append(incident)
             return incident
@@ -382,8 +389,7 @@ class FailureDetector:
     # ==========================================
 
     def detect_cascading_tool_failure(
-        self,
-        execution_trace: List[Dict[str, Any]]
+        self, execution_trace: List[Dict[str, Any]]
     ) -> Optional[PathologyIncident]:
         """
         Detect destructive error propagation through tool chains.
@@ -406,19 +412,21 @@ class FailureDetector:
 
             if status in ("failure", "error", "failed"):
                 consecutive_failures += 1
-                failure_chain.append({
-                    "step": i,
-                    "tool": step.get("tool", "unknown"),
-                    "error": str(step.get("error", "unknown"))[:200]
-                })
+                failure_chain.append(
+                    {
+                        "step": i,
+                        "tool": step.get("tool", "unknown"),
+                        "error": str(step.get("error", "unknown"))[:200],
+                    }
+                )
 
                 # Check if this failure was caused by previous failure's output
                 if i > 0 and len(failure_chain) >= 2:
-                    prev_output = str(execution_trace[i-1].get("output", ""))
+                    prev_output = str(execution_trace[i - 1].get("output", ""))
                     curr_input = str(step.get("input", ""))
 
                     # Simple heuristic: error message from prev appears in current input
-                    prev_error = str(execution_trace[i-1].get("error", ""))
+                    prev_error = str(execution_trace[i - 1].get("error", ""))
                     if prev_error and prev_error in curr_input:
                         cascade_detected = True
             else:
@@ -436,10 +444,10 @@ class FailureDetector:
                 description=f"Cascading failure chain of {len(failure_chain)} steps detected",
                 context={
                     "failure_chain": failure_chain,
-                    "cascade_confirmed": cascade_detected
+                    "cascade_confirmed": cascade_detected,
                 },
                 detection_method="cascade_chain_analysis",
-                confidence=0.85 if cascade_detected else 0.7
+                confidence=0.85 if cascade_detected else 0.7,
             )
             self.incidents.append(incident)
             return incident
@@ -450,7 +458,7 @@ class FailureDetector:
         self,
         action: Any,
         expected_postcondition: Dict[str, Any],
-        actual_observation: Dict[str, Any]
+        actual_observation: Dict[str, Any],
     ) -> Optional[PathologyIncident]:
         """
         Detect when action outcomes don't match expectations.
@@ -469,19 +477,23 @@ class FailureDetector:
             actual = actual_observation.get(key)
 
             if actual is None:
-                mismatches.append({
-                    "key": key,
-                    "expected": expected,
-                    "actual": "MISSING",
-                    "type": "missing_postcondition"
-                })
+                mismatches.append(
+                    {
+                        "key": key,
+                        "expected": expected,
+                        "actual": "MISSING",
+                        "type": "missing_postcondition",
+                    }
+                )
             elif actual != expected:
-                mismatches.append({
-                    "key": key,
-                    "expected": expected,
-                    "actual": actual,
-                    "type": "value_mismatch"
-                })
+                mismatches.append(
+                    {
+                        "key": key,
+                        "expected": expected,
+                        "actual": actual,
+                        "type": "value_mismatch",
+                    }
+                )
 
         if mismatches:
             incident = PathologyIncident(
@@ -489,12 +501,9 @@ class FailureDetector:
                 severity=PathologySeverity.MEDIUM,
                 timestamp=time.time(),
                 description=f"Action postconditions not satisfied: {len(mismatches)} mismatches",
-                context={
-                    "action": str(action)[:200],
-                    "mismatches": mismatches
-                },
+                context={"action": str(action)[:200], "mismatches": mismatches},
                 detection_method="postcondition_verification",
-                confidence=0.9
+                confidence=0.9,
             )
             self.incidents.append(incident)
             return incident
@@ -508,7 +517,7 @@ class FailureDetector:
     def detect_memory_poisoning(
         self,
         memories: List[Dict[str, Any]],
-        max_age_seconds: float = 86400  # 24 hours default TTL
+        max_age_seconds: float = 86400,  # 24 hours default TTL
     ) -> Optional[PathologyIncident]:
         """
         Detect corrupted memories that could degrade future performance.
@@ -544,18 +553,28 @@ class FailureDetector:
 
             # Check for anomalous confidence scores
             confidence = memory.get("confidence", 1.0)
-            if not isinstance(confidence, (int, float)) or confidence < 0 or confidence > 1:
+            if (
+                not isinstance(confidence, (int, float))
+                or confidence < 0
+                or confidence > 1
+            ):
                 issues.append("invalid_confidence")
 
             if issues:
-                suspicious_memories.append({
-                    "memory_id": memory.get("id", "unknown"),
-                    "issues": issues,
-                    "content_preview": content[:100]
-                })
+                suspicious_memories.append(
+                    {
+                        "memory_id": memory.get("id", "unknown"),
+                        "issues": issues,
+                        "content_preview": content[:100],
+                    }
+                )
 
         if suspicious_memories:
-            severity = PathologySeverity.HIGH if len(suspicious_memories) > 5 else PathologySeverity.MEDIUM
+            severity = (
+                PathologySeverity.HIGH
+                if len(suspicious_memories) > 5
+                else PathologySeverity.MEDIUM
+            )
 
             incident = PathologyIncident(
                 pathology=FailurePathology.MEMORY_POISONING,
@@ -564,7 +583,7 @@ class FailureDetector:
                 description=f"Found {len(suspicious_memories)} suspicious memories",
                 context={"suspicious_memories": suspicious_memories[:10]},
                 detection_method="memory_audit",
-                confidence=0.7
+                confidence=0.7,
             )
             self.incidents.append(incident)
             return incident
@@ -583,15 +602,13 @@ class FailureDetector:
             "system prompt:",
             "```system",
             "ADMIN MODE",
-            "developer mode"
+            "developer mode",
         ]
         content_lower = content.lower()
         return any(p.lower() in content_lower for p in patterns)
 
     def detect_feedback_amplification(
-        self,
-        error_history: List[Dict[str, Any]],
-        window_size: int = 10
+        self, error_history: List[Dict[str, Any]], window_size: int = 10
     ) -> Optional[PathologyIncident]:
         """
         Detect self-reinforcing error patterns.
@@ -619,14 +636,17 @@ class FailureDetector:
 
         # Simple amplification check: are errors getting larger?
         increasing_count = sum(
-            1 for i in range(1, len(error_magnitudes))
-            if error_magnitudes[i] > error_magnitudes[i-1]
+            1
+            for i in range(1, len(error_magnitudes))
+            if error_magnitudes[i] > error_magnitudes[i - 1]
         )
 
         amplification_ratio = increasing_count / (len(error_magnitudes) - 1)
 
         # Check for error content repetition (crystallization)
-        error_contents = [str(e.get("content", e.get("message", "")))[:50] for e in recent]
+        error_contents = [
+            str(e.get("content", e.get("message", "")))[:50] for e in recent
+        ]
         unique_errors = len(set(error_contents))
         repetition_ratio = 1 - (unique_errors / len(error_contents))
 
@@ -639,10 +659,10 @@ class FailureDetector:
                 context={
                     "amplification_ratio": amplification_ratio,
                     "repetition_ratio": repetition_ratio,
-                    "error_magnitudes": error_magnitudes
+                    "error_magnitudes": error_magnitudes,
                 },
                 detection_method="error_correlation_analysis",
-                confidence=0.75
+                confidence=0.75,
             )
             self.incidents.append(incident)
             return incident
@@ -657,7 +677,7 @@ class FailureDetector:
         self,
         original_goal: str,
         recent_actions: List[Any],
-        drift_threshold: float = 0.3
+        drift_threshold: float = 0.3,
     ) -> Optional[PathologyIncident]:
         """
         Detect objective divergence in long-horizon operation.
@@ -685,9 +705,9 @@ class FailureDetector:
         # Infer current goal from recent actions
         action_descriptions = []
         for action in recent_actions[-10:]:  # Last 10 actions
-            if hasattr(action, 'reasoning'):
+            if hasattr(action, "reasoning"):
                 action_descriptions.append(action.reasoning)
-            elif hasattr(action, 'description'):
+            elif hasattr(action, "description"):
                 action_descriptions.append(action.description)
             else:
                 action_descriptions.append(str(action))
@@ -706,7 +726,11 @@ class FailureDetector:
         drift_score = float(1.0 - similarity)
 
         if drift_score > drift_threshold:
-            severity = PathologySeverity.CRITICAL if drift_score > 0.6 else PathologySeverity.HIGH
+            severity = (
+                PathologySeverity.CRITICAL
+                if drift_score > 0.6
+                else PathologySeverity.HIGH
+            )
 
             incident = PathologyIncident(
                 pathology=FailurePathology.GOAL_DRIFT,
@@ -717,10 +741,10 @@ class FailureDetector:
                     "original_goal": original_goal,
                     "inferred_goal_preview": inferred_goal[:200],
                     "drift_score": drift_score,
-                    "threshold": drift_threshold
+                    "threshold": drift_threshold,
                 },
                 detection_method="embedding_similarity",
-                confidence=0.8
+                confidence=0.8,
             )
             self.incidents.append(incident)
             return incident
@@ -728,9 +752,7 @@ class FailureDetector:
         return None
 
     def detect_planning_myopia(
-        self,
-        plan: List[Any],
-        horizon_analysis: Optional[Dict[str, Any]] = None
+        self, plan: List[Any], horizon_analysis: Optional[Dict[str, Any]] = None
     ) -> Optional[PathologyIncident]:
         """
         Detect shortsighted planning.
@@ -752,11 +774,13 @@ class FailureDetector:
         if horizon_analysis:
             expected_steps = horizon_analysis.get("expected_steps", 0)
             if expected_steps > 0 and len(plan) < expected_steps * 0.5:
-                issues.append({
-                    "type": "insufficient_planning",
-                    "plan_length": len(plan),
-                    "expected_min": expected_steps
-                })
+                issues.append(
+                    {
+                        "type": "insufficient_planning",
+                        "plan_length": len(plan),
+                        "expected_min": expected_steps,
+                    }
+                )
 
         # Check 2: Greedy pattern - immediate rewards without long-term consideration
         if horizon_analysis:
@@ -764,23 +788,21 @@ class FailureDetector:
             long_term_value = horizon_analysis.get("long_term_value", 0)
 
             if short_term_value > 0 and long_term_value < 0:
-                issues.append({
-                    "type": "greedy_pattern",
-                    "short_term_value": short_term_value,
-                    "long_term_value": long_term_value
-                })
+                issues.append(
+                    {
+                        "type": "greedy_pattern",
+                        "short_term_value": short_term_value,
+                        "long_term_value": long_term_value,
+                    }
+                )
 
         # Check 3: Lack of contingency/branching
         has_contingency = any(
-            hasattr(step, 'fallback') or
-            (isinstance(step, dict) and 'fallback' in step)
+            hasattr(step, "fallback") or (isinstance(step, dict) and "fallback" in step)
             for step in plan
         )
         if len(plan) > 5 and not has_contingency:
-            issues.append({
-                "type": "no_contingency",
-                "plan_length": len(plan)
-            })
+            issues.append({"type": "no_contingency", "plan_length": len(plan)})
 
         if issues:
             incident = PathologyIncident(
@@ -790,7 +812,7 @@ class FailureDetector:
                 description=f"Planning myopia detected: {len(issues)} issues",
                 context={"issues": issues},
                 detection_method="horizon_analysis",
-                confidence=0.7
+                confidence=0.7,
             )
             self.incidents.append(incident)
             return incident
@@ -804,7 +826,7 @@ class FailureDetector:
     def detect_emergent_collusion(
         self,
         agent_actions: Dict[str, List[Any]],  # agent_id -> actions
-        intended_objectives: Dict[str, str]   # agent_id -> objective
+        intended_objectives: Dict[str, str],  # agent_id -> objective
     ) -> Optional[PathologyIncident]:
         """
         Detect agents developing implicit coordination against human interests.
@@ -837,10 +859,12 @@ class FailureDetector:
                 if set_i and set_j:
                     overlap = len(set_i & set_j) / min(len(set_i), len(set_j))
                     if overlap > 0.5:
-                        overlaps.append({
-                            "agents": (agent_ids[i], agent_ids[j]),
-                            "overlap_ratio": overlap
-                        })
+                        overlaps.append(
+                            {
+                                "agents": (agent_ids[i], agent_ids[j]),
+                                "overlap_ratio": overlap,
+                            }
+                        )
 
         if overlaps:
             incident = PathologyIncident(
@@ -850,7 +874,7 @@ class FailureDetector:
                 description=f"Suspicious action convergence between {len(overlaps)} agent pairs",
                 context={"overlaps": overlaps},
                 detection_method="action_convergence_analysis",
-                confidence=0.6
+                confidence=0.6,
             )
             self.incidents.append(incident)
             return incident
@@ -858,9 +882,7 @@ class FailureDetector:
         return None
 
     def detect_consensus_deadlock(
-        self,
-        debate_history: List[Dict[str, Any]],
-        max_rounds: int = 10
+        self, debate_history: List[Dict[str, Any]], max_rounds: int = 10
     ) -> Optional[PathologyIncident]:
         """
         Detect debate protocols failing to converge.
@@ -891,10 +913,10 @@ class FailureDetector:
                 context={
                     "rounds": len(recent),
                     "unique_positions": unique_positions,
-                    "recent_positions": [str(p)[:50] for p in positions[-5:]]
+                    "recent_positions": [str(p)[:50] for p in positions[-5:]],
                 },
                 detection_method="convergence_monitoring",
-                confidence=0.85
+                confidence=0.85,
             )
             self.incidents.append(incident)
             return incident
@@ -905,6 +927,7 @@ class FailureDetector:
 # ============================================================
 # Utility: Map old IncidentType to new FailurePathology
 # ============================================================
+
 
 def map_incident_type_to_pathology(incident_type: str) -> Optional[FailurePathology]:
     """

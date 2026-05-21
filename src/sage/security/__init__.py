@@ -10,26 +10,21 @@ Provides security validation and threat modeling capabilities including:
 This module implements the formal threat modeling framework described in Section X-C.
 """
 
-from .threat_validator import (
-    # Core classes
-    ThreatValidator,
-    # Data classes
-    ThreatDefinition,
-    ThreatResult,
-    AttackTreeNode,
-    STRIDEReport,
-    # Enums
-    STRIDECategory,
-    ThreatSeverity,
-    MitigationStatus,
-    # Threat definitions
-    MCP_THREATS,
+from .threat_validator import (  # Core classes; Data classes; Enums; Threat definitions; Convenience functions
     A2A_THREATS,
     ALL_THREATS,
-    # Convenience functions
-    quick_security_assessment,
-    get_threat_by_id,
+    MCP_THREATS,
+    AttackTreeNode,
+    MitigationStatus,
+    STRIDECategory,
+    STRIDEReport,
+    ThreatDefinition,
+    ThreatResult,
+    ThreatSeverity,
+    ThreatValidator,
     get_stride_mcp_table,
+    get_threat_by_id,
+    quick_security_assessment,
 )
 
 __all__ = [

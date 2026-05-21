@@ -30,28 +30,29 @@ Example:
     >>> await server.start()
 """
 
+import asyncio
+import hashlib
 import logging
 import time
-import hashlib
-import asyncio
-from typing import Optional, List, Dict, Any, Callable, AsyncIterator
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from typing import Any, AsyncIterator, Callable, Dict, List, Optional
 
 from .client import (
-    MCPToolDefinition,
-    MCPResource,
     MCPRequest,
+    MCPResource,
     MCPResponse,
+    MCPToolDefinition,
 )
-from .validation import validate_tool_call, MCPValidationError
+from .validation import MCPValidationError, validate_tool_call
 
 logger = logging.getLogger(__name__)
 
 
 class ServerEventType(Enum):
     """Types of server-sent events."""
+
     TOOL_REGISTERED = "tool_registered"
     TOOL_EXECUTED = "tool_executed"
     RESOURCE_UPDATED = "resource_updated"
@@ -71,6 +72,7 @@ class MCPPrompt:
         template: Prompt template with {arg} placeholders
         arguments: List of argument definitions
     """
+
     name: str
     description: str
     template: str
@@ -101,6 +103,7 @@ class ServerEvent:
         timestamp: When event occurred
         client_id: Target client (None for broadcast)
     """
+
     event_type: ServerEventType
     data: Dict[str, Any]
     timestamp: datetime = field(default_factory=datetime.now)
@@ -122,6 +125,7 @@ class MCPServerConfig:
         max_tool_execution_time: Maximum tool execution time
         enable_completions: Enable completions endpoint
     """
+
     name: str = "MCP Server"
     version: str = "1.0.0"
     max_request_age_seconds: float = 300.0  # 5 minutes
@@ -196,7 +200,9 @@ class MCPServer:
         self._used_nonces: Dict[str, float] = {}  # nonce -> timestamp
         self._request_counts: Dict[str, List[float]] = {}  # client_id -> timestamps
         self._authenticated_clients: set = set()
-        self._client_permissions: Dict[str, List[str]] = {}  # client_id -> allowed tools
+        self._client_permissions: Dict[str, List[str]] = (
+            {}
+        )  # client_id -> allowed tools
 
         # Event system
         self._event_queues: Dict[str, asyncio.Queue] = {}  # client_id -> event queue
@@ -252,10 +258,12 @@ class MCPServer:
         while self._running:
             await asyncio.sleep(self.config.heartbeat_interval_seconds)
             if self._running:
-                await self._emit_event(ServerEvent(
-                    event_type=ServerEventType.HEARTBEAT,
-                    data={"timestamp": datetime.now().isoformat()},
-                ))
+                await self._emit_event(
+                    ServerEvent(
+                        event_type=ServerEventType.HEARTBEAT,
+                        data={"timestamp": datetime.now().isoformat()},
+                    )
+                )
 
     def register_tool(
         self,
@@ -362,7 +370,7 @@ class MCPServer:
             try:
                 event = await asyncio.wait_for(
                     self._event_queues[client_id].get(),
-                    timeout=self.config.heartbeat_interval_seconds
+                    timeout=self.config.heartbeat_interval_seconds,
                 )
                 yield event
             except asyncio.TimeoutError:
@@ -477,10 +485,12 @@ class MCPServer:
             self._authenticated_clients.add(client_id)
 
             # Emit event
-            await self._emit_event(ServerEvent(
-                event_type=ServerEventType.CLIENT_CONNECTED,
-                data={"client_id": client_id},
-            ))
+            await self._emit_event(
+                ServerEvent(
+                    event_type=ServerEventType.CLIENT_CONNECTED,
+                    data={"client_id": client_id},
+                )
+            )
 
             return MCPResponse(
                 request_id=request.request_id,
@@ -491,10 +501,12 @@ class MCPServer:
         elif request.method == "auth/logout":
             self._authenticated_clients.discard(client_id)
 
-            await self._emit_event(ServerEvent(
-                event_type=ServerEventType.CLIENT_DISCONNECTED,
-                data={"client_id": client_id},
-            ))
+            await self._emit_event(
+                ServerEvent(
+                    event_type=ServerEventType.CLIENT_DISCONNECTED,
+                    data={"client_id": client_id},
+                )
+            )
 
             return MCPResponse(
                 request_id=request.request_id,
@@ -572,12 +584,14 @@ class MCPServer:
 
         # Remove old timestamps
         self._request_counts[client_id] = [
-            ts for ts in self._request_counts[client_id]
-            if ts > minute_ago
+            ts for ts in self._request_counts[client_id] if ts > minute_ago
         ]
 
         # Check limit
-        if len(self._request_counts[client_id]) >= self.config.rate_limit_requests_per_minute:
+        if (
+            len(self._request_counts[client_id])
+            >= self.config.rate_limit_requests_per_minute
+        ):
             raise MCPValidationError("Rate limit exceeded")
 
         # Add current request
@@ -587,8 +601,7 @@ class MCPServer:
         """Remove old nonces to prevent memory growth."""
         cutoff = time.time() - (self.config.max_request_age_seconds * 2)
         self._used_nonces = {
-            nonce: ts for nonce, ts in self._used_nonces.items()
-            if ts > cutoff
+            nonce: ts for nonce, ts in self._used_nonces.items() if ts > cutoff
         }
 
     async def _handle_list_tools(
@@ -603,12 +616,14 @@ class MCPServer:
         tools = []
         for t in self._tools.values():
             if allowed_tools is None or t.name in allowed_tools:
-                tools.append({
-                    "name": t.name,
-                    "description": t.description,
-                    "parameters": t.parameters,
-                    "version": t.version,
-                })
+                tools.append(
+                    {
+                        "name": t.name,
+                        "description": t.description,
+                        "parameters": t.parameters,
+                        "version": t.version,
+                    }
+                )
 
         return MCPResponse(
             request_id=request.request_id,
@@ -657,8 +672,7 @@ class MCPServer:
         try:
             if asyncio.iscoroutinefunction(handler):
                 result = await asyncio.wait_for(
-                    handler(**arguments),
-                    timeout=self.config.max_tool_execution_time
+                    handler(**arguments), timeout=self.config.max_tool_execution_time
                 )
             else:
                 result = handler(**arguments)
@@ -666,10 +680,12 @@ class MCPServer:
             self._stats["tools_executed"] += 1
 
             # Emit event
-            await self._emit_event(ServerEvent(
-                event_type=ServerEventType.TOOL_EXECUTED,
-                data={"tool": tool_name, "client_id": client_id},
-            ))
+            await self._emit_event(
+                ServerEvent(
+                    event_type=ServerEventType.TOOL_EXECUTED,
+                    data={"tool": tool_name, "client_id": client_id},
+                )
+            )
 
             return MCPResponse(
                 request_id=request.request_id,
@@ -890,7 +906,8 @@ class MCPServer:
             "is_running": self._running,
             "uptime_seconds": (
                 (datetime.now() - self._start_time).total_seconds()
-                if self._start_time else None
+                if self._start_time
+                else None
             ),
             "registered_tools": list(self._tools.keys()),
             "registered_resources": list(self._resources.keys()),

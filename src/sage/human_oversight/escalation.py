@@ -27,20 +27,21 @@ Example:
     ... )
 """
 
-from dataclasses import dataclass, field
-from typing import Optional, Dict, Any, List, Callable
-from datetime import datetime, timedelta
-from enum import Enum
 import logging
 import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
 
-from .approval_flow import RiskLevel, ApprovalRequest
+from .approval_flow import ApprovalRequest, RiskLevel
 
 logger = logging.getLogger(__name__)
 
 
 class EscalationLevel(Enum):
     """Escalation tiers for human oversight."""
+
     TIER_1 = "tier_1"  # First-line supervisor
     TIER_2 = "tier_2"  # Manager
     TIER_3 = "tier_3"  # Senior management
@@ -60,6 +61,7 @@ class EscalationPolicy:
         required_approvers: Number of approvers required at this level
         escalate_to: Next escalation level if not resolved
     """
+
     trigger_level: EscalationLevel
     risk_levels: List[RiskLevel]
     timeout_seconds: float = 300.0
@@ -84,6 +86,7 @@ class EscalationRequest:
         resolver: Who resolved the escalation
         metadata: Additional context
     """
+
     escalation_id: str
     original_request_id: str
     level: EscalationLevel
@@ -164,9 +167,7 @@ class EscalationHandler:
         )
 
     def get_policy(
-        self,
-        level: EscalationLevel,
-        risk_level: RiskLevel
+        self, level: EscalationLevel, risk_level: RiskLevel
     ) -> Optional[EscalationPolicy]:
         """Get the applicable policy for a level and risk.
 
@@ -285,9 +286,7 @@ class EscalationHandler:
         try:
             current_idx = level_order.index(current.level)
             if current_idx >= len(level_order) - 1:
-                logger.warning(
-                    f"Escalation {escalation_id} already at highest level"
-                )
+                logger.warning(f"Escalation {escalation_id} already at highest level")
                 return None
             next_level = level_order[current_idx + 1]
         except ValueError:
@@ -312,43 +311,34 @@ class EscalationHandler:
         """Get an escalation by ID."""
         return self._escalations.get(escalation_id)
 
-    def get_escalations_for_request(
-        self,
-        request_id: str
-    ) -> List[EscalationRequest]:
+    def get_escalations_for_request(self, request_id: str) -> List[EscalationRequest]:
         """Get all escalations for a request."""
         return [
-            e for e in self._escalations.values()
-            if e.original_request_id == request_id
+            e for e in self._escalations.values() if e.original_request_id == request_id
         ]
 
     def get_active_escalations(self) -> List[EscalationRequest]:
         """Get all unresolved escalations."""
-        return [
-            e for e in self._escalations.values()
-            if not e.resolved
-        ]
+        return [e for e in self._escalations.values() if not e.resolved]
 
     def get_escalations_by_level(
-        self,
-        level: EscalationLevel
+        self, level: EscalationLevel
     ) -> List[EscalationRequest]:
         """Get all escalations at a specific level."""
-        return [
-            e for e in self._escalations.values()
-            if e.level == level
-        ]
+        return [e for e in self._escalations.values() if e.level == level]
 
     def _log_audit(self, event: str, escalation: EscalationRequest) -> None:
         """Add entry to audit log."""
-        self._audit_log.append({
-            "timestamp": datetime.now().isoformat(),
-            "event": event,
-            "escalation_id": escalation.escalation_id,
-            "request_id": escalation.original_request_id,
-            "level": escalation.level.value,
-            "resolved": escalation.resolved,
-        })
+        self._audit_log.append(
+            {
+                "timestamp": datetime.now().isoformat(),
+                "event": event,
+                "escalation_id": escalation.escalation_id,
+                "request_id": escalation.original_request_id,
+                "level": escalation.level.value,
+                "resolved": escalation.resolved,
+            }
+        )
 
     def get_audit_log(self) -> List[Dict[str, Any]]:
         """Get the audit log."""
@@ -376,7 +366,8 @@ class EscalationHandler:
             "by_level": by_level,
             "avg_resolution_time_seconds": (
                 sum(resolution_times) / len(resolution_times)
-                if resolution_times else 0.0
+                if resolution_times
+                else 0.0
             ),
         }
 

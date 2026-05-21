@@ -1,9 +1,9 @@
 """Skill selector for intelligent skill ranking and selection."""
 
 import logging
-from typing import Optional, List, Dict, Any, Tuple
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 from .skill_base import Skill
 from .skill_registry import SkillRegistry
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class SelectionStrategy(Enum):
     """Strategy for skill selection."""
+
     RELEVANCE = "relevance"  # Pure relevance ranking
     TRUST = "trust"  # Trust-weighted ranking
     COST = "cost"  # Cost-optimized ranking
@@ -22,6 +23,7 @@ class SelectionStrategy(Enum):
 @dataclass
 class SkillScore:
     """Score breakdown for a skill."""
+
     skill: Skill
     relevance_score: float = 0.0
     trust_score: float = 0.0
@@ -173,10 +175,10 @@ class SkillSelector:
 
         elif strategy == SelectionStrategy.BALANCED:
             score.total_score = (
-                self.relevance_weight * score.relevance_score +
-                self.trust_weight * score.trust_score +
-                self.cost_weight * score.cost_score +
-                self.history_weight * score.history_score
+                self.relevance_weight * score.relevance_score
+                + self.trust_weight * score.trust_score
+                + self.cost_weight * score.cost_score
+                + self.history_weight * score.history_score
             )
 
         return score
@@ -221,6 +223,7 @@ class SkillSelector:
         recency_bonus = 0.0
         if stats.last_used:
             from datetime import datetime
+
             try:
                 last_used = datetime.fromisoformat(stats.last_used)
                 age_hours = (datetime.now() - last_used).total_seconds() / 3600

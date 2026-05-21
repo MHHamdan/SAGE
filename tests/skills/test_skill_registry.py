@@ -8,7 +8,7 @@ class TestSkillRegistry:
 
     def test_register_skill(self):
         """Test skill registration."""
-        from sage.skills import SkillRegistry, Skill
+        from sage.skills import Skill, SkillRegistry
 
         registry = SkillRegistry()
 
@@ -26,7 +26,7 @@ class TestSkillRegistry:
 
     def test_get_skill(self):
         """Test skill retrieval."""
-        from sage.skills import SkillRegistry, Skill
+        from sage.skills import Skill, SkillRegistry
 
         registry = SkillRegistry()
 
@@ -42,7 +42,7 @@ class TestSkillRegistry:
 
     def test_unregister_skill(self):
         """Test skill unregistration."""
-        from sage.skills import SkillRegistry, Skill
+        from sage.skills import Skill, SkillRegistry
 
         registry = SkillRegistry()
 
@@ -57,14 +57,18 @@ class TestSkillRegistry:
 
     def test_search_skills(self):
         """Test skill search by query."""
-        from sage.skills import SkillRegistry, Skill
+        from sage.skills import Skill, SkillRegistry
 
         registry = SkillRegistry()
 
         skills = [
-            Skill(name="search_web", description="Search the web", function=lambda: None),
+            Skill(
+                name="search_web", description="Search the web", function=lambda: None
+            ),
             Skill(name="read_file", description="Read a file", function=lambda: None),
-            Skill(name="write_file", description="Write to a file", function=lambda: None),
+            Skill(
+                name="write_file", description="Write to a file", function=lambda: None
+            ),
         ]
 
         for skill in skills:
