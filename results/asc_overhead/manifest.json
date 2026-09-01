@@ -1,0 +1,17 @@
+{
+  "experiment": "0.4_asc_overhead",
+  "git_sha": "32f0c66",
+  "env_hash": "dd7f26b1ddf1",
+  "timestamp": "2026-07-18T01:06:31.677905+00:00",
+  "base_seed": 42,
+  "config": {
+    "n_tasks": 50,
+    "n_seeds": 3,
+    "total_turns": 50,
+    "embedding_dim": 64,
+    "predictive_lead_time_k": 5
+  },
+  "predictive_head_mem_bytes": 272,
+  "process_peak_rss_kb": 773164,
+  "note": "Timings via time.perf_counter over all replayed E4 decisions (4 controllers x 3 seeds x 50 tasks x 50 turns = 30000 each). No API calls; deterministic replay of committed E4 episodes."
+}

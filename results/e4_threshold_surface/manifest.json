@@ -1,0 +1,42 @@
+{
+  "experiment": "0.5_e4_threshold_surface",
+  "git_sha": "32f0c66",
+  "env_hash": "dd7f26b1ddf1",
+  "timestamp": "2026-07-18T03:34:53.601072+00:00",
+  "base_seed": 42,
+  "k_grid": [
+    5,
+    8,
+    10,
+    12,
+    15
+  ],
+  "B_grid": [
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "window": 10,
+  "eval_per_cell": 150,
+  "completion_min": 0.34,
+  "completion_max": 0.9867,
+  "completion_mean": 0.752,
+  "completion_range": 0.6467,
+  "config": {
+    "n_tasks": 50,
+    "n_seeds": 3,
+    "total_turns": 50,
+    "drift_threshold": 0.3,
+    "fidelity_threshold": 0.7,
+    "completion_drift_threshold": 0.35
+  },
+  "mapping_note": "Faithful reconstruction using the actual sage ThresholdController. k -> cooldown_turns; B -> oscillation_threshold = B/5 (E4 committed osc_thr=0.60 <=> B=3). B in {6,7} => threshold>1 => oscillation trigger disabled. The committed E4 THRESHOLD cell is (k=3, B=3), which is below the swept k-grid; reported separately.",
+  "as_run_committed_cell": {
+    "cooldown_turns": 3,
+    "oscillation_threshold": 0.6,
+    "B_equiv": 3,
+    "committed_completion": 0.8933
+  }
+}

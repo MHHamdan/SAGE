@@ -1,0 +1,26 @@
+{
+  "experiment": "0.3_e5_monitor_errors",
+  "git_sha": "32f0c66",
+  "env_hash": "dd7f26b1ddf1",
+  "timestamp": "2026-07-18T01:08:43.452035+00:00",
+  "base_seed": 42,
+  "k": 5,
+  "operating_threshold": 0.5,
+  "youden_j_threshold": 0.4358,
+  "config": {
+    "n_violation_tasks": 200,
+    "n_control_tasks": 100,
+    "total_turns": 50,
+    "n_cv_folds": 5,
+    "drift_rate_violation": 0.12,
+    "completion_drift_threshold": 0.35
+  },
+  "auc": 0.7518,
+  "ap": 0.2107,
+  "confusion_op": {
+    "TP": 1107,
+    "FP": 4991,
+    "FN": 383,
+    "TN": 8519
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "payload": "SAGE local open-weight reproducibility study (Track 2)",
+  "git_sha": "32f0c66",
+  "framing": "Controlled mechanism (paper E4/E5 simulation) + honest local real-data transfer. Raw numbers reported as they fell; no tuning toward any target.",
+  "environment": {
+    "runner": "Ollama 0.19.0",
+    "gpus": "4x RTX 2080 Ti",
+    "dataset": "hotpot_qa/distractor/validation"
+  },
+  "harness_disclosure": "Only change during smoke-test was a forced final-answer step (if the agent exhausts its turn budget without ANSWER[], it is prompted once for a final short answer). Applied identically to all policies/models. No task definition or success criterion was altered. No parameter was chosen to move a result.",
+  "experiments": {
+    "2A_cnsr_ladder": {
+      "path": "results/ollama_real/2A/",
+      "temp": 0.0,
+      "seeds": [
+        0,
+        1
+      ],
+      "n_tasks": 50,
+      "eval_split_hash": "0adbc73f25bed988862b1a989a43c158",
+      "success": "exact match (EM)",
+      "cost": "measured tokens x hosted list price (inference only)",
+      "price_provider": "Together AI (serverless size-tier)",
+      "price_date": "2026-07-18",
+      "kendall_tau_b": -0.5270462766947299,
+      "tau_p": 0.206507295485425,
+      "per_model": {
+        "llama3.2:3b": {
+          "EM": 0.24,
+          "cnsr": 3460.746483016387,
+          "mean_tokens": 1155.82,
+          "slug": "meta-llama/Llama-3.2-3B-Instruct-Turbo",
+          "price_per_1M_usd": 0.06
+        },
+        "mistral:7b": {
+          "EM": 0.34,
+          "cnsr": 584.3671475664546,
+          "mean_tokens": 2909.13,
+          "slug": "mistralai/Mistral-7B-Instruct-v0.3",
+          "price_per_1M_usd": 0.2
+        },
+        "gemma2:9b": {
+          "EM": 0.48,
+          "cnsr": 1247.6022643981096,
+          "mean_tokens": 1282.46,
+          "slug": "google/gemma-2-9b-it",
+          "price_per_1M_usd": 0.3
+        },
+        "qwen2.5:14b": {
+          "EM": 0.48,
+          "cnsr": 859.2449385102841,
+          "mean_tokens": 1862.1,
+          "slug": "Qwen/Qwen2.5-14B-Instruct",
+          "price_per_1M_usd": 0.3
+        },
+        "qwen2.5:32b": {
+          "EM": 0.54,
+          "cnsr": 517.6936174129124,
+          "mean_tokens": 1303.86,
+          "slug": "Qwen/Qwen2.5-32B-Instruct",
+          "price_per_1M_usd": 0.8
+        }
+      }
+    },
+    "2B_e4t_controller": {
+      "path": "results/ollama_real/2B/",
+      "agent": "llama3.1:8b",
+      "temp": 0.6,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "n_eval": 50,
+      "n_train": 150,
+      "eval_split_hash": "896edbae1af608e37b6dc263cfa566f0",
+      "predictor_cv_auc": 0.49387086642437295,
+      "n_pathology_tasks": 48,
+      "fidelity_measured": {
+        "min": 0.88,
+        "mean_fid_min": 0.99978,
+        "inert": false
+      },
+      "completion_all_tasks": {
+        "NoControl": 0.324,
+        "FixedSchedule": 0.34,
+        "Threshold": 0.28,
+        "Predictive": 0.312
+      },
+      "completion_pathology": {
+        "NoControl": 0.31666666666666665,
+        "FixedSchedule": 0.3333333333333333,
+        "Threshold": 0.2708333333333333,
+        "Predictive": 0.30416666666666664
+      }
+    }
+  },
+  "reference_simulation_E4": {
+    "path": "results/e4_closed_loop/ (committed, NOT modified)",
+    "note": "synthetic; no LLM calls",
+    "completion": {
+      "NoControl": 0.02,
+      "FixedSchedule": 0.3667,
+      "ThresholdController": 0.8933,
+      "PredictiveController": 0.8333
+    }
+  },
+  "headline": {
+    "cnsr_inversion_reproduces_on_real_models": true,
+    "controller_lift_on_real_2hop_QA": "null (32.4% -> 31.2% Predictive, McNemar p=0.75, |h|<0.10)",
+    "diagnosis": "HotpotQA oscillation is a symptom of capability-limited failure (P(success|osc)=0.314 ~ base 0.324; predictor AUC 0.494), not the recoverable goal-drift the controller targets."
+  },
+  "separation": "Entirely separate from committed simulation results; no committed result file or paper table was modified."
+}

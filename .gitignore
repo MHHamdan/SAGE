@@ -121,8 +121,54 @@ logs/
 tmp/
 temp/
 *.tmp
-paper/
-CONTRIBUTING.md
 
-paper/
-CONTRIBUTING.md
+# ===================================================================
+# PRIVATE MATERIALS — never commit, never push.
+# Local-only working area for anything that must not become public:
+# reviewer correspondence, acceptance notices, manuscript drafts,
+# agent/LLM prompts and transcripts, and internal audit notes.
+# ===================================================================
+.private/
+
+# Paper working area: only paper/public/ is released.
+paper/*
+!paper/public/
+!paper/public/**
+paper/private/
+
+# Manuscript sources, rebuttals, and submission bundles anywhere in the tree.
+# Generated LaTeX *table fragments* under results/ are reproducibility artifacts
+# and stay tracked, so this blocks manuscript-shaped files by name, not *.tex.
+/*.tex
+**/main.tex
+**/supplementary.tex
+**/response_to_reviewers.tex
+**/consolidated_bundle.tex
+**/manuscript_*.tex
+*.aux
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.out
+IEEEtai.cls
+To-Submit-*/
+**/REBUTTAL.md
+**/CLAUDE_INSTRUCTIONS.md
+**/*_internal_notes.md
+**/*_draft.md
+AUDIT.md
+
+# Agent/LLM prompts and transcripts
+*.prompt
+prompts/
+.claude/
+CLAUDE.md
+
+# Unpublished / metered API result bundles (contain per-call spend records)
+results/api_real/
+
+# Local scratch
+scratch/
+notebooks/scratch/

@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{Per-pillar leave-one-out ablation on the research family (5 seeds, 50 tasks; bootstrap 95\% CIs). $\Delta$Compl.\ is Full-SAGE minus the variant (drop attributable to the removed pillar).}
+\label{tab:pillar_ablation}
+\begin{tabular}{lcccc}
+\toprule
+Variant & Completion (95\% CI) & CNSR & Interv. & $\Delta$Compl. \\
+\midrule
+\textbf{Full-SAGE} & 84.4\% [80.0\%, 88.8\%] & 0.65 & 5.7 & +0.0\% \\
+-Stabilize & 1.6\% [0.4\%, 3.2\%] & 0.02 & 0.0 & +82.8\% \\
+-Assess & 69.2\% [63.2\%, 74.8\%] & 0.54 & 5.6 & +15.2\% \\
+-Govern & 9.2\% [6.0\%, 12.8\%] & 0.09 & 5.4 & +75.2\% \\
+-Enforce & 1.6\% [0.4\%, 3.2\%] & 0.02 & 5.3 & +82.8\% \\
+\bottomrule
+\end{tabular}
+\end{table}

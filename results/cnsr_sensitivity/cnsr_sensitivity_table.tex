@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{CNSR cost-parameter sensitivity. Baseline (grid centre) is the canonical committed success-vs-CNSR Kendall's $\tau_b$ across the 7 configurations. Under the committed inference-cost model, $\tau_b$ is \emph{invariant} across the full $5\times3\times3$ grid: uniform inference repricing preserves CNSR rank, and the $w_{\mathrm{lat}}$/$C_{\mathrm{hum}}$ weights scale cost terms the committed model does not contain.}
+\label{tab:cnsr_sensitivity}
+\begin{tabular}{lccc}
+\toprule
+Task family & baseline $\tau_b$ & $p$ & \% grid cells $\tau<0$ \\
+\midrule
+Code & -0.429 & 0.239 & 100\% \\
+Web & -0.238 & 0.562 & 100\% \\
+Research & -0.619 & 0.069 & 100\% \\
+\midrule
+\multicolumn{4}{l}{\textit{Overall grid cells with $\tau<0$: 100\%; $\tau_b$ invariant across the grid (see text).}} \\
+\bottomrule
+\end{tabular}
+\end{table}

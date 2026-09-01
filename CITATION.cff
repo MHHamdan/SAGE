@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+message: >-
+  If you use SAGE, the CNSR metric, or the experimental results in your
+  research, please cite the IEEE Transactions on Artificial Intelligence
+  article (preferred-citation below).
+title: "SAGE: A Stabilize-Assess-Govern-Enforce Framework for Deployment-Oriented Evaluation of LLM-Based Autonomous Agents"
+abstract: >-
+  Reference implementation of SAGE, a four-pillar framework for
+  deployment-oriented analysis of LLM-based autonomous agents. Stabilize models
+  the agent loop as a closed-loop system and relates three sufficient stability
+  conditions - observation fidelity, progress monotonicity, and bounded context
+  noise - to monitorable failure indicators. Assess combines a behavioral
+  autonomy taxonomy with the Cost-Normalized Success Rate (CNSR), a
+  ratio-valued metric reporting successful completions per dollar of measured
+  operating cost. Govern organizes deployment incidents through a ten-class
+  failure taxonomy and a STRIDE analysis of the Model Context Protocol (MCP)
+  and Agent-to-Agent (A2A) boundaries. Enforce adds an Adaptive Stability
+  Controller that consumes monitor signals and dispatches bounded interventions.
+  The repository contains the framework code, the paper's experiments, the
+  committed result artifacts, and the scripts that regenerate every table and
+  figure.
+type: software
+version: 1.2.0
+license: MIT
+repository-code: "https://github.com/MHHamdan/SAGE"
+url: "https://github.com/MHHamdan/SAGE"
+authors:
+  - family-names: Hamdan
+    given-names: Mohammed H.
+keywords:
+  - large language models
+  - LLM agents
+  - autonomous agents
+  - agentic AI
+  - agent evaluation
+  - deployment-oriented evaluation
+  - closed-loop control
+  - adaptive control
+  - cost-normalized success rate
+  - CNSR
+  - AI safety
+  - responsible AI
+  - benchmarking
+  - Model Context Protocol
+  - MCP
+  - A2A
+  - STRIDE threat modeling
+
+preferred-citation:
+  type: article
+  title: "SAGE: A Stabilize-Assess-Govern-Enforce Framework for Deployment-Oriented Evaluation of LLM-Based Autonomous Agents"
+  authors:
+    - family-names: Hamdan
+      given-names: Mohammed H.
+  journal: "IEEE Transactions on Artificial Intelligence"
+  publisher:
+    name: "Institute of Electrical and Electronics Engineers (IEEE)"
+  year: 2026
+  # DOI and volume/issue/pages are added once the article of record appears
+  # on IEEE Xplore.

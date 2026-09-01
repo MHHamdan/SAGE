@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{E4-T on real HotpotQA-distractor (llama3.1:8b, temp 0.6, 5 seeds; BCa 95\% CIs). (a) all 50 tasks; (b) pathology subset (48/50 tasks with oscillation$>$0.6 under NoControl). $p$: McNemar vs NoControl.}
+\label{tab:e4t_ollama}
+\begin{tabular}{lcccc}
+\toprule
+Policy & Completion (95\% CI) & CNSR & Interv. & McNemar $p$ \\
+\midrule
+\multicolumn{5}{l}{\textit{(a) All tasks}} \\
+NoControl & 32.4\% [26.8\%,38.4\%] & 381 & 0.0 & — \\
+FixedSchedule & 34.0\% [28.0\%,40.0\%] & 416 & 1.2 & 0.596 \\
+Threshold & 28.0\% [22.8\%,34.0\%] & 356 & 1.9 & 0.082 \\
+Predictive & 31.2\% [25.2\%,36.8\%] & 389 & 1.3 & 0.749 \\
+\midrule
+\multicolumn{5}{l}{\textit{(b) Pathology subset}} \\
+NoControl & 31.7\% [26.2\%,37.9\%] & 359 & 0.0 & — \\
+FixedSchedule & 33.3\% [27.5\%,39.2\%] & 393 & 1.3 & 0.596 \\
+Threshold & 27.1\% [21.7\%,32.9\%] & 332 & 2.0 & 0.082 \\
+Predictive & 30.4\% [24.6\%,36.2\%] & 366 & 1.4 & 0.749 \\
+\bottomrule
+\end{tabular}
+\end{table}

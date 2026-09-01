@@ -1,0 +1,21 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{Real-model validation of the CNSR inversion} (cf.\ Table~IV, synthetic). Open-weight models on real HotpotQA-distractor (research/QA family) via Ollama, temp 0.0, 50 tasks $\times$ 3 seeds; success $=$ EM, cost $=$ measured tokens $\times$ hosted list price (Together AI (serverless size-tier), 2026-07-18). Seed-SD is $0$ (greedy decoding is deterministic); the $95\%$ CI is a task-level bootstrap. Kendall's $\tau_b$ (SR rank vs.\ CNSR rank) $=-0.255$ ($p=0.383$); $\tau<0$ confirms the rank inversion on real models.}
+\label{tab:cnsr_ollama_real}
+\begin{tabular}{lccccc}
+\toprule
+Model & CNSR $\pm$ SD & 95\% CI & SR & CNSR rank & SR rank \\
+\midrule
+Llama-3.2-3B & $3845 \pm 0$ & [2077, 6396] & 28\% & 1 & 8 \\
+Gemma-2-9B & $1248 \pm 0$ & [814, 1854] & 48\% & 2 & 2 \\
+Phi-4-14B & $1043 \pm 0$ & [586, 1740] & 40\% & 3 & 4 \\
+Gemma-2-2B & $912 \pm 37$ & [526, 1434] & 29\% & 4 & 7 \\
+Qwen2.5-14B & $859 \pm 0$ & [531, 1358] & 48\% & 5 & 3 \\
+Mistral-7B & $585 \pm 0$ & [339, 960] & 34\% & 6 & 6 \\
+Qwen2.5-32B & $511 \pm 0$ & [327, 771] & 52\% & 7 & 1 \\
+Llama-3.1-8B & $434 \pm 34$ & [263, 645] & 35\% & 8 & 5 \\
+\midrule
+\multicolumn{6}{l}{\textit{Kendall's $\tau_b$ (SR rank vs.\ CNSR rank):} $-0.255$ ($p=0.383$)} \\
+\bottomrule
+\end{tabular}
+\end{table}

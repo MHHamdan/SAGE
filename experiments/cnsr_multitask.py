@@ -261,60 +261,68 @@ def _simulate_run(
     }
 
 
+def _stable_sim_seed(model: str, task_id: str, seed: int) -> int:
+    """Process-stable RNG seed for the simulator.
+
+    Determinism fix: the previous code used ``seed ^ hash(task_id) ^ hash(model)``,
+    but Python salts str hashing (PYTHONHASHSEED), so that seed — and therefore the
+    simulated success/tokens and the downstream Kendall's tau — changed every
+    process. md5 of the identity string is stable across processes.
+    """
+    h = hashlib.md5(f"{model}|{task_id}|{seed}".encode()).digest()
+    return (seed * 1_000_003) ^ int.from_bytes(h[:8], "little")
+
+
 def run_model_on_task(
     model: str,
     task: dict[str, Any],
     seed: int,
     use_cache: bool = True,
+    backend: str = "litellm",
 ) -> dict[str, Any]:
-    """Run model on task, using cache when available."""
+    """Run model on task using an EXPLICIT backend, caching when available.
+
+    backend='litellm' (default) uses the real hosted API and raises a clear
+    CredentialError if credentials/litellm are missing — there is NO silent
+    fallback to the simulator. backend='simulator' is opt-in and offline.
+    """
     if use_cache:
         cached = cache_load(model, task["task_id"], seed)
         if cached is not None:
             return cached
 
-    # Try real LiteLLM call; fall back to simulation on any error
-    result = None
-    try:
-        import litellm  # noqa: F401 — optional dependency
+    if backend == "simulator":
+        rng = random.Random(_stable_sim_seed(model, task["task_id"], seed))
+        result = _simulate_run(model, task, seed, rng)
+    else:
+        from sage.core.backends import resolve_backend
 
-        resp = litellm.completion(
-            model=model,
-            messages=[{"role": "user", "content": task["prompt"]}],
-            max_tokens=512,
-            timeout=30,
+        comp = resolve_backend(backend).complete(
+            model, task["prompt"], temperature=0.0, seed=seed, max_tokens=512,
         )
-        content = resp.choices[0].message.content or ""
-        usage = resp.usage or {}
-        prompt_tokens = getattr(usage, "prompt_tokens", 500)
-        completion_tokens = getattr(usage, "completion_tokens", 300)
-        cost = track_cost(model, prompt_tokens, completion_tokens)
-        # Heuristic success: non-empty response
-        success = bool(content.strip())
         result = {
             "task_id": task["task_id"],
             "config": model,
             "task_type": task["task_type"],
-            "success": success,
-            "cost_usd": round(cost, 6),
-            "tokens_used": prompt_tokens + completion_tokens,
-            "prompt_tokens": prompt_tokens,
-            "completion_tokens": completion_tokens,
+            "success": bool(comp.text.strip()),  # heuristic; override per task type
+            "cost_usd": round(track_cost(model, comp.prompt_tokens,
+                                         comp.completion_tokens), 6),
+            "tokens_used": comp.prompt_tokens + comp.completion_tokens,
+            "prompt_tokens": comp.prompt_tokens,
+            "completion_tokens": comp.completion_tokens,
             "seed": seed,
         }
-    except Exception:
-        rng = random.Random(seed ^ hash(task["task_id"]) ^ hash(model))
-        result = _simulate_run(model, task, seed, rng)
 
-    if use_cache and result is not None:
+    if use_cache:
         cache_save(model, task["task_id"], seed, result)
-    return result  # type: ignore[return-value]
+    return result
 
 
 # ── main harness ──────────────────────────────────────────────────────────────
 
-def run_experiment(seeds: list[int] = (0, 1, 2)) -> list[dict[str, Any]]:
-    """Run full CNSR multi-task evaluation."""
+def run_experiment(seeds: list[int] = (0, 1, 2),
+                   backend: str = "litellm") -> list[dict[str, Any]]:
+    """Run full CNSR multi-task evaluation on an explicit backend."""
     all_results: list[dict[str, Any]] = []
 
     tasks_by_type: dict[str, list[dict[str, Any]]] = {
@@ -334,7 +342,7 @@ def run_experiment(seeds: list[int] = (0, 1, 2)) -> list[dict[str, Any]]:
                 continue  # handled separately below
             for task_type, tasks in tasks_by_type.items():
                 for task in tasks:
-                    row = run_model_on_task(model, task, seed)
+                    row = run_model_on_task(model, task, seed, backend=backend)
                     all_results.append(row)
                     done += 1
                     if done % 100 == 0:
@@ -348,15 +356,15 @@ def run_experiment(seeds: list[int] = (0, 1, 2)) -> list[dict[str, Any]]:
             for task in tasks:
                 # Gather votes from top-3
                 votes = [
-                    run_model_on_task(m, task, seed)["success"] for m in top3
+                    run_model_on_task(m, task, seed, backend=backend)["success"] for m in top3
                 ]
                 success = sum(votes) >= 2  # majority
                 # Cost = sum of top-3 costs
                 costs = [
-                    run_model_on_task(m, task, seed)["cost_usd"] for m in top3
+                    run_model_on_task(m, task, seed, backend=backend)["cost_usd"] for m in top3
                 ]
                 tokens = [
-                    run_model_on_task(m, task, seed)["tokens_used"] for m in top3
+                    run_model_on_task(m, task, seed, backend=backend)["tokens_used"] for m in top3
                 ]
                 all_results.append({
                     "task_id": task["task_id"],
@@ -518,11 +526,21 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="CNSR Multi-Task Evaluation")
     parser.add_argument("--seeds", nargs="+", type=int, default=[0, 1, 2])
     parser.add_argument("--no-cache", action="store_true")
+    parser.add_argument(
+        "--backend", default="litellm",
+        choices=["litellm", "ollama", "simulator"],
+        help="Provider backend. 'litellm' (default) calls the real hosted APIs and "
+             "REQUIRES credentials (.env); it raises if they are missing. "
+             "'simulator' is opt-in, offline, and reproduces the committed synthetic "
+             "study.",
+    )
     args = parser.parse_args()
 
-    print("Running CNSR multi-task evaluation …")
+    print(f"Running CNSR multi-task evaluation (backend={args.backend}) …")
+    if args.backend != "simulator":
+        print("  NOTE: real-API backend — this incurs provider spend on YOUR keys.")
     t0 = time.time()
-    rows = run_experiment(seeds=args.seeds)
+    rows = run_experiment(seeds=args.seeds, backend=args.backend)
     print(f"Collected {len(rows)} rows in {time.time() - t0:.1f}s")
 
     write_csv(rows)

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sage-framework"
 version = "1.2.0"
-description = "SAGE — a Stabilize–Assess–Govern–Enforce framework for deployment-ready LLM-based autonomous agents (reference implementation for IEEE TAI submission)"
+description = "SAGE — a Stabilize-Assess-Govern-Enforce framework for deployment-oriented evaluation of LLM-based autonomous agents (official implementation, IEEE Transactions on Artificial Intelligence)"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -19,8 +19,25 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
 ]
-keywords = ["ai", "agents", "llm", "sage", "stability", "cnsr", "langchain", "langgraph", "agentic"]
+keywords = [
+    "llm",
+    "large-language-models",
+    "ai-agents",
+    "autonomous-agents",
+    "agent-evaluation",
+    "agentic-ai",
+    "responsible-ai",
+    "ai-safety",
+    "benchmarking",
+    "closed-loop-control",
+    "cnsr",
+    "stability-monitoring",
+    "mcp",
+    "a2a",
+    "sage",
+]
 
 dependencies = [
     "langchain>=0.2.0",
@@ -84,10 +101,14 @@ all = [
 Homepage = "https://github.com/MHHamdan/SAGE"
 Documentation = "https://github.com/MHHamdan/SAGE#readme"
 Repository = "https://github.com/MHHamdan/SAGE"
+Changelog = "https://github.com/MHHamdan/SAGE/blob/main/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/MHHamdan/SAGE/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+# Jupyter checkpoint directories are not packages; excluding them keeps stale
+# copies of source files out of the built wheel.
+exclude = ["*.ipynb_checkpoints*"]
 
 [tool.black]
 line-length = 88

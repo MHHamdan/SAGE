@@ -1,0 +1,22 @@
+task_family,kendall_tau_b,p_value,config,success_rate,cnsr_mean
+code,-0.4286,0.2389,Gemini-1.5-Flash,0.5867,670.8654
+,,,GPT-3.5-Turbo,0.4,386.8815
+,,,LLaMA-3-70B,0.6067,201.686
+,,,Mistral-7B,0.26,124.1324
+,,,Ensemble (top-3),0.54,109.8686
+,,,Claude-3.5-Sonnet,0.6667,44.9453
+,,,GPT-4-Turbo,0.76,21.3664
+web,-0.2381,0.5619,Gemini-1.5-Flash,0.5533,1060.0957
+,,,GPT-3.5-Turbo,0.3733,596.0328
+,,,LLaMA-3-70B,0.4933,275.7713
+,,,Mistral-7B,0.3667,271.8486
+,,,Ensemble (top-3),0.4533,154.3505
+,,,Claude-3.5-Sonnet,0.68,85.5534
+,,,GPT-4-Turbo,0.64,32.111
+research,-0.6190,0.0690,Gemini-1.5-Flash,0.68,542.5736
+,,,GPT-3.5-Turbo,0.5067,342.425
+,,,Mistral-7B,0.5267,188.2719
+,,,LLaMA-3-70B,0.54,135.516
+,,,Ensemble (top-3),0.6333,94.3111
+,,,Claude-3.5-Sonnet,0.82,39.5551
+,,,GPT-4-Turbo,0.8267,16.0107

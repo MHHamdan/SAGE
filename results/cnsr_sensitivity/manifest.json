@@ -1,0 +1,23 @@
+{
+  "experiment": "0.2_cnsr_tau_canonical_FIXED",
+  "git_sha": "32f0c66",
+  "env_hash": "dd7f26b1ddf1",
+  "timestamp": "2026-07-18T04:10:46.170590+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "determinism_fix": "per-task RNG seeded from md5 digest (stable across processes) instead of the salted builtin hash().",
+  "canonical_tau_b": {
+    "code": -0.4286,
+    "web": -0.2381,
+    "research": -0.619
+  },
+  "p_values": {
+    "code": 0.2389,
+    "web": 0.5619,
+    "research": 0.069
+  },
+  "grid_invariance": "tau_b invariant across all 45 cells under committed inference-only cost (uniform repricing rank-preserving; w_lat/C_hum inert). overall %cells tau<0 = 100%."
+}

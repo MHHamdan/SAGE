@@ -1,0 +1,198 @@
+{
+  "experiment": "2A_cnsr_ladder_ollama",
+  "git_sha": "32f0c66",
+  "env_hash": "dd7f26b1ddf1",
+  "timestamp": "2026-07-19T16:26:13.048124+00:00",
+  "temperature": 0.6,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "n_tasks": 50,
+  "offset": 200,
+  "dataset": "hotpot_qa/distractor/validation",
+  "eval_split_hash": "0adbc73f25bed988862b1a989a43c158",
+  "price_provider": "Together AI (serverless size-tier)",
+  "price_retrieval_date": "2026-07-18",
+  "price_note": "flat serverless size-tier rate, input=output, USD per 1M tokens",
+  "per_model": {
+    "llama3.2:3b": {
+      "success_rate": 0.24,
+      "sr_sd": 0.06,
+      "cnsr_mean": 2741.791841610337,
+      "cnsr_sd": 846.2795879524111,
+      "cnsr_ci_lo": 1509.0667854079782,
+      "cnsr_ci_hi": 4327.369608442455,
+      "mean_cost": 8.852040000000001e-05,
+      "mean_tokens": 1475.34,
+      "seed_cnsr": [
+        2537.201720222766,
+        2016.56270165627,
+        3671.6111029519748
+      ],
+      "seed_sr": [
+        0.24,
+        0.18,
+        0.3
+      ],
+      "price_per_1M": 0.06,
+      "slug": "meta-llama/Llama-3.2-3B-Instruct-Turbo",
+      "n": 150,
+      "cnsr_rank": 1,
+      "sr_rank": 5
+    },
+    "mistral:7b": {
+      "success_rate": 0.2733333333333334,
+      "sr_sd": 0.030550504633038936,
+      "cnsr_mean": 452.74896457563324,
+      "cnsr_sd": 100.68022486836198,
+      "cnsr_ci_lo": 256.6291334214238,
+      "cnsr_ci_hi": 694.2328875380543,
+      "mean_cost": 0.0006165680000000001,
+      "mean_tokens": 3082.84,
+      "seed_cnsr": [
+        340.9846500076722,
+        536.345038425291,
+        480.9172052939366
+      ],
+      "seed_sr": [
+        0.24,
+        0.28,
+        0.3
+      ],
+      "price_per_1M": 0.2,
+      "slug": "mistralai/Mistral-7B-Instruct-v0.3",
+      "n": 150,
+      "cnsr_rank": 4,
+      "sr_rank": 4
+    },
+    "gemma2:9b": {
+      "success_rate": 0.5,
+      "sr_sd": 0.034641016151377574,
+      "cnsr_mean": 1205.6700297802674,
+      "cnsr_sd": 172.31562220001126,
+      "cnsr_ci_lo": 796.3288841015583,
+      "cnsr_ci_hi": 1718.733936335043,
+      "mean_cost": 0.00041811199999999994,
+      "mean_tokens": 1393.7066666666667,
+      "seed_cnsr": [
+        1201.111027700623,
+        1380.2199150397964,
+        1035.679146600383
+      ],
+      "seed_sr": [
+        0.48,
+        0.54,
+        0.48
+      ],
+      "price_per_1M": 0.3,
+      "slug": "google/gemma-2-9b-it",
+      "n": 150,
+      "cnsr_rank": 2,
+      "sr_rank": 1
+    },
+    "qwen2.5:14b": {
+      "success_rate": 0.4666666666666666,
+      "sr_sd": 0.04163331998932266,
+      "cnsr_mean": 743.9126758454894,
+      "cnsr_sd": 105.72139996914352,
+      "cnsr_ci_lo": 461.9380860651252,
+      "cnsr_ci_hi": 1125.7727544839452,
+      "mean_cost": 0.0006309519999999999,
+      "mean_tokens": 2103.173333333333,
+      "seed_cnsr": [
+        804.0201005025126,
+        621.840826515293,
+        805.8771005186625
+      ],
+      "seed_sr": [
+        0.48,
+        0.42,
+        0.5
+      ],
+      "price_per_1M": 0.3,
+      "slug": "Qwen/Qwen2.5-14B-Instruct",
+      "n": 150,
+      "cnsr_rank": 3,
+      "sr_rank": 3
+    },
+    "qwen2.5:32b": {
+      "success_rate": 0.48666666666666664,
+      "sr_sd": 0.011547005383792526,
+      "cnsr_mean": 443.8118469194989,
+      "cnsr_sd": 39.571665476026965,
+      "cnsr_ci_lo": 284.34578761880584,
+      "cnsr_ci_hi": 658.5990734272611,
+      "mean_cost": 0.0011010346666666666,
+      "mean_tokens": 1376.2933333333333,
+      "seed_cnsr": [
+        441.5660877244627,
+        405.41088393086386,
+        484.45856910317025
+      ],
+      "seed_sr": [
+        0.48,
+        0.48,
+        0.5
+      ],
+      "price_per_1M": 0.8,
+      "slug": "Qwen/Qwen2.5-32B-Instruct",
+      "n": 150,
+      "cnsr_rank": 5,
+      "sr_rank": 2
+    }
+  },
+  "kendall_tau_b": {
+    "tau": -0.19999999999999998,
+    "p": 0.8166666666666667,
+    "n_configs": 5,
+    "definition": "scipy.stats.kendalltau (tie-corrected tau_b) over (success_rate, cnsr) across the ladder"
+  },
+  "cost_note": "CNSR uses measured-token x hosted-list-price inference cost only; NO GPU wall-clock in cost.",
+  "runtime_s": 2758.9,
+  "log": [
+    "[2A] 50 tasks (offset=200, disjoint from 2B) split_hash=0adbc73f25be",
+    "[2A] model llama3.2:3b (meta-llama/Llama-3.2-3B-Instruct-Turbo) \u2026",
+    "    llama3.2:3b: 25/150 (42s)",
+    "    llama3.2:3b: 50/150 (64s)",
+    "    llama3.2:3b: 75/150 (88s)",
+    "    llama3.2:3b: 100/150 (112s)",
+    "    llama3.2:3b: 125/150 (127s)",
+    "    llama3.2:3b: 150/150 (151s)",
+    "    -> SR=0.240 tokens=1475 cost=$8.85e-05 CNSR=2742\u00b1846",
+    "[2A] model mistral:7b (mistralai/Mistral-7B-Instruct-v0.3) \u2026",
+    "    mistral:7b: 25/150 (245s)",
+    "    mistral:7b: 50/150 (336s)",
+    "    mistral:7b: 75/150 (386s)",
+    "    mistral:7b: 100/150 (469s)",
+    "    mistral:7b: 125/150 (540s)",
+    "    mistral:7b: 150/150 (623s)",
+    "    -> SR=0.273 tokens=3083 cost=$6.17e-04 CNSR=453\u00b1101",
+    "[2A] model gemma2:9b (google/gemma-2-9b-it) \u2026",
+    "    gemma2:9b: 25/150 (671s)",
+    "    gemma2:9b: 50/150 (709s)",
+    "    gemma2:9b: 75/150 (749s)",
+    "    gemma2:9b: 100/150 (789s)",
+    "    gemma2:9b: 125/150 (825s)",
+    "    gemma2:9b: 150/150 (888s)",
+    "    -> SR=0.500 tokens=1394 cost=$4.18e-04 CNSR=1206\u00b1172",
+    "[2A] model qwen2.5:14b (Qwen/Qwen2.5-14B-Instruct) \u2026",
+    "    qwen2.5:14b: 25/150 (990s)",
+    "    qwen2.5:14b: 50/150 (1068s)",
+    "    qwen2.5:14b: 75/150 (1152s)",
+    "    qwen2.5:14b: 100/150 (1249s)",
+    "    qwen2.5:14b: 125/150 (1318s)",
+    "    qwen2.5:14b: 150/150 (1417s)",
+    "    -> SR=0.467 tokens=2103 cost=$6.31e-04 CNSR=744\u00b1106",
+    "[2A] model qwen2.5:32b (Qwen/Qwen2.5-32B-Instruct) \u2026",
+    "    qwen2.5:32b: 25/150 (1653s)",
+    "    qwen2.5:32b: 50/150 (1885s)",
+    "    qwen2.5:32b: 75/150 (2074s)",
+    "    qwen2.5:32b: 100/150 (2352s)",
+    "    qwen2.5:32b: 125/150 (2549s)",
+    "    qwen2.5:32b: 150/150 (2759s)",
+    "    -> SR=0.487 tokens=1376 cost=$1.10e-03 CNSR=444\u00b140",
+    "[2A] canonical Kendall tau_b (SR-rank vs CNSR-rank, n=5 configs) = -0.2000 (p=0.8167)"
+  ]
+}

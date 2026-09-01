@@ -1,0 +1,109 @@
+{
+  "experiment": "P1_longhorizon_terminal_derailment",
+  "git_sha": "32f0c66",
+  "env_hash": "dd7f26b1ddf1",
+  "timestamp": "2026-07-20T02:37:27.709884+00:00",
+  "agent": "qwen2.5:32b",
+  "temp": 0.6,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "n_eval": 12,
+  "n_train": 12,
+  "max_turns": 8,
+  "force_final_answer": false,
+  "offset": 250,
+  "eval_split_hash": "4a8c4892df0501bd20a043c7c15c4b85",
+  "predictor_cv_auc": 0.3333333333333333,
+  "price_snapshot": {
+    "provider": "Together AI (serverless size-tier)",
+    "slug": "Qwen/Qwen2.5-32B-Instruct",
+    "per_1M_usd": 0.8,
+    "retrieval_date": "2026-07-18"
+  },
+  "regime_note": "long-horizon, NO forced answer => derailment is terminal (the E4 failure mode). Contrast 2B which forced a final answer.",
+  "summary": {
+    "NoControl": {
+      "completion": 0.6166666666666667,
+      "clo": 0.48333333333333334,
+      "chi": 0.7333333333333333,
+      "mean_cost": 0.0007126666666666667,
+      "cnsr": 865.2946679139383,
+      "cnsr_lo": 654.5820931147122,
+      "cnsr_hi": 1105.698463295331,
+      "interv": 0.0,
+      "derail_rate": 0.0,
+      "mcnemar_p": NaN,
+      "cohens_h_vs_nc": 0.0
+    },
+    "Threshold": {
+      "completion": 0.6166666666666667,
+      "clo": 0.48333333333333334,
+      "chi": 0.7333333333333333,
+      "mean_cost": 0.0006990933333333332,
+      "cnsr": 882.0949038754961,
+      "cnsr_lo": 672.0100589342652,
+      "cnsr_hi": 1121.7256806902453,
+      "interv": 0.11666666666666667,
+      "derail_rate": 0.0,
+      "mcnemar_p": 1.0,
+      "cohens_h_vs_nc": 0.0
+    },
+    "Predictive": {
+      "completion": 0.6,
+      "clo": 0.4666666666666667,
+      "chi": 0.7166666666666667,
+      "mean_cost": 0.0007000666666666666,
+      "cnsr": 857.061232263594,
+      "cnsr_lo": 640.3560138322034,
+      "cnsr_hi": 1103.9996596972508,
+      "interv": 0.16666666666666666,
+      "derail_rate": 0.0,
+      "mcnemar_p": 1.0,
+      "cohens_h_vs_nc": -0.03414631593046913
+    }
+  },
+  "terminality_diagnosis": {
+    "base_completion": 0.6166666666666667,
+    "derail_rate": 0.0,
+    "n_fail": 23,
+    "frac_fail_derailed": 0.0,
+    "frac_fail_wrong_answer": 1.0,
+    "n_pathology_episodes": 8,
+    "pathology_terminal_rate": 0.0,
+    "pathology_recovered_rate": 1.0
+  },
+  "controller_rescue": {
+    "Threshold": {
+      "n": 0,
+      "completion_on_nc_derailed": 0.0,
+      "still_derailed": 0.0
+    },
+    "Predictive": {
+      "n": 0,
+      "completion_on_nc_derailed": 0.0,
+      "still_derailed": 0.0
+    }
+  },
+  "runtime_s": 1378.8,
+  "log": [
+    "[P1] PROJECTION: 192 episodes (qwen2.5:32b, ~8 turns, temp 0.6); 32B ~serial ~90s/episode => ~4.8 h. $0 local (list-price accounting only).",
+    "[P1] split 12 train / 12 eval (disjoint) eval_hash=4a8c4892df05",
+    "[P1] predictor: 21 turn-samples pos_rate=0.81 CV-AUC=0.333",
+    "[P1] running 180 eval episodes \u2026",
+    "    20/180 (322s)",
+    "    40/180 (437s)",
+    "    60/180 (587s)",
+    "    80/180 (720s)",
+    "    100/180 (834s)",
+    "    120/180 (982s)",
+    "    140/180 (1113s)",
+    "    160/180 (1229s)",
+    "    180/180 (1379s)",
+    "[P1] eval done in 1379s"
+  ]
+}

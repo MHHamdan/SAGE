@@ -1,0 +1,14 @@
+\begin{table}[t]
+\centering
+\caption{P1: controller on the long-horizon, terminal-derailment regime (qwen2.5:32b, temp 0.6, 5 seeds, no forced answer; BCa 95\% CIs). Predictor CV-AUC $=0.33$. $p$: McNemar vs.\ NoControl.}
+\label{tab:p1_longhorizon}
+\begin{tabular}{lccccc}
+\toprule
+Policy & Completion (95\% CI) & CNSR & Interv. & Derail & McNemar $p$ \\
+\midrule
+NoControl & 61.7\% [48.3\%, 73.3\%] & 865 & 0.0 & 0\% & --- \\
+Threshold & 61.7\% [48.3\%, 73.3\%] & 882 & 0.1 & 0\% & 1.000 \\
+Predictive & 60.0\% [46.7\%, 71.7\%] & 857 & 0.2 & 0\% & 1.000 \\
+\bottomrule
+\end{tabular}
+\end{table}

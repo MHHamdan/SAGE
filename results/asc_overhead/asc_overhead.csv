@@ -1,0 +1,5 @@
+controller,n_decisions,decide_ms_mean,decide_ms_p50,decide_ms_p95,signal_ms_mean,feature_extract_ms_mean,logistic_head_ms_mean,turn_ms_mean,added_latency_pct_of_turn,predictive_head_mem_bytes,process_peak_rss_kb
+NoControl,7500,0.00117,0.00115,0.00137,0.02485,0.0,0.0,0.04044,2.905,0,773164
+FixedSchedule,7500,0.00136,0.00126,0.00183,0.02449,0.0,0.0,0.0424,3.215,0,773164
+ThresholdController,7500,0.00238,0.00191,0.00449,0.02565,0.0,0.0,0.04772,4.991,0,773164
+PredictiveController,7500,0.15114,0.17886,0.22464,0.0387,0.00749,0.18714,0.4155,36.376,272,773164
