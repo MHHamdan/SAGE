@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{\textbf{API-measured CNSR} (current-generation proprietary + open models via OpenRouter; companion to Table~IV and tab:cnsr\_local). Real calls, measured tokens $\times$ live list price (2026-07-20); same 50 HotpotQA-distractor tasks and EM grading as the local table; temp 0.0. NB: the 2024 Table~IV models are retired, so successors are used. Kendall's $\tau_b$ (SR rank vs.\ CNSR rank) $=-0.250$ ($p=0.442$).}
+\label{tab:cnsr_api}
+\begin{tabular}{lccccc}
+\toprule
+Model & CNSR & 95\% CI & SR (EM) & CNSR rank & SR rank \\
+\midrule
+Mistral-Nemo & 10250 & [6291, 16065] & 40\% & 1 & 7 \\
+Llama-3.1-8B & 1733 & [1064, 2523] & 40\% & 2 & 6 \\
+GPT-4o-mini & 1663 & [1108, 2536] & 54\% & 3 & 1 \\
+Gemini-2.5-Flash & 457 & [269, 713] & 48\% & 4 & 4 \\
+Llama-3.1-70B & 454 & [320, 632] & 54\% & 5 & 2 \\
+Claude-Sonnet-4.5 & 62 & [42, 92] & 52\% & 6 & 3 \\
+GPT-4-Turbo & 22 & [13, 36] & 46\% & 7 & 5 \\
+\midrule
+\multicolumn{6}{l}{\textit{Kendall's $\tau_b$:} $-0.250$ ($p=0.442$); total measured spend \$1.61} \\
+\bottomrule
+\end{tabular}
+\end{table}

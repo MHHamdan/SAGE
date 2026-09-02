@@ -13,10 +13,10 @@ default argument, experiment, or published number changed.** Every committed
 result artifact under `results/` is byte-identical to the previous commit.
 
 ### Added
-- **`docs/assets/`** — the paper's architecture figure (Fig. 1) plus the control-loop,
-  autonomy-level, E4 Pareto, and E5 ROC figures, rendered to PNG at 3× from the
-  publication vector sources for use in the README.
-- **`paper/public/`** — vector (PDF) sources for the three published framework figures.
+- **`docs/assets/`** — all fifteen figures the paper includes (five in the main text,
+  ten in the supplement), rendered to PNG at 3x from the publication vector sources.
+- **`paper/public/figures/`** — the same fifteen figures as vector PDF, the version of
+  record.
 - **`CITATION.cff`** — machine-readable citation metadata; GitHub renders it under
   *Cite this repository*.
 - **`scripts/env_report.py`** — environment/provenance report (text and JSON) covering
@@ -38,6 +38,10 @@ result artifact under `results/` is byte-identical to the previous commit.
   with their committed artifacts under `results/`.
 
 ### Fixed
+- **`results/cache/` documented as empty.** Supplementary F.5 describes an offline
+  replay mode backed by cached LLM responses there; the cache was not retained, so the
+  README states this plainly and points offline reproduction at `--backend simulator`
+  instead of repeating a claim the artifact does not support.
 - **Simulator determinism in `experiments/cnsr_multitask.py`** — the per-run RNG seed
   was derived from `hash(task_id) ^ hash(model)`, but Python salts string hashing, so
   the simulated success rates, token counts, and the resulting Kendall's tau changed
@@ -46,13 +50,23 @@ result artifact under `results/` is byte-identical to the previous commit.
   --salted` reproduces the old behavior for comparison.
 
 ### Changed
-- **`README.md`** — rewritten as a publication-quality research-artifact README:
-  overview of the evaluation gap, per-pillar architecture sections matching the final
-  paper, key contributions, results tables (E4, E5, CNSR inversion, pillar ablation,
-  and the negative second-dataset result), paper→code map, repository structure,
-  verified installation and quick-start commands, experiment workflow, and
-  reproducibility notes. Every code snippet in it was executed against this
-  repository's API before publication.
+- **`README.md`** — rewritten from scratch against the paper source, with
+  **Supplementary Material F (Reference Implementation Details)** as the authoritative
+  spec for what this repository claims. Covers the evaluation gap, the closed-loop
+  model, per-pillar sections carrying the paper's own scope limits, key contributions
+  with the three negative findings stated as prominently as the positive ones, results
+  for every experiment with its data source labelled (simulation vs real models), the
+  consolidated experiment table from Supp. H.1, a paper-to-code map spanning the main
+  text and all supplements, and a reproducibility section built around the checks the
+  paper says the artifacts support. Every code snippet was executed against this
+  repository's API, and every reported number is machine-checked against the committed
+  CSVs and manifests.
+- **Reproducibility framing corrected.** The paper scopes its reproducibility claim to
+  120 pillar-aligned tests (32 in `tests/monitoring/`, 88 in `tests/stability/`) and
+  explicitly places other modules out of scope. The README now leads with that scope
+  and with `tests/stability/test_e4_e5_smoke.py` — the 18-test, ~9-second suite that
+  validates the headline E4/E5 invariants offline — rather than with a raw full-suite
+  pass/fail count.
 - **`requirements.txt`** — was still the stale "Agentic AI Toolkit" list, missing
   `scikit-learn`, `scipy`, `pandas`, `litellm`, and `sentence-transformers` (all of
   which the experiments import) while carrying unused Sphinx pins. Now mirrors the
@@ -79,9 +93,14 @@ result artifact under `results/` is byte-identical to the previous commit.
   prompts and instruction files, and internal audit notes.
 - **`paper/`** split into `paper/public/` (released) and `paper/private/` (local only).
 - **`.gitignore`** extended with explicit rules for manuscript sources, rebuttals,
-  submission bundles, agent prompts and transcripts, and metered-API result bundles
-  (which contain per-call spend records). Generated LaTeX *table fragments* under
-  `results/` remain tracked as reproducibility artifacts.
+  submission bundles, and agent prompts and transcripts. Generated LaTeX *table
+  fragments* under `results/` remain tracked as reproducibility artifacts, and
+  `results/api_real/` is published: it holds only per-task token counts, cost, and
+  exact-match scores -- no credentials or account identifiers -- and Supplementary
+  H.2's API table is not reproducible without it.
+- Two revision scripts carried peer-review references in their docstrings
+  (`e4_threshold_surface.py`, `ollama_2b.py`); both now cite the supplementary
+  material instead.
 - Audited every tracked file for API keys, tokens, email addresses, and absolute local
   paths: none found, and no private path has ever been committed to this repository's
   history.
