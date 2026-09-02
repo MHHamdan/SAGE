@@ -13,8 +13,18 @@ default argument, experiment, or published number changed.** Every committed
 result artifact under `results/` is byte-identical to the previous commit.
 
 ### Added
-- **`docs/assets/`** — all fifteen figures the paper includes (five in the main text,
-  ten in the supplement), rendered to PNG at 3x from the publication vector sources.
+- **`docs/assets/sage_architecture.svg`** (+ dark variant) and
+  **`scripts/make_architecture_figure.py`** — the framework architecture diagram, drawn
+  to the *final* paper's structure and regenerable from source. The manuscript's Fig. 1
+  carries inset pointers from an earlier draft (Stabilize as section III, and a section
+  XI the final paper does not contain, against actual sections IV/V/VI/VII), and no
+  corrected source for it exists. Rather than embed a figure that contradicts the
+  article, the README uses this diagram; the published figure is preserved unaltered in
+  `paper/public/figures/` as the version of record. The two variants are selected by
+  `<picture>` on the reader's colour scheme.
+- **`docs/assets/`** — the fourteen other figures the paper includes (four remaining in
+  the main text, ten in the supplement), rendered to PNG at 3x from the publication
+  vector sources.
 - **`paper/public/figures/`** — the same fifteen figures as vector PDF, the version of
   record.
 - **`CITATION.cff`** — machine-readable citation metadata; GitHub renders it under
