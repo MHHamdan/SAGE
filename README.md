@@ -123,8 +123,12 @@ By construction drift is $0$ for identical embeddings, $1/2$ for orthogonal, and
 
 **Evaluation methodology — CNSR.** For task $\tau$ drawn from a deployment distribution $\mathcal{D}$, with success $Y(\tau)\in\{0,1\}$ and total cost $C_{\mathrm{total}}(\tau)>0$ decomposing additively into inference, tool, latency, and human-escalation components, the **Cost-Normalized Success Rate** is the ratio of expectations:
 
-\mathrm{CNSR} := \frac{\mathbb{E}_{\tau \sim \mathcal{D}}[Y(\tau)]}{\mathbb{E}_{\tau \sim \mathcal{D}}[C_{\mathrm{total}}(\tau)]} \quad \text{[successful completions per \$]}
-
+$$
+\mathrm{CNSR} := 
+\frac{\mathbb{E}_{\tau \sim \mathcal{D}}[Y(\tau)]}
+{\mathbb{E}_{\tau \sim \mathcal{D}}[C_{\mathrm{total}}(\tau)]}
+\quad \text{[successful completions per dollar]}
+$$
 estimated by the plug-in ratio $\widehat{\mathrm{SR}}/\bar{C}_{\mathrm{total}}$ with BCa bootstrap confidence intervals over the task index.
 
 > **CNSR is ratio-valued, not a percentage.** Its units are completions per dollar, so large values reflect a small cost denominator, not high accuracy. The induced ranking is invariant to common positive rescaling of $C_{\mathrm{total}}$, but **not** to provider repricing, different latency weights, or different escalation costs. Read it as a transparent cost-normalised comparison under stated assumptions, and recompute it with current prices for any real deployment decision.
