@@ -123,7 +123,7 @@ By construction drift is $0$ for identical embeddings, $1/2$ for orthogonal, and
 
 **Evaluation methodology — CNSR.** For task $\tau$ drawn from a deployment distribution $\mathcal{D}$, with success $Y(\tau)\in\{0,1\}$ and total cost $C_{\mathrm{total}}(\tau)>0$ decomposing additively into inference, tool, latency, and human-escalation components, the **Cost-Normalized Success Rate** is the ratio of expectations:
 
-$$\mathrm{CNSR} := \frac{\mathbb{E}_{\tau \sim \mathcal{D}}[Y(\tau)]}{\mathbb{E}_{\tau \sim \mathcal{D}}[C_{\mathrm{total}}(\tau)]} \quad \text{[successful completions per \$]}$$
+\mathrm{CNSR} := \frac{\mathbb{E}_{\tau \sim \mathcal{D}}[Y(\tau)]}{\mathbb{E}_{\tau \sim \mathcal{D}}[C_{\mathrm{total}}(\tau)]} \quad \text{[successful completions per \$]}
 
 estimated by the plug-in ratio $\widehat{\mathrm{SR}}/\bar{C}_{\mathrm{total}}$ with BCa bootstrap confidence intervals over the task index.
 
