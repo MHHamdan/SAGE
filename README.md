@@ -129,8 +129,7 @@ $$
 {\mathbb{E}_{\tau \sim \mathcal{D}}[C_{\mathrm{total}}(\tau)]}
 \quad \text{successful completions per dollar}
 $$
-
-estimated by the plug-in ratio `\hat{SR}/\bar{C}_{\mathrm{total}}` with BCa bootstrap confidence intervals over the task index.
+estimated by the plug-in ratio $\widehat{\mathrm{SR}}/\bar{C}_{\mathrm{total}}$ with BCa bootstrap confidence intervals over the task index.
 
 > **CNSR is ratio-valued, not a percentage.** Its units are completions per dollar, so large values reflect a small cost denominator, not high accuracy. The induced ranking is invariant to common positive rescaling of $C_{\mathrm{total}}$, but **not** to provider repricing, different latency weights, or different escalation costs. Read it as a transparent cost-normalised comparison under stated assumptions, and recompute it with current prices for any real deployment decision.
 
